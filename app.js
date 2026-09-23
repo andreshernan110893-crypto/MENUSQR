@@ -3,7 +3,7 @@ const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable
 const qs=new URLSearchParams(location.search),place=(qs.get("place")||"M01").toUpperCase();
 const $=s=>document.querySelector(s),money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const state={brands:[],categories:[],products:[],allProducts:[],channels:[],heroSlides:[],promos:[],promoLinks:[],groups:[],options:[],links:[],activeCategory:null,cart:[],session:null,diner:null,place:null,promoIndex:0,heroIndex:0,current:null};let feedbackRating=0;
+const state={brands:[],categories:[],products:[],allProducts:[],channels:[],heroSlides:[],promos:[],promoLinks:[],groups:[],options:[],links:[],activeCategory:null,activeDrinkCategory:null,cart:[],session:null,diner:null,place:null,promoIndex:0,heroIndex:0,current:null};let feedbackRating=0;
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2300)};
 async function init(){
  const [b,c,p,ch,hs,pr,ppr,g,o,l,pl]=await Promise.all([
@@ -105,7 +105,30 @@ function renderPromos(){const list=heroProducts();if(!list.length)return;const p
 function nextPromo(){const list=heroProducts();if(list.length<2)return;state.heroIndex=(state.heroIndex+1)%list.length;renderPromos()}
 function renderProducts(){const q=$('#search').value.trim().toLowerCase();const list=q?state.products.filter(function(p){return (p.name+' '+(p.description||'')).toLowerCase().includes(q)}):state.products.filter(function(p){return p.category_id===state.activeCategory});$('#products').innerHTML=list.length?list.map(productCardV2).join(''):'<div class="empty">Sin productos disponibles.</div>';bindCardsV2($('#products'))}
 function openPromotion(id){const pr=state.promos.find(function(p){return p.id===id});if(!pr)return;const ids=state.promoLinks.filter(function(x){return x.promotion_id===id}).map(function(x){return x.product_id});const list=ids.map(function(id){return state.products.find(function(p){return p.id===id})}).filter(Boolean);$('#promoDialogType').textContent=(pr.promo_type||'PROMOCIÓN').replace('_',' ');$('#promoDialogTitle').textContent=pr.title;$('#promoDialogSubtitle').textContent=pr.subtitle||'';$('#promoProducts').innerHTML=list.length?list.map(productCardV2).join(''):'<div class="empty">Sin productos disponibles.</div>';bindCardsV2($('#promoProducts'));$('#promoDialog').showModal()}
-function renderHomeSectionsV2(){const fresh=state.products.filter(function(p){return ['bs-073','bs-074','bs-075','lb-030'].includes(p.id)||p.badge==='NUEVO'}),combos=state.products.filter(function(p){return p.category_id==='combos'}),drinkCats=new Set(['cervezas','cocktails','mocktails','vinos','tequila','ron','whiskey','vodka','gin','daiquiris']),drinks=state.products.filter(function(p){return p.brand_id==='BS'&&drinkCats.has(p.category_id)}).slice(0,14);[['#newProducts','#newSection',fresh],['#comboProducts','#comboSection',combos],['#drinkProducts','#drinkSection',drinks]].forEach(function(x){const el=$(x[0]);$(x[1]).classList.toggle('hidden',!x[2].length);el.innerHTML=x[2].map(productCardV2).join('');bindCardsV2(el)})}
+function renderHomeSectionsV2(){
+ const fresh=state.products.filter(function(p){return ['bs-073','bs-074','bs-075','lb-030'].includes(p.id)||p.badge==='NUEVO'});
+ const combos=state.products.filter(function(p){return p.category_id==='combos'});
+ [['#newProducts','#newSection',fresh],['#comboProducts','#comboSection',combos]].forEach(function(x){
+   const el=$(x[0]);$(x[1]).classList.toggle('hidden',!x[2].length);el.innerHTML=x[2].map(productCardV2).join('');bindCardsV2(el);
+ });
+ renderDrinkSection();
+}
+function renderDrinkSection(){
+ const drinkIds=new Set(['cervezas','cocktails','mocktails','vinos','tequila','ron','whiskey','vodka','gin','daiquiris']);
+ const available=state.categories.filter(function(c){return c.brand_id==='BS'&&drinkIds.has(c.id)&&state.products.some(p=>p.category_id===c.id)});
+ const section=$('#drinkSection'),nav=$('#drinkCategories'),grid=$('#drinkProducts');
+ section.classList.toggle('hidden',!available.length);
+ if(!available.length)return;
+ if(!available.some(c=>c.id===state.activeDrinkCategory))state.activeDrinkCategory=available[0].id;
+ nav.innerHTML=available.map(function(c){
+   const count=state.products.filter(p=>p.category_id===c.id).length;
+   return '<button class="drink-category '+(c.id===state.activeDrinkCategory?'active':'')+'" data-drink-cat="'+c.id+'"><span>'+safe(c.name)+'</span><small>'+count+' productos</small></button>';
+ }).join('');
+ nav.querySelectorAll('[data-drink-cat]').forEach(function(b){b.onclick=function(){state.activeDrinkCategory=b.dataset.drinkCat;renderDrinkSection()}});
+ const drinks=state.products.filter(function(p){return p.category_id===state.activeDrinkCategory});
+ grid.innerHTML=drinks.map(productCardV2).join('');
+ bindCardsV2(grid);
+}
 function renderPromoGrid(){const el=$("#promoGrid"),list=state.promos.slice(0,10);$("#promoSection").classList.toggle("hidden",!list.length);el.innerHTML=list.map(function(p){return '<article class="promo-card" data-promo="'+p.id+'"><img loading="lazy" decoding="async" src="'+(p.image_url||'')+'" width="820" height="460"><div><small>'+safe((p.promo_type||"PROMO").replace("_"," "))+'</small><b>'+safe(p.title)+'</b><span>'+safe(p.subtitle||"")+'</span></div></article>'}).join("");el.querySelectorAll("[data-promo]").forEach(function(x){x.onclick=function(){openPromotion(x.dataset.promo)}});renderHomeSectionsV2()}
 if($('#seeDrinks'))$('#seeDrinks').onclick=function(){const c=state.categories.find(function(c){return ['daiquiris','cervezas','cocktails','mocktails'].includes(c.id)});if(c){state.activeCategory=c.id;renderCategories();renderProducts();document.querySelector('.menu-section').scrollIntoView({behavior:'smooth'})}};
 if($('#backToPromos'))$('#backToPromos').onclick=function(){$('#promoSection').scrollIntoView({behavior:'smooth'})};
