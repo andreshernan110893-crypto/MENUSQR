@@ -12,7 +12,7 @@
 </head>
 <body>
 <section id="experienceIntro" class="experience-intro">
-  <div class="intro-bg" id="introBg"></div>
+  <div class="intro-slides" id="introSlides"></div>
   <div class="intro-stage">
     <div id="introLogos" class="intro-logos"></div>
     <div class="intro-plus">+</div>
@@ -28,7 +28,15 @@
     <div><small>LA BANDEJA + BEER STATION</small><strong id="placeName">Mesa</strong></div>
   </div>
   <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
-  <div class="actions"><button id="bellButton" aria-label="Servicio"><span class="icon-dot"></span></button><button id="cartTop" aria-label="Pedido"><span class="cart-label">Pedido</span><span id="cartCount">0</span></button></div>
+  <div class="actions">
+    <button id="bellButton" class="icon-btn" aria-label="Servicio">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+    </button>
+    <button id="cartTop" class="icon-btn cart-icon-btn" aria-label="Pedido">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H7M10 20a1 1 0 1 0 0 .01M18 20a1 1 0 1 0 0 .01"/></svg>
+      <span id="cartCount">0</span>
+    </button>
+  </div>
 </header>
 <main>
 <section class="intro place-hero">

@@ -25,15 +25,19 @@ async function init(){
 function renderHeaderLogos(){const html=state.brands.map(b=>`<img src="${b.logo_url||""}" alt="${safe(b.name)}">`).join("");$("#headerLogos").innerHTML=html;$("#introLogos").innerHTML=html}
 function setupExperience(){
  const p=state.place,type=p.place_type||"TABLE";
- $("#introBg").style.backgroundImage=`linear-gradient(135deg,rgba(0,0,0,.68),rgba(0,0,0,.25)),url("${p.hero_image_url||""}")`;
- $("#introTitle").textContent=p.intro_title||"La Bandeja + Beer Station";$("#introSubtitle").textContent=p.intro_subtitle||"";$("#introLabel").textContent=type==="COURT"?"LA BANDEJA + BEER STATION · MODO CANCHA":type==="DELIVERY"?"LA BANDEJA + BEER STATION · DELIVERY":"LA BANDEJA + BEER STATION · PREMIUM";
- $("#heroTitle").textContent=p.intro_title||"";$("#heroSubtitle").textContent=p.intro_subtitle||"";$("#heroLabel").textContent=type==="COURT"?"AMBIENTE FUTBOLERO":type==="DELIVERY"?"DELIVERY":"EXPERIENCIA PREMIUM";$("#heroImage").src=p.hero_image_url||"";
+ const featured=state.products.filter(x=>x.featured&&x.image_url).slice(0,6);
+ const introImages=featured.length?featured:state.products.filter(x=>x.image_url).slice(0,6);
+ $("#introSlides").innerHTML=introImages.map((x,i)=>`<div class="intro-slide ${i===0?"active":""}"><img src="${x.image_url}" alt=""><span>${safe(x.name||"")}</span></div>`).join("");
+ const slideEls=[...document.querySelectorAll(".intro-slide")];let introIndex=0;
+ const introTimer=setInterval(()=>{if(slideEls.length<2)return;slideEls[introIndex].classList.remove("active");introIndex=(introIndex+1)%slideEls.length;slideEls[introIndex].classList.add("active")},560);
+ $("#introTitle").textContent=p.intro_title||"La Bandeja + Beer Station";$("#introSubtitle").textContent=p.intro_subtitle||"";$("#introLabel").textContent=type==="COURT"?"LA BANDEJA + BEER STATION · CANCHA":type==="DELIVERY"?"LA BANDEJA + BEER STATION · DELIVERY":"LA BANDEJA + BEER STATION";
+ $("#heroTitle").textContent=p.intro_title||"";$("#heroSubtitle").textContent=p.intro_subtitle||"";$("#heroLabel").textContent=type==="COURT"?"CANCHA":type==="DELIVERY"?"DELIVERY":"PREMIUM";$("#heroImage").src=p.hero_image_url||"";
  $("#heroBadges").innerHTML="";
- const joinTitle=$("#joinDialog h2"),joinText=$("#joinDialog p");
- if(type==="COURT"){joinTitle.textContent="¿Cómo te llamas?";joinText.textContent="Identificamos tu pedido dentro de "+p.name+". Aquí no hay mesas: todo queda asociado directamente a la cancha."}
- else if(type==="DELIVERY"){joinTitle.textContent="¿A nombre de quién va el pedido?";joinText.textContent="Usaremos tu nombre para identificar este pedido de delivery."}
- else {joinTitle.textContent="¿Cómo te llamas?";joinText.textContent="Cada comensal puede pedir desde su teléfono y todo queda asociado a la misma mesa."}
- const closeIntro=()=>$("#experienceIntro").classList.add("done");setTimeout(closeIntro,2400);
+ const joinTitle=$("#joinDialog h2"),joinText=$("#joinDialog p"),kicker=$("#joinKicker");
+ if(type==="COURT"){kicker.textContent=p.name.toUpperCase();joinTitle.textContent="Tu nombre";joinText.textContent="Tu pedido queda asociado a esta cancha."}
+ else if(type==="DELIVERY"){kicker.textContent="DELIVERY";joinTitle.textContent="Nombre del pedido";joinText.textContent="Lo usaremos para identificar tu orden."}
+ else {kicker.textContent=p.name.toUpperCase();joinTitle.textContent="Tu nombre";joinText.textContent="Tu pedido queda asociado a esta mesa."}
+ const closeIntro=()=>{clearInterval(introTimer);$("#experienceIntro").classList.add("done")};setTimeout(closeIntro,3000);
 }
 function restoreDiner(){try{const x=JSON.parse(localStorage.getItem("d504_diner_"+place)||"null");if(x?.session_id&&x?.diner_id){state.diner=x;state.session={id:x.session_id};$("#dinerName").textContent=x.name}}catch{}}
 function renderCategories(){const el=$("#categories");el.innerHTML=state.categories.map(c=>`<button class="category-tile ${c.id===state.activeCategory?"active":""}" data-cat="${c.id}" style="--cat-bg:url('${c.image_url||""}')"><span>${safe(c.name)}</span></button>`).join("");el.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{state.activeCategory=b.dataset.cat;renderCategories();renderProducts()})}
@@ -51,7 +55,7 @@ function openProduct(id){
  const linked=state.links.filter(x=>x.product_id===id).map(x=>state.groups.find(g=>g.id===x.group_id)).filter(Boolean);
  const wrap=$("#detailOptions");wrap.innerHTML="";
  linked.forEach(g=>{const box=document.createElement("section");box.className="option-group";box.dataset.group=g.id;box.innerHTML=`<div class="option-head"><div><b>${safe(g.name)}</b><small>${g.min_selections>0?"Elige una opción":"Opcional"}</small></div></div>`;
-  state.options.filter(o=>o.group_id===g.id).forEach(o=>{const label=document.createElement("label");label.className="option-row";const type=g.selection_type==="multiple"?"checkbox":"radio";label.innerHTML=`<span><input type="${type}" name="g_${g.id}" value="${o.id}"> ${safe(o.name)}</span><b>${o.price_delta?("+"+money(o.price_delta)):"Incluido"}</b>`;box.append(label)});wrap.append(box)});
+  state.options.filter(o=>o.group_id===g.id).forEach(o=>{const label=document.createElement("label");label.className="option-row";const type=g.selection_type==="multiple"?"checkbox":"radio";label.innerHTML=`<span><input type="${type}" name="g_${g.id}" value="${o.id}"> ${safe(o.name)}</span><b>${o.price_delta?("+"+money(o.price_delta)):""}</b>`;box.append(label)});wrap.append(box)});
  refreshDetailPrice();wrap.querySelectorAll("input").forEach(i=>i.onchange=refreshDetailPrice);$("#productDialog").showModal();
 }
 function selectedOptions(){return [...$("#detailOptions").querySelectorAll("input:checked")].map(i=>i.value)}
@@ -71,5 +75,5 @@ async function sendOrder(){if(!state.diner){$("#joinDialog").showModal();return}
 async function callStaff(reason){if(!state.diner){$("#joinDialog").showModal();return}const {error}=await sb.rpc("call_staff_public",{p_payload:{session_id:state.session.id,diner_id:state.diner.diner_id,reason}});toast(error?error.message:"Solicitud enviada")}
 function renderPromos(){if(!state.promos.length)return;const p=state.promos[state.promoIndex%state.promos.length];$("#promoHero").innerHTML=`<img src="${p.image_url}"><div class="promo-copy"><small>SELECCIÓN</small><h2>${safe(p.title)}</h2><p>${safe(p.subtitle||"")}</p></div>`;$("#promoDots").innerHTML=state.promos.map((_,i)=>`<button class="${i===state.promoIndex?"active":""}" data-dot="${i}"></button>`).join("");$("#promoDots").querySelectorAll("[data-dot]").forEach(d=>d.onclick=()=>{state.promoIndex=+d.dataset.dot;renderPromos()})}
 function nextPromo(){if(!state.promos.length)return;state.promoIndex=(state.promoIndex+1)%state.promos.length;renderPromos()}
-function renderPromoGrid(){const el=$("#promoGrid");el.innerHTML=state.promos.slice(0,6).map(p=>`<article><img src="${p.image_url}"><div><b>${safe(p.title)}</b><span>${safe(p.subtitle||"")}</span></div></article>`).join("")}
+function renderPromoGrid(){const el=$("#promoGrid");const list=state.promos.filter(p=>p.promo_type&&p.promo_type!=="GENERAL").slice(0,8);el.innerHTML=list.map(p=>`<article class="promo-card"><img src="${p.image_url}"><div><small>${safe(p.promo_type.replace("_"," "))}</small><b>${safe(p.title)}</b><span>${safe(p.subtitle||"")}</span></div></article>`).join("");let i=0;clearInterval(window.__promoCardsTimer);window.__promoCardsTimer=setInterval(()=>{if(el.children.length<2)return;i=(i+1)%el.children.length;el.children[i].scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"})},3200)}
 $("#search").oninput=renderProducts;$("#cartDock").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#cartTop").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#joinButton").onclick=joinTable;$("#sendOrder").onclick=sendOrder;$("#bellButton").onclick=()=>$("#serviceDialog").showModal();document.querySelectorAll("[data-service]").forEach(b=>b.onclick=()=>{callStaff(b.dataset.service);$("#serviceDialog").close()});document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());init();

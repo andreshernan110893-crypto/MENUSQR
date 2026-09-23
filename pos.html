@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090a0d"><title>POS · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css"></head>
+<body>
+<section id="posAuth" class="auth"><div class="auth-card"><small>POS</small><h1>La Bandeja + Beer Station</h1><input id="email" type="email" placeholder="Correo"><input id="password" type="password" placeholder="Contraseña"><button id="login">Ingresar</button><p id="authMsg"></p></div></section>
+<section id="posApp" class="hidden">
+<header><div><small>POS</small><strong>La Bandeja + Beer Station</strong></div><div class="mode-tabs"><button data-mode="TABLE">Mesas</button><button data-mode="COURT">Canchas</button><button data-mode="DELIVERY">Delivery</button></div><button id="logout">Salir</button></header>
+<main>
+<section class="catalog">
+<div class="bar"><select id="placeSelect"></select><input id="search" placeholder="Buscar producto"><button id="refresh">Actualizar</button></div>
+<nav id="cats"></nav><div id="productGrid" class="product-grid"></div>
+</section>
+<aside class="ticket"><div class="ticket-head"><small>PEDIDO</small><h2 id="ticketPlace">Nuevo pedido</h2></div><input id="customerName" placeholder="Cliente / referencia"><div id="ticketItems"></div><div class="payment"><select id="paymentMethod"><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option><option value="CREDIT">Crédito</option></select><select id="paymentStatus"><option value="PENDING">Pendiente</option><option value="PAID">Pagado</option><option value="CREDIT">Crédito</option></select></div><div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Enviar pedido</button></aside>
+</main>
+<section class="orders-panel"><div class="orders-head"><small>OPERACIÓN</small><h2>Pedidos recientes</h2></div><div id="orders"></div></section>
+</section>
+<dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
+<div id="toast"></div><script type="module" src="/pos.js"></script></body></html>
