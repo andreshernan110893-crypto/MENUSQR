@@ -11,7 +11,7 @@
 </section>
 <aside class="ticket"><div class="ticket-head"><small>PEDIDO</small><h2 id="ticketPlace">Nuevo pedido</h2></div><input id="customerName" placeholder="Cliente / referencia"><div id="ticketItems"></div><div class="payment"><select id="paymentMethod"><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option><option value="CREDIT">Crédito</option></select><select id="paymentStatus"><option value="PENDING">Pendiente</option><option value="PAID">Pagado</option><option value="CREDIT">Crédito</option></select></div><div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Enviar pedido</button></aside>
 </main>
-<section class="orders-panel"><div class="orders-head"><small>OPERACIÓN</small><h2>Pedidos recientes</h2></div><div id="orders"></div></section>
+<section class="orders-panel"><div class="orders-head"><div><small>OPERACIÓN</small><h2>Pedidos recientes</h2></div><div id="orderFilters" class="order-filters"><button data-order-filter="ALL" class="active">Todos</button><button data-order-filter="TABLE">Mesas</button><button data-order-filter="COURT">Canchas</button><button data-order-filter="DELIVERY">Delivery</button></div></div><div id="orders"></div></section>
 </section>
 <dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
 <div id="toast"></div><script type="module" src="/pos.js"></script></body></html>

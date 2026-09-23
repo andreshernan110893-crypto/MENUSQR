@@ -3,98 +3,48 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0d">
+<meta name="theme-color" content="#07080a">
 <title>La Bandeja + Beer Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/app.css">
 </head>
 <body>
 <section id="experienceIntro" class="experience-intro">
-  <div class="intro-slides" id="introSlides"></div>
-  <div class="intro-stage">
-    <div id="introLogos" class="intro-logos"></div>
-    <div class="intro-plus">+</div>
-    <small id="introLabel">LA BANDEJA + BEER STATION</small>
-    <h1 id="introTitle">Bienvenido</h1>
-    <p id="introSubtitle">Comida, bebidas y buenos momentos.</p>
-
-  </div>
+  <div id="introSlides" class="intro-slides"></div>
+  <div class="intro-brand"><div id="introLogos" class="intro-logos"></div><span>LA BANDEJA + BEER STATION</span></div>
 </section>
 <header class="topbar">
-  <div class="header-brand">
-    <div id="headerLogos" class="header-logos"></div>
-    <div><small>LA BANDEJA + BEER STATION</small><strong id="placeName">Mesa</strong></div>
-  </div>
-  <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
+  <div class="header-brand"><div id="headerLogos" class="header-logos"></div><div><small>LA BANDEJA + BEER STATION</small><strong id="placeName">Mesa</strong></div></div>
+  <div class="table-party"><div id="diners"></div><span id="dinerCount"></span><b id="dinerName">Invitado</b></div>
   <div class="actions">
-    <button id="bellButton" class="icon-btn" aria-label="Servicio">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-    </button>
-    <button id="cartTop" class="icon-btn cart-icon-btn" aria-label="Pedido">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H7M10 20a1 1 0 1 0 0 .01M18 20a1 1 0 1 0 0 .01"/></svg>
-      <span id="cartCount">0</span>
-    </button>
+    <button id="bellButton" class="icon-btn" aria-label="Servicio"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+    <button id="cartTop" class="icon-btn cart-icon-btn" aria-label="Pedido"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H7M10 20a1 1 0 1 0 0 .01M18 20a1 1 0 1 0 0 .01"/></svg><span id="cartCount">0</span></button>
   </div>
 </header>
 <main>
-<section class="intro place-hero">
-  <div class="place-hero-copy">
-    <span class="eyebrow" id="heroLabel">LA BANDEJA + BEER STATION</span>
-    <h1 id="heroTitle">Comida, bebidas y momentos para compartir.</h1>
-    <p id="heroSubtitle">Todo el menú en un solo lugar.</p>
-    <div id="heroBadges" class="hero-badges"></div>
-  </div>
-  <div id="heroAmbient" class="hero-ambient" aria-hidden="true"></div>
-</section>
-<section class="promo-wrap"><div id="promoHero" class="promo-hero"></div><div id="promoDots" class="promo-dots"></div></section>
-<section class="more-promos"><div class="section-head"><small>PROMOCIONES</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
-<section class="menu-section">
-  <div class="section-head menu-title"><div><small>MENÚ</small><h2>¿Qué se te antoja?</h2></div><input id="search" placeholder="Buscar producto…"></div>
-  <nav id="categories" class="categories"></nav>
-  <section id="products" class="products"></section>
-</section>
-<section class="experience-end">
-  <div class="experience-copy"><small>ANTES DE IRTE</small><h2>¿Qué te pareció la experiencia?</h2><p>Tu opinión nos ayuda a mejorar cada visita.</p></div>
-  <div class="rating-card">
-    <div id="ratingStars" class="rating-stars">
-      <button data-rating="1">1</button><button data-rating="2">2</button><button data-rating="3">3</button><button data-rating="4">4</button><button data-rating="5">5</button>
+  <section class="cinema-hero"><div id="heroAmbient" class="hero-ambient"></div><div id="heroDots" class="hero-dots"></div></section>
+  <section id="promoSection" class="home-section"><div class="section-head"><div><small>AHORA</small><h2>Promociones y recomendados</h2></div></div><div id="promoGrid" class="promo-grid"></div></section>
+  <section id="newSection" class="home-section"><div class="section-head"><div><small>RECIÉN LLEGADOS</small><h2>Nuevos productos</h2></div></div><div id="newProducts" class="product-rail"></div></section>
+  <section id="comboSection" class="home-section"><div class="section-head"><div><small>LA BANDEJA + BEER STATION</small><h2>Combos</h2></div></div><div id="comboProducts" class="product-rail"></div></section>
+  <section id="drinkSection" class="home-section"><div class="section-head"><div><small>BEER STATION</small><h2>Bebidas</h2></div><button id="seeDrinks" class="text-btn">Ver todas</button></div><div id="drinkProducts" class="product-rail"></div></section>
+  <section class="menu-section"><div class="section-head menu-title"><div><small>MENÚ</small><h2>Todo lo disponible</h2></div><input id="search" placeholder="Buscar producto"></div><nav id="categories" class="categories"></nav><section id="products" class="products"></section></section>
+  <section class="experience-end">
+    <div class="experience-copy"><small>ANTES DE IRTE</small><h2>Queremos saber cómo estuvo.</h2><p>Califica tu experiencia o solicita lo que necesites antes de cerrar la cuenta.</p>
+      <div class="quick-service"><button data-service-end="ATENCION">Atención</button><button data-service-end="CUENTA">Solicitar cuenta</button><button id="backToPromos">Ver promociones</button></div>
     </div>
-    <textarea id="feedbackComment" placeholder="Cuéntanos algo más, si quieres"></textarea>
-    <div class="experience-actions"><button id="sendFeedback">Enviar opinión</button><button id="backToTop">Volver arriba</button></div>
-  </div>
-</section>
+    <div class="rating-card"><div id="ratingStars" class="rating-stars"><button data-rating="1">1</button><button data-rating="2">2</button><button data-rating="3">3</button><button data-rating="4">4</button><button data-rating="5">5</button></div><textarea id="feedbackComment" placeholder="Cuéntanos algo más, si quieres"></textarea><button id="sendFeedback" class="primary">Enviar opinión</button></div>
+  </section>
 </main>
 <button id="cartDock" class="cart-dock hidden"><span>Pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
-<dialog id="productDialog">
-  <button class="close" data-close>×</button>
-  <div class="product-modal">
-    <img id="detailImage" alt="">
-    <div class="product-modal-body">
-      <small id="detailBrand"></small>
-      <h2 id="detailName"></h2>
-      <p id="detailDescription"></p>
-      <div id="detailOptions"></div>
-      <label class="note-label">Indicaciones especiales<textarea id="detailNote" placeholder="Ej. sin cebolla, poco hielo, bien cocido…"></textarea></label>
-      <div class="product-modal-footer"><div><small>Precio</small><b id="detailPrice">L 0.00</b></div><button id="addConfigured" class="primary compact">Agregar al pedido</button></div>
-    </div>
-  </div>
-</dialog>
-<dialog id="promoDialog">
-  <button class="close" data-close>×</button>
-  <div class="dialog-card promo-dialog-card"><small id="promoDialogType">PROMOCIÓN</small><h2 id="promoDialogTitle"></h2><p id="promoDialogSubtitle"></p><div id="promoProducts" class="promo-products"></div></div>
-</dialog>
-<dialog id="joinDialog">
- <div class="dialog-card"><small id="joinKicker">IDENTIFICACIÓN</small><h2>¿Cómo te llamas?</h2><p>Cada pedido queda asociado a este punto.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Continuar</button></div>
-</dialog>
-<dialog id="cartDialog">
- <button class="close" data-close>×</button><div class="dialog-card"><small>TU PEDIDO</small><h2>Revisa antes de enviar</h2><div id="cartItems"></div><div class="grand"><span>Total</span><b id="cartGrand">L 0.00</b></div><button id="sendOrder" class="primary">Enviar pedido</button></div>
-</dialog>
-<dialog id="serviceDialog">
- <button class="close" data-close>×</button><div class="dialog-card"><small>SERVICIO</small><h2>Solicitar</h2><div class="service-grid"><button data-service="ATENCION">Atención</button><button data-service="CUENTA">Cuenta</button><button data-service="LIMPIEZA">Limpieza</button><button data-service="PEDIDO">Pedido</button></div></div>
-</dialog>
+<dialog id="productDialog"><button class="close" data-close>×</button><div class="product-modal"><img id="detailImage" alt=""><div class="product-modal-body"><small id="detailBrand"></small><h2 id="detailName"></h2><p id="detailDescription"></p><div id="detailOptions"></div><label class="note-label">Indicaciones especiales<textarea id="detailNote" placeholder="Escribe una indicación si la necesitas"></textarea></label><div class="product-modal-footer"><div><small>PRECIO</small><b id="detailPrice">L 0.00</b></div><button id="addConfigured" class="primary compact">Agregar</button></div></div></div></dialog>
+<dialog id="promoDialog"><button class="close" data-close>×</button><div class="dialog-card promo-dialog-card"><small id="promoDialogType">PROMOCIÓN</small><h2 id="promoDialogTitle"></h2><p id="promoDialogSubtitle"></p><div id="promoProducts" class="promo-products products"></div></div></dialog>
+<dialog id="joinDialog"><div class="dialog-card"><small id="joinKicker">IDENTIFICACIÓN</small><h2>Tu nombre</h2><p>Usaremos tu nombre para identificar el pedido.</p><input id="joinName" maxlength="50" placeholder="Nombre"><button id="joinButton" class="primary">Continuar</button></div></dialog>
+<dialog id="cartDialog"><button class="close" data-close>×</button><div class="dialog-card"><small>TU PEDIDO</small><h2>Revisa antes de enviar</h2><div id="cartItems"></div><div class="grand"><span>Total</span><b id="cartGrand">L 0.00</b></div><button id="sendOrder" class="primary">Enviar pedido</button></div></dialog>
+<dialog id="serviceDialog"><button class="close" data-close>×</button><div class="dialog-card"><small>SERVICIO</small><h2>Solicitar</h2><div class="service-grid"><button data-service="ATENCION">Atención</button><button data-service="CUENTA">Cuenta</button><button data-service="LIMPIEZA">Limpieza</button><button data-service="PEDIDO">Pedido</button></div></div></dialog>
 <div id="toast"></div>
+<button id="backToTop" hidden></button>
 <script type="module" src="/app.js"></script>
 </body>
 </html>
