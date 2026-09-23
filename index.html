@@ -11,6 +11,17 @@
 <link rel="stylesheet" href="/app.css">
 </head>
 <body>
+<section id="experienceIntro" class="experience-intro">
+  <div class="intro-bg" id="introBg"></div>
+  <div class="intro-stage">
+    <div id="introLogos" class="intro-logos"></div>
+    <div class="intro-plus">+</div>
+    <small id="introLabel">LA BANDEJA + BEER STATION</small>
+    <h1 id="introTitle">Bienvenido</h1>
+    <p id="introSubtitle">Comida, bebidas y buenos momentos.</p>
+    <button id="enterMenu">Entrar al menú</button>
+  </div>
+</section>
 <header class="topbar">
   <div class="header-brand">
     <div id="headerLogos" class="header-logos"></div>
@@ -20,10 +31,14 @@
   <div class="actions"><button id="bellButton" aria-label="Llamar personal">🔔</button><button id="cartTop">🛒 <span id="cartCount">0</span></button></div>
 </header>
 <main>
-<section class="intro">
-  <span class="eyebrow">LA BANDEJA + BEER STATION</span>
-  <h1>Comida, bebidas y momentos para compartir.</h1>
-  <p>Todo el menú en un solo lugar. Elige tu categoría, personaliza tu pedido y disfruta desde tu mesa.</p>
+<section class="intro place-hero">
+  <div class="place-hero-copy">
+    <span class="eyebrow" id="heroLabel">LA BANDEJA + BEER STATION</span>
+    <h1 id="heroTitle">Comida, bebidas y momentos para compartir.</h1>
+    <p id="heroSubtitle">Todo el menú en un solo lugar.</p>
+    <div id="heroBadges" class="hero-badges"></div>
+  </div>
+  <img id="heroImage" alt="">
 </section>
 <section class="promo-wrap"><div id="promoHero" class="promo-hero"></div><div id="promoDots" class="promo-dots"></div></section>
 <section class="menu-section">
