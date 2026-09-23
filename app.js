@@ -120,8 +120,9 @@ function renderDrinkSection(){
  section.classList.toggle('hidden',!available.length);
  if(!available.length)return;
  nav.innerHTML=available.map(function(c){
-   const count=state.products.filter(p=>p.category_id===c.id).length;
-   return '<button class="drink-category" data-drink-cat="'+c.id+'"><span>'+safe(c.name)+'</span><small>'+count+' productos</small></button>';
+   const list=state.products.filter(p=>p.category_id===c.id);
+   const cover=c.image_url||list.find(p=>p.image_url)?.image_url||'';
+   return '<button class="category-tile drink-category-tile" data-drink-cat="'+c.id+'" style="--cat-bg:url(\''+cover+'\')"><span>'+safe(c.name)+'</span></button>';
  }).join('');
  nav.querySelectorAll('[data-drink-cat]').forEach(function(b){b.onclick=function(){
    const c=available.find(x=>x.id===b.dataset.drinkCat);if(!c)return;
