@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090a0d">
-<title>Distrito 504 · Menú QR</title>
+<title>La Bandeja + Beer Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
@@ -12,29 +12,44 @@
 </head>
 <body>
 <header class="topbar">
- <div class="place"><small>ESTÁS EN</small><strong id="placeName">Distrito 504</strong></div>
- <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
- <div class="actions"><button id="bellButton" aria-label="Llamar personal">🔔</button><button id="cartTop">🛒 <span id="cartCount">0</span></button></div>
+  <div class="header-brand">
+    <div id="headerLogos" class="header-logos"></div>
+    <div><small>LA BANDEJA + BEER STATION</small><strong id="placeName">Mesa</strong></div>
+  </div>
+  <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
+  <div class="actions"><button id="bellButton" aria-label="Llamar personal">🔔</button><button id="cartTop">🛒 <span id="cartCount">0</span></button></div>
 </header>
 <main>
 <section class="intro">
- <div><span class="eyebrow">DISTRITO 504</span><h1>Tu mesa. Tu grupo. Tu pedido.</h1><p>La Bandeja y Beer Station juntos, sin levantarte de tu mesa.</p></div>
+  <span class="eyebrow">LA BANDEJA + BEER STATION</span>
+  <h1>Comida, bebidas y momentos para compartir.</h1>
+  <p>Todo el menú en un solo lugar. Elige tu categoría, personaliza tu pedido y disfruta desde tu mesa.</p>
 </section>
-<section class="promo-wrap">
- <div id="promoHero" class="promo-hero"></div>
- <div id="promoDots" class="promo-dots"></div>
-</section>
-<section class="brand-section"><div class="section-head"><small>ELIGE TU EXPERIENCIA</small><h2>¿Dónde quieres pedir?</h2></div><div id="brands" class="brands"></div></section>
+<section class="promo-wrap"><div id="promoHero" class="promo-hero"></div><div id="promoDots" class="promo-dots"></div></section>
 <section class="menu-section">
- <div class="section-head menu-title"><div><small>MENÚ</small><h2>Explora por categoría</h2></div><input id="search" placeholder="Buscar en esta categoría…"></div>
- <nav id="categories" class="categories"></nav>
- <section id="products" class="products"></section>
+  <div class="section-head menu-title"><div><small>MENÚ</small><h2>¿Qué se te antoja?</h2></div><input id="search" placeholder="Buscar producto…"></div>
+  <nav id="categories" class="categories"></nav>
+  <section id="products" class="products"></section>
 </section>
-<section class="more-promos"><div class="section-head"><small>PARA TI</small><h2>Más para disfrutar</h2></div><div id="promoGrid" class="promo-grid"></div></section>
+<section class="more-promos"><div class="section-head"><small>PARA DISFRUTAR MÁS</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
 </main>
 <button id="cartDock" class="cart-dock hidden"><span>Ver pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
+<dialog id="productDialog">
+  <button class="close" data-close>×</button>
+  <div class="product-modal">
+    <img id="detailImage" alt="">
+    <div class="product-modal-body">
+      <small id="detailBrand"></small>
+      <h2 id="detailName"></h2>
+      <p id="detailDescription"></p>
+      <div id="detailOptions"></div>
+      <label class="note-label">Indicaciones especiales<textarea id="detailNote" placeholder="Ej. sin cebolla, poco hielo, bien cocido…"></textarea></label>
+      <div class="product-modal-footer"><div><small>Precio</small><b id="detailPrice">L 0.00</b></div><button id="addConfigured" class="primary compact">Agregar al pedido</button></div>
+    </div>
+  </div>
+</dialog>
 <dialog id="joinDialog">
- <div class="dialog-card"><div class="dialog-icon">👋</div><small>BIENVENIDO A TU MESA</small><h2>¿Cómo te llamas?</h2><p>Así identificamos tu pedido dentro de esta mesa.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Unirme a la mesa</button></div>
+ <div class="dialog-card"><div class="dialog-icon">👋</div><small>BIENVENIDO A TU MESA</small><h2>¿Cómo te llamas?</h2><p>Cada comensal puede pedir desde su teléfono y todo queda asociado a la misma mesa.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Unirme a la mesa</button></div>
 </dialog>
 <dialog id="cartDialog">
  <button class="close" data-close>×</button><div class="dialog-card"><small>TU PEDIDO</small><h2>Revisa antes de enviar</h2><div id="cartItems"></div><div class="grand"><span>Total</span><b id="cartGrand">L 0.00</b></div><button id="sendOrder" class="primary">Enviar pedido</button></div>
@@ -44,4 +59,5 @@
 </dialog>
 <div id="toast"></div>
 <script type="module" src="/app.js"></script>
-</body></html>
+</body>
+</html>
