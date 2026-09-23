@@ -49,12 +49,13 @@
   <img id="heroImage" alt="">
 </section>
 <section class="promo-wrap"><div id="promoHero" class="promo-hero"></div><div id="promoDots" class="promo-dots"></div></section>
+<section class="more-promos"><div class="section-head"><small>PROMOCIONES</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
 <section class="menu-section">
   <div class="section-head menu-title"><div><small>MENÚ</small><h2>¿Qué se te antoja?</h2></div><input id="search" placeholder="Buscar producto…"></div>
   <nav id="categories" class="categories"></nav>
   <section id="products" class="products"></section>
 </section>
-<section class="more-promos"><div class="section-head"><small>PARA DISFRUTAR MÁS</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
+
 </main>
 <button id="cartDock" class="cart-dock hidden"><span>Pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
 <dialog id="productDialog">
@@ -70,6 +71,10 @@
       <div class="product-modal-footer"><div><small>Precio</small><b id="detailPrice">L 0.00</b></div><button id="addConfigured" class="primary compact">Agregar al pedido</button></div>
     </div>
   </div>
+</dialog>
+<dialog id="promoDialog">
+  <button class="close" data-close>×</button>
+  <div class="dialog-card promo-dialog-card"><small id="promoDialogType">PROMOCIÓN</small><h2 id="promoDialogTitle"></h2><p id="promoDialogSubtitle"></p><div id="promoProducts" class="promo-products"></div></div>
 </dialog>
 <dialog id="joinDialog">
  <div class="dialog-card"><small id="joinKicker">IDENTIFICACIÓN</small><h2>¿Cómo te llamas?</h2><p>Cada pedido queda asociado a este punto.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Continuar</button></div>
