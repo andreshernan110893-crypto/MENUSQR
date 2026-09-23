@@ -293,3 +293,58 @@ main{width:min(1520px,calc(100vw - 48px));margin-inline:auto}
  .experience-end{padding:22px 18px;margin-bottom:90px}
 }
 
+
+
+/* Beverage category cards + global search modal */
+.global-search{margin:0 0 28px;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));box-shadow:0 18px 55px rgba(0,0,0,.18)}
+.global-search>small{display:block;color:var(--accent);font-size:.65rem;font-weight:900;letter-spacing:.14em;margin-bottom:9px}
+.search-box{display:flex;align-items:center;gap:10px;background:#0d1117;border:1px solid #272d36;border-radius:17px;padding:0 15px;transition:.2s}
+.search-box:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.08)}
+.search-box svg{width:20px;height:20px;fill:none;stroke:#99a2af;stroke-width:1.8;flex:0 0 auto}
+.search-box input{width:100%;border:0;outline:0;background:transparent;color:#fff;padding:15px 0;font-size:1rem}
+.search-box input::placeholder{color:#707986}
+
+.drink-categories{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px!important;overflow:visible!important;padding:2px!important}
+.drink-category{min-width:0!important;min-height:108px;position:relative;overflow:hidden;display:flex!important;flex-direction:column;justify-content:flex-end;border-radius:22px!important;padding:16px!important;background:
+radial-gradient(circle at 85% 10%,rgba(80,180,255,.12),transparent 35%),
+linear-gradient(145deg,#171d25,#0d1117)!important}
+.drink-category:before{content:"";position:absolute;inset:auto -10% -45% 25%;height:110%;border-radius:50%;background:radial-gradient(circle,rgba(110,210,255,.10),transparent 68%);filter:blur(10px)}
+.drink-category span,.drink-category small{position:relative;z-index:1}
+.drink-category span{font-size:1rem!important}
+.drink-category small{font-size:.7rem!important}
+.drink-category:hover{transform:translateY(-3px);border-color:rgba(126,208,255,.34)!important;box-shadow:0 16px 38px rgba(0,0,0,.25)}
+.drink-category:active{transform:scale(.98)}
+
+.catalog-dialog{width:min(1180px,94vw)!important;max-width:none!important;height:min(82vh,820px);max-height:82vh!important;border-radius:26px!important;overflow:hidden!important;background:#0a0d12!important}
+.catalog-dialog::backdrop{background:rgba(0,0,0,.76);backdrop-filter:blur(10px)}
+.catalog-dialog .close{position:absolute!important;right:16px!important;top:16px!important;z-index:20!important;width:42px;height:42px;border-radius:50%!important;background:rgba(8,10,14,.78)!important;border:1px solid rgba(255,255,255,.12)!important}
+.catalog-card{height:100%;display:flex;flex-direction:column;min-height:0}
+.catalog-head{flex:0 0 auto;padding:28px 72px 18px 28px;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,#11161d,#0c1015)}
+.catalog-head small{color:var(--accent);font-size:.66rem;font-weight:900;letter-spacing:.14em}
+.catalog-head h2{font-family:"Playfair Display",serif;font-size:clamp(1.9rem,4vw,3rem);margin:4px 0}
+.catalog-head p{margin:0;color:var(--muted);font-size:.82rem}
+.catalog-products{flex:1;min-height:0;overflow:auto;padding:20px 22px 28px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-content:start;overscroll-behavior:contain}
+.catalog-products .product{height:max-content}
+.catalog-products::-webkit-scrollbar{width:9px}
+.catalog-products::-webkit-scrollbar-thumb{background:#303742;border-radius:99px;border:2px solid #0a0d12}
+
+@media(max-width:1100px){
+ .drink-categories{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .catalog-products{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:760px){
+ .global-search{padding:13px;border-radius:19px;margin-bottom:22px}
+ .search-box input{padding:13px 0;font-size:.9rem}
+ .drink-categories{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;padding:2px 3vw 12px 2px!important;margin-right:-3vw}
+ .drink-category{flex:0 0 145px!important;min-height:92px;scroll-snap-align:start;padding:13px!important}
+ .catalog-dialog{width:96vw!important;height:88dvh;max-height:88dvh!important;border-radius:24px!important}
+ .catalog-head{padding:22px 62px 14px 18px}
+ .catalog-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:13px}
+ .catalog-products .product-media{height:142px}
+}
+@media(max-width:390px){
+ .drink-category{flex-basis:136px!important}
+ .catalog-products{gap:8px;padding:10px}
+ .catalog-products .product-media{height:132px}
+}
+
