@@ -64,7 +64,7 @@ function openProduct(id){
  const wrap=$("#detailOptions");wrap.innerHTML="";
  linked.forEach(g=>{const box=document.createElement("section");box.className="option-group";box.dataset.group=g.id;box.innerHTML=`<div class="option-head"><div><b>${safe(g.name)}</b><small>${g.min_selections>0?"Elige una opción":"Opcional"}</small></div></div>`;
   state.options.filter(o=>o.group_id===g.id).forEach(o=>{const label=document.createElement("label");label.className="option-row";const type=g.selection_type==="multiple"?"checkbox":"radio";label.innerHTML=`<span><input type="${type}" name="g_${g.id}" value="${o.id}"> ${safe(o.name)}</span><b>${o.price_delta?("+"+money(o.price_delta)):""}</b>`;box.append(label)});wrap.append(box)});
- refreshDetailPrice();wrap.querySelectorAll("input").forEach(i=>i.onchange=refreshDetailPrice);$("#productDialog").showModal();
+ refreshDetailPrice();wrap.querySelectorAll("input").forEach(i=>i.onchange=refreshDetailPrice);$("#productDialog").showModal();requestProductSuggestion(p);
 }
 function selectedOptions(){return [...$("#detailOptions").querySelectorAll("input:checked")].map(i=>i.value)}
 function refreshDetailPrice(){if(!state.current)return;const extra=selectedOptions().reduce((s,id)=>s+Number(state.options.find(o=>o.id===id)?.price_delta||0),0);$("#detailPrice").textContent=money(Number(state.current.price)+extra)}
@@ -155,3 +155,61 @@ function renderPromoGrid(){const el=$("#promoGrid"),list=state.promos.slice(0,10
 if($('#seeDrinks'))$('#seeDrinks').onclick=function(){const c=state.categories.find(function(c){return ['daiquiris','cervezas','cocktails','mocktails'].includes(c.id)});if(c){state.activeCategory=c.id;renderCategories();renderProducts();document.querySelector('.menu-section').scrollIntoView({behavior:'smooth'})}};
 if($('#backToPromos'))$('#backToPromos').onclick=function(){$('#promoSection').scrollIntoView({behavior:'smooth'})};
 document.querySelectorAll('[data-service-end]').forEach(function(b){b.onclick=function(){callStaff(b.dataset.serviceEnd)}});
+
+let __aiSuggestionSeq=0;
+function aiProduct(p){
+ return {id:p.id,name:p.name,price:Number(p.price||0),category:p.category_id,brand:p.brand_id,description:String(p.description||"").slice(0,180)};
+}
+function aiCart(){
+ return state.cart.map(i=>{const p=state.products.find(x=>x.id===i.product_id);return p?{...aiProduct(p),qty:i.qty}:null}).filter(Boolean).slice(0,20);
+}
+function aiCandidates(selected){
+ const seen=new Set(selected?[selected.id]:[]),out=[];
+ const add=p=>{if(p&&!seen.has(p.id)){seen.add(p.id);out.push(aiProduct(p))}};
+ const combos=state.products.filter(p=>p.category_id==="combos");
+ const drinks=new Set(["cervezas","cocktails","mocktails","vinos","tequila","ron","whiskey","vodka","gin","daiquiris"]);
+ if(selected?.brand_id==="LB")state.products.filter(p=>p.brand_id==="BS"&&drinks.has(p.category_id)).forEach(add);
+ else if(selected?.brand_id==="BS")state.products.filter(p=>p.brand_id==="LB").forEach(add);
+ combos.forEach(add);
+ state.products.filter(p=>p.featured).forEach(add);
+ state.products.forEach(add);
+ return out.slice(0,45);
+}
+function aiOptionsFor(productId){
+ const groupIds=state.links.filter(x=>x.product_id===productId).map(x=>x.group_id);
+ return state.options.filter(o=>groupIds.includes(o.group_id)).map(o=>({name:o.name,price_delta:Number(o.price_delta||0)})).slice(0,25);
+}
+async function askMenuAI(payload){
+ const r=await fetch("/api/gemini",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+ if(!r.ok)throw new Error("AI "+r.status);
+ return r.json();
+}
+
+async function requestProductSuggestion(p){
+ const box=$("#aiSuggestion"),text=$("#aiSuggestionText"),actions=$("#aiSuggestionActions");
+ const seq=++__aiSuggestionSeq;box.classList.remove("hidden");box.classList.add("loading");text.textContent="Pensando en qué combina mejor…";actions.innerHTML="";
+ try{
+  const data=await askMenuAI({mode:"product",message:"Recomienda algo útil antes de agregar este producto.",selected:aiProduct(p),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  if(seq!==__aiSuggestionSeq||state.current?.id!==p.id)return;
+  text.textContent=data.message||"";
+  actions.innerHTML=(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);return rp?'<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>':""}).join("");
+  actions.querySelectorAll("[data-ai-open]").forEach(b=>b.onclick=()=>{$("#productDialog").close();openProduct(b.dataset.aiOpen)});
+  box.classList.remove("loading");box.classList.toggle("hidden",!text.textContent&&!actions.children.length);
+ }catch{
+  if(seq===__aiSuggestionSeq){box.classList.add("hidden");box.classList.remove("loading")}
+ }
+}
+function addAIMessage(role,html){
+ const el=document.createElement("div");el.className="ai-msg "+role;el.innerHTML=html;$("#aiMessages").append(el);$("#aiMessages").scrollTop=$("#aiMessages").scrollHeight;return el;
+}
+$("#aiFab").onclick=()=>$("#aiDialog").showModal();
+$("#aiForm").onsubmit=async e=>{
+ e.preventDefault();const input=$("#aiInput"),q=input.value.trim();if(!q)return;
+ addAIMessage("user",safe(q));input.value="";
+ const wait=addAIMessage("assistant","Pensando…");
+ try{
+  const data=await askMenuAI({mode:"chat",message:q,selected:state.current?aiProduct(state.current):null,options:state.current?aiOptionsFor(state.current.id):[],cart:aiCart(),candidates:aiCandidates(null),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  wait.innerHTML=safe(data.message||"");
+  (data.recommendations||[]).forEach(r=>{const p=state.products.find(x=>x.id===r.id);if(!p)return;const b=document.createElement("button");b.className="ai-chat-rec";b.innerHTML="<b>"+safe(p.name)+"</b><small>"+safe(r.reason||money(p.price))+"</small>";b.onclick=()=>{$("#aiDialog").close();openProduct(p.id)};wait.append(b)});
+ }catch{wait.textContent="Ahorita no pude conectarme. Intenta de nuevo en un momento."}
+};
