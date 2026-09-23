@@ -1,6 +1,6 @@
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
-  if (req.method === "GET") return res.status(200).json({ok:true,configured:Boolean(process.env.GEMINI_API_KEY),model:"gemini-2.5-flash-lite"});
+  if (req.method === "GET") return res.status(200).json({ok:true,configured:Boolean(process.env.GEMINI_API_KEY),model:"gemini-3.5-flash-lite"});
   if (req.method !== "POST") return res.status(405).json({error:"Método no permitido"});
   if (!process.env.GEMINI_API_KEY) return res.status(503).json({error:"Gemini no está configurado"});
   try {
@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
       'Devuelve SOLO JSON válido: {"message":"texto breve","recommendations":[{"id":"product_id","reason":"motivo breve"}]}'
     ].join("\n");
     const context = {message:String(body.message||"").slice(0,800),place:body.place||{},selected,options,cart,candidates};
-    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
     const upstream = await fetch(url,{
       method:"POST",
       headers:{"Content-Type":"application/json","x-goog-api-key":process.env.GEMINI_API_KEY},
