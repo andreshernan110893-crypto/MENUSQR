@@ -19,3 +19,15 @@ dialog{width:min(560px,92vw);border:1px solid var(--line);border-radius:24px;bac
 
 .orders-head{display:flex;justify-content:space-between;align-items:end;gap:16px}.order-filters{display:flex;gap:7px;flex-wrap:wrap}.order-filters button{border:1px solid var(--line);background:#14181f;color:#d7dce3;border-radius:999px;padding:8px 11px;font-weight:800}.order-filters button.active{background:var(--gold);color:#111;border-color:var(--gold)}.empty-pos{padding:26px;border:1px dashed var(--line);border-radius:15px;color:var(--muted);text-align:center}@media(max-width:700px){.orders-head{align-items:flex-start;flex-direction:column}.order-filters{width:100%;overflow:auto;flex-wrap:nowrap}.order-filters button{white-space:nowrap}}
 
+
+
+.station-pill{padding:8px 14px;border-radius:999px;font-weight:900;letter-spacing:.08em;border:1px solid var(--line);background:#171b22}
+body[data-station="LB"]{--gold:#f4c400;--accent:#f4c400}
+body[data-station="BS"]{--gold:#f5a400;--accent:#f5a400}
+.live-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#122219;border:1px solid #28583a;color:#7dea9a;font-size:.72rem;font-weight:900;letter-spacing:.08em}
+.order-items{display:flex;flex-direction:column;gap:3px;margin-top:7px}.order-items span{font-size:.8rem;color:#d8dde5}
+.station-order{align-items:flex-start}
+.origin.MESA{background:#2b2512;color:#f2d66b;border:1px solid #5b4b18}
+.origin.CANCHA{background:#0f2d19;color:#7bea8f;border:1px solid #245e35}
+@media(max-width:760px){header{gap:10px}.station-pill{font-size:.75rem;padding:7px 10px}.station-order{grid-template-columns:1fr}.station-order>span,.station-order>select{margin-top:8px}}
+
