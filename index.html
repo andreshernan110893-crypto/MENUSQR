@@ -19,7 +19,7 @@
     <small id="introLabel">LA BANDEJA + BEER STATION</small>
     <h1 id="introTitle">Bienvenido</h1>
     <p id="introSubtitle">Comida, bebidas y buenos momentos.</p>
-    <button id="enterMenu">Entrar al menú</button>
+
   </div>
 </section>
 <header class="topbar">
@@ -28,7 +28,7 @@
     <div><small>LA BANDEJA + BEER STATION</small><strong id="placeName">Mesa</strong></div>
   </div>
   <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
-  <div class="actions"><button id="bellButton" aria-label="Llamar personal">🔔</button><button id="cartTop">🛒 <span id="cartCount">0</span></button></div>
+  <div class="actions"><button id="bellButton" aria-label="Servicio"><span class="icon-dot"></span></button><button id="cartTop" aria-label="Pedido"><span class="cart-label">Pedido</span><span id="cartCount">0</span></button></div>
 </header>
 <main>
 <section class="intro place-hero">
@@ -48,7 +48,7 @@
 </section>
 <section class="more-promos"><div class="section-head"><small>PARA DISFRUTAR MÁS</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
 </main>
-<button id="cartDock" class="cart-dock hidden"><span>Ver pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
+<button id="cartDock" class="cart-dock hidden"><span>Pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
 <dialog id="productDialog">
   <button class="close" data-close>×</button>
   <div class="product-modal">
@@ -64,13 +64,13 @@
   </div>
 </dialog>
 <dialog id="joinDialog">
- <div class="dialog-card"><div class="dialog-icon">👋</div><small>BIENVENIDO A TU MESA</small><h2>¿Cómo te llamas?</h2><p>Cada comensal puede pedir desde su teléfono y todo queda asociado a la misma mesa.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Unirme a la mesa</button></div>
+ <div class="dialog-card"><small id="joinKicker">IDENTIFICACIÓN</small><h2>¿Cómo te llamas?</h2><p>Cada pedido queda asociado a este punto.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Continuar</button></div>
 </dialog>
 <dialog id="cartDialog">
  <button class="close" data-close>×</button><div class="dialog-card"><small>TU PEDIDO</small><h2>Revisa antes de enviar</h2><div id="cartItems"></div><div class="grand"><span>Total</span><b id="cartGrand">L 0.00</b></div><button id="sendOrder" class="primary">Enviar pedido</button></div>
 </dialog>
 <dialog id="serviceDialog">
- <button class="close" data-close>×</button><div class="dialog-card"><small>SERVICIO EN MESA</small><h2>¿En qué te ayudamos?</h2><div class="service-grid"><button data-service="ATENCION">🙋 Atención</button><button data-service="CUENTA">🧾 La cuenta</button><button data-service="LIMPIEZA">✨ Limpieza</button><button data-service="PEDIDO">🍽️ Mi pedido</button></div></div>
+ <button class="close" data-close>×</button><div class="dialog-card"><small>SERVICIO</small><h2>Solicitar</h2><div class="service-grid"><button data-service="ATENCION">Atención</button><button data-service="CUENTA">Cuenta</button><button data-service="LIMPIEZA">Limpieza</button><button data-service="PEDIDO">Pedido</button></div></div>
 </dialog>
 <div id="toast"></div>
 <script type="module" src="/app.js"></script>
