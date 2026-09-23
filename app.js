@@ -3,13 +3,15 @@ const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable
 const qs=new URLSearchParams(location.search),place=(qs.get("place")||"M01").toUpperCase();
 const $=s=>document.querySelector(s),money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const state={brands:[],categories:[],products:[],promos:[],promoLinks:[],groups:[],options:[],links:[],activeCategory:null,cart:[],session:null,diner:null,place:null,promoIndex:0,heroIndex:0,current:null};
+const state={brands:[],categories:[],products:[],allProducts:[],channels:[],heroSlides:[],promos:[],promoLinks:[],groups:[],options:[],links:[],activeCategory:null,cart:[],session:null,diner:null,place:null,promoIndex:0,heroIndex:0,current:null};let feedbackRating=0;
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2300)};
 async function init(){
- const [b,c,p,pr,ppr,g,o,l,pl]=await Promise.all([
+ const [b,c,p,ch,hs,pr,ppr,g,o,l,pl]=await Promise.all([
   sb.from("brands").select("*").eq("active",true).order("sort_order"),
   sb.from("categories").select("*").eq("active",true).order("sort_order"),
   sb.from("products").select("*").eq("active",true).order("sort_order"),
+  sb.from("product_channels").select("*").order("sort_order"),
+  sb.from("hero_slides").select("*").eq("active",true).order("sort_order"),
   sb.from("promotions").select("*").eq("active",true).order("sort_order"),
   sb.from("promotion_products").select("*").order("sort_order"),
   sb.from("option_groups").select("*").eq("active",true).order("sort_order"),
@@ -17,8 +19,11 @@ async function init(){
   sb.from("product_option_groups").select("*").order("sort_order"),
   sb.from("places").select("*").eq("code",place).maybeSingle()
  ]);
- state.brands=b.data||[];state.categories=c.data||[];state.products=p.data||[];state.promos=(pr.data||[]).filter(x=>!x.audience||x.audience==="ALL"||x.audience===((pl.data||{}).place_type||"TABLE"));state.promoLinks=ppr.data||[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];
+ state.brands=b.data||[];state.categories=c.data||[];state.allProducts=p.data||[];state.channels=ch.data||[];state.heroSlides=hs.data||[];state.promos=(pr.data||[]).filter(x=>!x.audience||x.audience==="ALL"||x.audience===((pl.data||{}).place_type||"TABLE"));state.promoLinks=ppr.data||[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];
  state.place=pl.data||{code:place,name:place,place_type:"TABLE",theme_key:"PREMIUM",intro_title:"Bienvenido",intro_subtitle:"La Bandeja + Beer Station"};
+ const allowed=new Set(state.channels.filter(x=>x.channel===state.place.place_type).map(x=>x.product_id));
+ state.products=state.allProducts.filter(x=>allowed.has(x.id));
+ const categoryIds=new Set(state.products.map(x=>x.category_id));state.categories=state.categories.filter(x=>categoryIds.has(x.id));
  document.body.dataset.placeType=state.place.place_type;document.body.dataset.theme=state.place.theme_key||state.place.place_type;$("#placeName").textContent=state.place.name;
  renderHeaderLogos();setupExperience();state.activeCategory=state.categories[0]?.id||null;renderCategories();renderProducts();renderPromos();renderPromoGrid();restoreDiner();updateCart();setInterval(nextPromo,4800);
  if(state.diner)await refreshDiners();
@@ -26,13 +31,15 @@ async function init(){
 function renderHeaderLogos(){const html=state.brands.map(b=>`<img src="${b.logo_url||""}" alt="${safe(b.name)}">`).join("");$("#headerLogos").innerHTML=html;$("#introLogos").innerHTML=html}
 function setupExperience(){
  const p=state.place,type=p.place_type||"TABLE";
- const featured=state.products.filter(x=>x.featured&&x.image_url).slice(0,6);
- const introImages=featured.length?featured:state.products.filter(x=>x.image_url).slice(0,6);
+ const slides=state.heroSlides.filter(x=>x.channel===type).map(x=>({id:x.product_id,name:x.title,description:x.subtitle,image_url:x.image_url||state.allProducts.find(p=>p.id===x.product_id)?.image_url})).filter(x=>x.image_url);
+ const introImages=slides.length?slides:state.products.filter(x=>x.image_url).slice(0,6);
  $("#introSlides").innerHTML=introImages.map((x,i)=>`<div class="intro-slide ${i===0?"active":""}"><img src="${x.image_url}" alt=""><span>${safe(x.name||"")}</span></div>`).join("");
  const slideEls=[...document.querySelectorAll(".intro-slide")];let introIndex=0;
  const introTimer=setInterval(()=>{if(slideEls.length<2)return;slideEls[introIndex].classList.remove("active");introIndex=(introIndex+1)%slideEls.length;slideEls[introIndex].classList.add("active")},560);
  $("#introTitle").textContent=p.intro_title||"La Bandeja + Beer Station";$("#introSubtitle").textContent=p.intro_subtitle||"";$("#introLabel").textContent=type==="COURT"?"LA BANDEJA + BEER STATION · CANCHA":type==="DELIVERY"?"LA BANDEJA + BEER STATION · DELIVERY":"LA BANDEJA + BEER STATION";
- $("#heroTitle").textContent=p.intro_title||"";$("#heroSubtitle").textContent=p.intro_subtitle||"";$("#heroLabel").textContent=type==="COURT"?"CANCHA":type==="DELIVERY"?"DELIVERY":"PREMIUM";$("#heroImage").src=p.hero_image_url||"";
+ $("#heroTitle").textContent=p.intro_title||"";$("#heroSubtitle").textContent=p.intro_subtitle||"";$("#heroLabel").textContent=type==="COURT"?"CANCHA":type==="DELIVERY"?"DELIVERY":"PREMIUM";
+ const ambient=slides.length?slides:introImages;$("#heroAmbient").innerHTML=ambient.slice(0,4).map((x,i)=>`<figure class="ambient-slide ${i===0?"active":""}"><img src="${x.image_url}" alt=""><span>${safe(x.name||"")}</span></figure>`).join("")+`<div class="ambient-vapor"></div>`;
+ const amb=[...$("#heroAmbient").querySelectorAll(".ambient-slide")];let ai=0;setInterval(()=>{if(amb.length<2)return;amb[ai].classList.remove("active");ai=(ai+1)%amb.length;amb[ai].classList.add("active")},2600);
  $("#heroBadges").innerHTML="";
  const joinTitle=$("#joinDialog h2"),joinText=$("#joinDialog p"),kicker=$("#joinKicker");
  if(type==="COURT"){kicker.textContent=p.name.toUpperCase();joinTitle.textContent="Tu nombre";joinText.textContent="Tu pedido queda asociado a esta cancha."}
@@ -74,9 +81,12 @@ async function joinTable(){const name=$("#joinName").value.trim();if(!name)retur
 async function refreshDiners(){if(!state.session?.id)return;const {data}=await sb.rpc("get_table_diners_public",{p_session:state.session.id});const list=Array.isArray(data)?data:[];$("#diners").innerHTML=list.map(d=>`<span class="diner">${safe(d.name).slice(0,1).toUpperCase()}</span>`).join("");const label=state.place?.place_type==="COURT"?" jugador"+(list.length===1?"":"es"):state.place?.place_type==="DELIVERY"?" pedido"+(list.length===1?"":"s"):" comensal"+(list.length===1?"":"es");$("#dinerCount").textContent=list.length+label}
 async function sendOrder(){if(!state.diner){$("#joinDialog").showModal();return}if(!state.cart.length)return toast("Agrega productos");const payload={session_id:state.session.id,diner_id:state.diner.diner_id,items:state.cart};const btn=$("#sendOrder");btn.disabled=true;btn.textContent="Enviando…";const {data,error}=await sb.rpc("place_order_public",{p_payload:payload});btn.disabled=false;btn.textContent="Enviar pedido";if(error)return toast(error.message);state.cart=[];updateCart();$("#cartDialog").close();toast("Pedido enviado")}
 async function callStaff(reason){if(!state.diner){$("#joinDialog").showModal();return}const {error}=await sb.rpc("call_staff_public",{p_payload:{session_id:state.session.id,diner_id:state.diner.diner_id,reason}});toast(error?error.message:"Solicitud enviada")}
-function heroProducts(){const featured=state.products.filter(p=>p.featured&&p.image_url);return featured.length?featured.slice(0,10):state.products.filter(p=>p.image_url).slice(0,10)}
+function heroProducts(){const ids=state.heroSlides.filter(x=>x.channel===state.place.place_type).map(x=>x.product_id).filter(Boolean);const slides=ids.map(id=>state.products.find(p=>p.id===id)).filter(Boolean);return slides.length?slides:state.products.filter(p=>p.featured&&p.image_url).slice(0,10)}
 function renderPromos(){const list=heroProducts();if(!list.length)return;const p=list[state.heroIndex%list.length];$("#promoHero").innerHTML=`<article class="hero-product" data-hero-product="${p.id}"><img src="${p.image_url}"><div class="promo-copy"><small>${p.brand_id==="LB"?"LA BANDEJA":"BEER STATION"}</small><h2>${safe(p.name)}</h2><p>${safe(p.description||"")}</p><b>${money(p.price)}</b></div></article>`;$("#promoHero").onclick=()=>openProduct(p.id);$("#promoDots").innerHTML=list.map((_,i)=>`<button class="${i===state.heroIndex?"active":""}" data-dot="${i}"></button>`).join("");$("#promoDots").querySelectorAll("[data-dot]").forEach(d=>d.onclick=e=>{e.stopPropagation();state.heroIndex=+d.dataset.dot;renderPromos()})}
 function nextPromo(){const list=heroProducts();if(!list.length)return;state.heroIndex=(state.heroIndex+1)%list.length;renderPromos()}
 function openPromotion(id){const pr=state.promos.find(p=>p.id===id);if(!pr)return;const ids=state.promoLinks.filter(x=>x.promotion_id===id).map(x=>x.product_id);const list=ids.map(id=>state.products.find(p=>p.id===id)).filter(Boolean);$("#promoDialogType").textContent=(pr.promo_type||"PROMOCIÓN").replace("_"," ");$("#promoDialogTitle").textContent=pr.title;$("#promoDialogSubtitle").textContent=pr.subtitle||"";$("#promoProducts").innerHTML=list.length?list.map(p=>`<article class="promo-product" data-promo-product="${p.id}"><img src="${p.image_url||""}"><div><b>${safe(p.name)}</b><span>${money(p.price)}</span></div></article>`).join(""):'<div class="empty">Sin productos vinculados.</div>';$("#promoProducts").querySelectorAll("[data-promo-product]").forEach(x=>x.onclick=()=>{$("#promoDialog").close();openProduct(x.dataset.promoProduct)});$("#promoDialog").showModal()}
 function renderPromoGrid(){const el=$("#promoGrid");const list=state.promos.filter(p=>p.promo_type&&p.promo_type!=="GENERAL").slice(0,10);el.innerHTML=list.map(p=>`<article class="promo-card" data-promo="${p.id}"><img src="${p.image_url}"><div><small>${safe(p.promo_type.replace("_"," "))}</small><b>${safe(p.title)}</b><span>${safe(p.subtitle||"")}</span></div></article>`).join("");el.querySelectorAll("[data-promo]").forEach(x=>x.onclick=()=>openPromotion(x.dataset.promo));let i=0;clearInterval(window.__promoCardsTimer);window.__promoCardsTimer=setInterval(()=>{if(el.children.length<2)return;i=(i+1)%el.children.length;el.scrollTo({left:el.children[i].offsetLeft-16,behavior:"smooth"})},3200)}
-$("#search").oninput=renderProducts;$("#cartDock").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#cartTop").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#joinButton").onclick=joinTable;$("#sendOrder").onclick=sendOrder;$("#bellButton").onclick=()=>$("#serviceDialog").showModal();document.querySelectorAll("[data-service]").forEach(b=>b.onclick=()=>{callStaff(b.dataset.service);$("#serviceDialog").close()});document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());init();
+$("#search").oninput=renderProducts;$("#cartDock").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#cartTop").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#joinButton").onclick=joinTable;$("#sendOrder").onclick=sendOrder;$("#bellButton").onclick=()=>$("#serviceDialog").showModal();document.querySelectorAll("[data-service]").forEach(b=>b.onclick=()=>{callStaff(b.dataset.service);$("#serviceDialog").close()});document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
+$("#ratingStars").querySelectorAll("[data-rating]").forEach(b=>b.onclick=()=>{feedbackRating=Number(b.dataset.rating);$("#ratingStars").querySelectorAll("button").forEach(x=>x.classList.toggle("active",Number(x.dataset.rating)<=feedbackRating))});
+$("#sendFeedback").onclick=async()=>{if(!feedbackRating)return toast("Selecciona una calificación");const {error}=await sb.rpc("submit_feedback_public",{p_payload:{place_code:place,session_id:state.session?.id||"",diner_id:state.diner?.diner_id||"",rating:feedbackRating,comment:$("#feedbackComment").value.trim()}});if(error)return toast(error.message);$("#feedbackComment").value="";toast("Gracias por tu opinión")};
+$("#backToTop").onclick=()=>window.scrollTo({top:0,behavior:"smooth"});init();

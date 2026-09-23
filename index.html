@@ -46,7 +46,7 @@
     <p id="heroSubtitle">Todo el menú en un solo lugar.</p>
     <div id="heroBadges" class="hero-badges"></div>
   </div>
-  <img id="heroImage" alt="">
+  <div id="heroAmbient" class="hero-ambient" aria-hidden="true"></div>
 </section>
 <section class="promo-wrap"><div id="promoHero" class="promo-hero"></div><div id="promoDots" class="promo-dots"></div></section>
 <section class="more-promos"><div class="section-head"><small>PROMOCIONES</small><h2>Promociones y recomendados</h2></div><div id="promoGrid" class="promo-grid"></div></section>
@@ -55,7 +55,16 @@
   <nav id="categories" class="categories"></nav>
   <section id="products" class="products"></section>
 </section>
-
+<section class="experience-end">
+  <div class="experience-copy"><small>ANTES DE IRTE</small><h2>¿Qué te pareció la experiencia?</h2><p>Tu opinión nos ayuda a mejorar cada visita.</p></div>
+  <div class="rating-card">
+    <div id="ratingStars" class="rating-stars">
+      <button data-rating="1">1</button><button data-rating="2">2</button><button data-rating="3">3</button><button data-rating="4">4</button><button data-rating="5">5</button>
+    </div>
+    <textarea id="feedbackComment" placeholder="Cuéntanos algo más, si quieres"></textarea>
+    <div class="experience-actions"><button id="sendFeedback">Enviar opinión</button><button id="backToTop">Volver arriba</button></div>
+  </div>
+</section>
 </main>
 <button id="cartDock" class="cart-dock hidden"><span>Pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
 <dialog id="productDialog">

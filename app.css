@@ -66,3 +66,36 @@ body[data-theme="DELIVERY"] .quick-add{background:#ff7b24;color:#fff}
 .hero-product{position:absolute;inset:0;cursor:pointer}.hero-product>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.48)}.hero-product:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.12))}.hero-product .promo-copy{position:relative;z-index:2}.hero-product .promo-copy>b{display:block;margin-top:18px;font-size:1.2rem;color:#fff}
 .promo-dialog-card{max-height:80vh;overflow:auto}.promo-dialog-card>p{color:var(--muted)}.promo-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}.promo-product{cursor:pointer;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#11151b}.promo-product img{width:100%;aspect-ratio:4/3;object-fit:cover}.promo-product div{padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center}.promo-product b{font-size:.85rem}.promo-product span{color:var(--gold);font-weight:900;font-size:.8rem}
 @media(max-width:620px){.promo-products{grid-template-columns:1fr}.hero-product .promo-copy{padding:28px}.hero-product .promo-copy h2{font-size:2.2rem}}
+
+/* v3 premium / court / delivery refinements */
+.product-body footer b{font-size:1.32rem!important;color:var(--gold);font-weight:900;letter-spacing:.01em}
+#detailPrice{font-size:2.2rem!important;line-height:1;color:var(--gold);font-weight:900}
+.product-modal-footer>div>small{letter-spacing:.1em;text-transform:uppercase;font-size:.65rem}
+#productDialog{width:min(920px,94vw);max-height:88vh;overflow:hidden}
+.product-modal{min-height:0;height:min(660px,86vh);grid-template-columns:minmax(300px,42%) 1fr}
+.product-modal>img{height:100%;min-height:0;object-fit:cover;object-position:center}
+.product-modal-body{max-height:none;height:100%;overflow:auto;padding:34px 34px 28px;scrollbar-width:thin}
+.product-modal-footer{position:sticky;bottom:-28px;background:linear-gradient(180deg,rgba(13,16,21,0),#0d1015 24%);padding:30px 0 4px;z-index:3}
+.hero-ambient{position:relative;height:470px;border-radius:38px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 30px 90px rgba(0,0,0,.48);isolation:isolate}
+.ambient-slide{position:absolute;inset:0;margin:0;opacity:0;transform:scale(1.04);transition:opacity 1s ease,transform 3.2s ease}.ambient-slide.active{opacity:1;transform:scale(1)}.ambient-slide img{width:100%;height:100%;object-fit:cover}.ambient-slide:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.03),rgba(0,0,0,.24))}
+.ambient-slide span{position:absolute;left:22px;bottom:20px;z-index:2;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:8px 11px;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.ambient-vapor{position:absolute;inset:auto 0 -28% 0;height:70%;z-index:4;pointer-events:none;opacity:.38;filter:blur(22px);background:radial-gradient(ellipse at 22% 72%,rgba(255,255,255,.23),transparent 34%),radial-gradient(ellipse at 58% 84%,rgba(255,255,255,.18),transparent 30%),radial-gradient(ellipse at 80% 62%,rgba(255,255,255,.16),transparent 28%);animation:vaporDrift 7s ease-in-out infinite alternate}
+@keyframes vaporDrift{from{transform:translate3d(-2%,8%,0) scale(1)}to{transform:translate3d(3%,-8%,0) scale(1.08)}}
+body[data-theme="FOOTBALL"] .ambient-vapor{opacity:.08}
+.experience-end{margin:80px 0 120px;padding:40px;border-radius:32px;border:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 15% 20%,rgba(212,175,55,.08),transparent 35%),#0e1116;display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}
+.experience-copy small{color:var(--accent);font-weight:900;letter-spacing:.13em}.experience-copy h2{font-family:"Playfair Display",serif;font-size:clamp(2rem,4vw,3.4rem);margin:7px 0}.experience-copy p{color:var(--muted)}
+.rating-card{padding:22px;border-radius:24px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07)}.rating-stars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.rating-stars button{aspect-ratio:1;border-radius:16px;background:#14181f;color:#8c95a1;border:1px solid var(--line);font-weight:900;font-size:1.05rem}.rating-stars button.active{background:var(--gold);color:#111;border-color:var(--gold);box-shadow:0 0 28px rgba(212,175,55,.18)}.rating-card textarea{width:100%;min-height:90px;margin:12px 0;background:#0b0e12;color:white;border:1px solid var(--line);border-radius:15px;padding:13px;font:inherit}.experience-actions{display:flex;gap:9px}.experience-actions button{flex:1;border-radius:13px;padding:12px;border:1px solid var(--line);background:#171b22;color:white;font-weight:800}.experience-actions button:first-child{background:var(--gold);color:#111;border-color:var(--gold)}
+body[data-theme="FOOTBALL"]{background:radial-gradient(circle at 22% 0%,rgba(66,211,94,.13),transparent 30%),linear-gradient(180deg,#07150c,#07110a 42%,#050b07)}
+body[data-theme="FOOTBALL"] main:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;background:repeating-linear-gradient(90deg,#fff 0 1px,transparent 1px 84px),repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 84px)}
+body[data-theme="FOOTBALL"] .place-hero-copy h1{font-family:Inter,sans-serif;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:-.055em}
+body[data-theme="FOOTBALL"] .hero-ambient{border-color:rgba(118,227,78,.28);box-shadow:0 30px 90px rgba(24,132,46,.16)}
+body[data-theme="FOOTBALL"] .promo-hero{transform:rotate(-.25deg);border-color:rgba(118,227,78,.25)}
+body[data-theme="FOOTBALL"] .promo-card:nth-child(even){transform:translateY(7px) rotate(.35deg)}
+body[data-theme="FOOTBALL"] .experience-end{background:radial-gradient(circle at 15% 20%,rgba(118,227,78,.13),transparent 35%),#0a1710}
+@media(max-width:760px){#productDialog{max-height:92vh}.product-modal{grid-template-columns:1fr;height:auto;max-height:92vh;overflow:auto}.product-modal>img{height:250px}.product-modal-body{height:auto;overflow:visible}.product-modal-footer{bottom:0}.hero-ambient{height:280px}.experience-end{grid-template-columns:1fr;padding:24px;margin-top:55px}.rating-stars button{border-radius:12px}}
+
+.hero-product .promo-copy{display:flex;flex-direction:column;justify-content:center;height:100%;padding-top:42px;padding-bottom:42px}
+.hero-product .promo-copy h2{font-size:clamp(2.2rem,5vw,4.2rem)!important;line-height:.98;max-width:680px;margin-bottom:14px}
+.hero-product .promo-copy p{max-width:560px;line-height:1.45;margin:0}
+.hero-product .promo-copy>b{font-size:2rem!important;color:var(--gold)!important;font-weight:900;margin-top:18px!important}
+.channel-checks{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}.channel-checks label{display:flex;align-items:center;gap:7px;background:#11151b;border:1px solid var(--line);border-radius:999px;padding:8px 11px}.channel-checks input{width:auto}
