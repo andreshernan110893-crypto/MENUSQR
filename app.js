@@ -24,7 +24,7 @@ async function init(){
  const allowed=new Set(state.channels.filter(x=>x.channel===state.place.place_type).map(x=>x.product_id));
  state.products=state.allProducts.filter(x=>allowed.has(x.id));
  const categoryIds=new Set(state.products.map(x=>x.category_id));state.categories=state.categories.filter(x=>categoryIds.has(x.id));
- document.body.dataset.placeType=state.place.place_type;document.body.dataset.theme=state.place.theme_key||state.place.place_type;$("#placeName").textContent=state.place.name;
+ document.body.dataset.placeType=state.place.place_type;document.body.dataset.theme=state.place.theme_key||state.place.place_type;$("#placeName").textContent=state.place.name;if(state.place.place_type==="COURT"){document.querySelector(".menu-title small").textContent="MENÚ DE CANCHA";document.querySelector(".menu-title h2").textContent="Antojitos para el partido"}
  renderHeaderLogos();setupExperience();state.activeCategory=state.categories[0]?.id||null;renderCategories();renderProducts();renderPromos();renderPromoGrid();restoreDiner();updateCart();setInterval(nextPromo,Number(state.place.hero_interval_ms||4800));
  if(state.diner)await refreshDiners();
 }
@@ -95,7 +95,7 @@ function visualClass(p){
  const coldCats=new Set(["cervezas","cubetazos","cocktails","mocktails","vinos","tequila","ron","whiskey","vodka","gin","daiquiris"]);
  const hotCats=new Set(["hotdogs","hamburguesas","pizzas","fried","papas","entradas","compartir","especialidades","combos"]);
  const portraitIds=new Set(["bs-073","bs-074","bs-075","bs-001","bs-002","bs-003","bs-004"]);
- const cold=p.brand_id==="BS"&&coldCats.has(p.category_id),hot=hotCats.has(p.category_id);
+ const cold=p.brand_id==="BS"&&coldCats.has(p.category_id),hot=hotCats.has(p.category_id)||String(p.category_id||"").startsWith("court-");
  return [cold?"cold":"",hot?"hot":"",portraitIds.has(p.id)?"fit-contain":""].filter(Boolean).join(" ");
 }
 function productCardV2(p){const cls=visualClass(p);return '<article class="product '+cls+'" data-open="'+p.id+'"><div class="product-media"><img loading="lazy" decoding="async" src="'+(p.image_url||'')+'" alt="'+safe(p.name)+'" width="640" height="640"><span class="brand-mark">'+safe(p.badge||(p.brand_id==='LB'?'LA BANDEJA':p.brand_id==='BS'?'BEER STATION':'COMBO'))+'</span><button class="quick-add" data-open="'+p.id+'" aria-label="Abrir">+</button></div><div class="product-body"><h3>'+safe(p.name)+'</h3><p>'+safe(p.description||'')+'</p><footer><b>'+money(p.price)+'</b></footer></div></article>'}
@@ -107,7 +107,7 @@ function renderProducts(){const list=state.products.filter(function(p){return p.
 function openPromotion(id){const pr=state.promos.find(function(p){return p.id===id});if(!pr)return;const ids=state.promoLinks.filter(function(x){return x.promotion_id===id}).map(function(x){return x.product_id});const list=ids.map(function(id){return state.products.find(function(p){return p.id===id})}).filter(Boolean);$('#promoDialogType').textContent=(pr.promo_type||'PROMOCIÓN').replace('_',' ');$('#promoDialogTitle').textContent=pr.title;$('#promoDialogSubtitle').textContent=pr.subtitle||'';$('#promoProducts').innerHTML=list.length?list.map(productCardV2).join(''):'<div class="empty">Sin productos disponibles.</div>';bindCardsV2($('#promoProducts'));$('#promoDialog').showModal()}
 function renderHomeSectionsV2(){
  const fresh=state.products.filter(function(p){return ['bs-073','bs-074','bs-075','lb-030'].includes(p.id)||p.badge==='NUEVO'});
- const combos=state.products.filter(function(p){return p.category_id==='combos'});
+ const combos=state.products.filter(function(p){return p.category_id===(state.place.place_type==='COURT'?'court-combos':'combos')});
  [['#newProducts','#newSection',fresh],['#comboProducts','#comboSection',combos]].forEach(function(x){
    const el=$(x[0]);$(x[1]).classList.toggle('hidden',!x[2].length);el.innerHTML=x[2].map(productCardV2).join('');bindCardsV2(el);
  });

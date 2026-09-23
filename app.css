@@ -443,3 +443,81 @@ linear-gradient(145deg,#171d25,#0d1117)!important}
 .ai-form button{border:0;border-radius:14px;background:var(--gold);color:#111;font-weight:900;padding:0 16px}
 @media(max-width:620px){.ai-fab{right:12px;bottom:76px;padding:10px 13px}.ai-fab b{display:none}.ai-dialog{width:100vw!important;height:100dvh!important;max-height:none!important;border-radius:0!important}.ai-chat{height:100dvh}.ai-chat-head{padding-top:22px}}
 
+
+
+/* Canchas: tema futbolero */
+body[data-place-type="COURT"]{
+  --gold:#52e56f;
+  --accent:#d9ff58;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(55,180,90,.22),transparent 36%),
+    linear-gradient(180deg,#07120b 0%,#050807 44%,#040605 100%);
+}
+body[data-place-type="COURT"]::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:
+    linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.025) 49.8%,rgba(255,255,255,.025) 50.2%,transparent 50.4%),
+    radial-gradient(circle at 50% 14%,transparent 0 78px,rgba(255,255,255,.025) 79px 81px,transparent 82px);
+}
+body[data-place-type="COURT"] .topbar{
+  border-bottom-color:rgba(90,230,120,.16);
+  background:rgba(4,10,6,.9);
+}
+body[data-place-type="COURT"] .cinema-hero .hero-ambient{
+  border:1px solid rgba(90,230,120,.16);
+  box-shadow:0 28px 90px rgba(0,0,0,.38),0 0 0 1px rgba(90,230,120,.03) inset;
+}
+body[data-place-type="COURT"] .cinema-slide:after{
+  content:"⚽";
+  position:absolute;right:5%;top:8%;z-index:3;
+  font-size:clamp(3rem,7vw,7rem);opacity:.13;
+  filter:drop-shadow(0 10px 22px rgba(0,0,0,.4));
+  animation:courtBallFloat 5s ease-in-out infinite;
+}
+@keyframes courtBallFloat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(12px) rotate(8deg)}}
+body[data-place-type="COURT"] .cinema-copy small:before{content:"⚽ ";}
+
+body[data-place-type="COURT"] .promo-card{
+  border-color:rgba(90,230,120,.12);
+  background:linear-gradient(145deg,#102016,#0a100c);
+}
+body[data-place-type="COURT"] .promo-card small{color:#d9ff58}
+body[data-place-type="COURT"] .promo-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(90,230,120,.32);
+  box-shadow:0 18px 50px rgba(0,0,0,.32);
+}
+
+body[data-place-type="COURT"] .category-tile{
+  border-color:rgba(90,230,120,.12)!important;
+}
+body[data-place-type="COURT"] .category-tile.active{
+  outline-color:#52e56f;
+  box-shadow:0 0 0 4px rgba(82,229,111,.07);
+}
+body[data-place-type="COURT"] .product{
+  border-color:rgba(90,230,120,.10);
+  background:linear-gradient(180deg,#111913,#0b100c);
+}
+body[data-place-type="COURT"] .product:hover{
+  border-color:rgba(90,230,120,.28);
+}
+body[data-place-type="COURT"] .brand-mark{
+  background:rgba(6,18,10,.82);
+  color:#d9ff58;
+  border-color:rgba(90,230,120,.16);
+}
+body[data-place-type="COURT"] .section-head h2{
+  text-shadow:0 8px 28px rgba(50,180,80,.08);
+}
+body[data-place-type="COURT"] .section-head small{
+  color:#d9ff58;
+}
+body[data-place-type="COURT"] #comboSection .section-head small:before{content:"⚽ ";}
+body[data-place-type="COURT"] #promoSection .section-head small:before{content:"🏆 ";}
+body[data-place-type="COURT"] .global-search{
+  border-color:rgba(90,230,120,.12);
+  background:linear-gradient(145deg,rgba(60,190,90,.07),rgba(255,255,255,.018));
+}
+
