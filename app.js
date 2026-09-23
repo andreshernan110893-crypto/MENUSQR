@@ -1,116 +1,36 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-
-const SUPABASE_URL = "https://bdasgggmksubcntqicfr.supabase.co";
-const SUPABASE_KEY = "sb_publishable_XNHu3v0-mBOp89Q5uPHV_Q_FxPZ3y2m";
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const PLACE_NAMES = {
-  CANCHA1:"Cancha 1", CANCHA2:"Cancha 2", M01:"Mesa VIP", M02:"Mesa 2", M03:"Mesa 3",
-  M04:"Mesa 4", M05:"Mesa 5", M06:"Mesa 6", M07:"Mesa 7", M08:"Mesa 8",
-  M09:"Mesa 9", M10:"Mesa 10", M11:"Mesa 11", M12:"Mesa 12"
-};
-
-const qs = new URLSearchParams(location.search);
-const place = (qs.get("place") || qs.get("mesa") || "M01").toUpperCase();
-const state = { categories:[], products:[], groups:[], options:[], links:[], cart:[], current:null, selectedCategory:"all" };
-
-const $ = s => document.querySelector(s);
-const money = n => "L " + Number(n || 0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const toast = msg => { const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2300); };
-
-$("#placeName").textContent = PLACE_NAMES[place] || place;
-$("#heroAction").onclick = () => $("#products").scrollIntoView({behavior:"smooth"});
-$("#searchButton").onclick = () => $("#search").classList.toggle("hidden");
-$("#search").oninput = renderProducts;
-$("#cartButton").onclick = $("#cartDock").onclick = () => { renderCart(); $("#cartDialog").showModal(); };
-$("#orderButton").onclick = showOrderStatus;
-$("#bellButton").onclick = () => $("#bellDialog").showModal();
-document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
-document.querySelectorAll("[data-reason]").forEach(b=>b.onclick=()=>callStaff(b.dataset.reason));
-
-function productTotal(item){
-  const p = state.products.find(x=>x.id===item.product_id);
-  const extras = item.option_ids.reduce((sum,id)=>sum+Number(state.options.find(o=>o.id===id)?.price_delta||0),0);
-  return (Number(p?.price||0)+extras)*item.qty;
+const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable_9Du-_m5etaGt-vCBkDvROw_-0sdB_jT");
+const qs=new URLSearchParams(location.search),place=(qs.get("place")||"M01").toUpperCase();
+const $=s=>document.querySelector(s), money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const state={brands:[],categories:[],products:[],promos:[],activeBrand:"LB",activeCategory:null,cart:[],session:null,diner:null,place:null,promoIndex:0};
+const safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)};
+async function init(){
+ const [b,c,p,pr,pl]=await Promise.all([
+  sb.from("brands").select("*").eq("active",true).order("sort_order"),
+  sb.from("categories").select("*").eq("active",true).order("sort_order"),
+  sb.from("products").select("*").eq("active",true).order("sort_order"),
+  sb.from("promotions").select("*").eq("active",true).order("sort_order"),
+  sb.from("places").select("*").eq("code",place).maybeSingle()
+ ]);
+ state.brands=b.data||[];state.categories=c.data||[];state.products=p.data||[];state.promos=pr.data||[];state.place=pl.data||{code:place,name:place,place_type:"TABLE"};
+ document.body.dataset.placeType=state.place.place_type; $("#placeName").textContent=state.place.name;
+ restoreDiner(); renderBrands(); selectBrand("LB"); renderPromos(); renderPromoGrid(); updateCart(); setInterval(nextPromo,4500);
+ if(state.diner) await refreshDiners(); else setTimeout(()=>$("#joinDialog").showModal(),700);
 }
-function cartTotal(){ return state.cart.reduce((s,i)=>s+productTotal(i),0); }
-function updateDock(){
-  const count=state.cart.reduce((s,i)=>s+i.qty,0);
-  $("#cartCount").textContent=count; $("#dockCount").textContent=count; $("#dockTotal").textContent=money(cartTotal())+" →";
-  $("#cartDock").classList.toggle("hidden",count===0);
-}
-async function load(){
-  const [c,p,g,o,l] = await Promise.all([
-    sb.from("categories").select("*").eq("active",true).order("sort_order"),
-    sb.from("products").select("*").eq("active",true).order("sort_order"),
-    sb.from("option_groups").select("*").eq("active",true).order("sort_order"),
-    sb.from("options").select("*").eq("active",true).order("sort_order"),
-    sb.from("product_option_groups").select("*")
-  ]);
-  const err = c.error||p.error||g.error||o.error||l.error;
-  if(err) toast("No se pudo cargar el menú");
-  state.categories=c.data||[]; state.products=p.data||[]; state.groups=g.data||[]; state.options=o.data||[]; state.links=l.data||[];
-  renderCategories(); renderProducts();
-  setTimeout(()=>$("#splash").classList.add("fade"),250);
-}
-function renderCategories(){
-  const nav=$("#categories"); nav.innerHTML="";
-  const all=document.createElement("button"); all.textContent="Todo"; all.className=state.selectedCategory==="all"?"active":"";
-  all.onclick=()=>{state.selectedCategory="all";renderCategories();renderProducts()}; nav.append(all);
-  state.categories.forEach(c=>{const b=document.createElement("button");b.textContent=c.name;b.className=state.selectedCategory===c.id?"active":"";b.onclick=()=>{state.selectedCategory=c.id;renderCategories();renderProducts()};nav.append(b)});
-}
-function renderProducts(){
-  const q=$("#search").value.trim().toLowerCase();
-  let items=state.products.filter(p=>(!q||(p.name+" "+(p.description||"")).toLowerCase().includes(q))&&(state.selectedCategory==="all"||p.category_id===state.selectedCategory));
-  const out=$("#products"); out.innerHTML="";
-  if(!items.length){
-    out.innerHTML='<div class="empty"><h3>Menú listo para cargar</h3><p>No hay productos visibles todavía. Cuando se agreguen productos en Distrito 504 POS aparecerán aquí automáticamente.</p></div>';
-    return;
-  }
-  items.forEach(p=>{const el=document.createElement("article");el.className="product";el.innerHTML='<div><span class="station">'+(p.station==="LB"?"LA BANDEJA":"BEER STATION")+'</span><h3>'+escapeHtml(p.name)+'</h3><p>'+escapeHtml(p.description||"")+'</p></div><footer><b>'+money(p.price)+'</b><button>Agregar</button></footer>';el.querySelector("button").onclick=()=>openProduct(p);out.append(el)});
-}
-function openProduct(p){
-  state.current={product:p, option_ids:[]};
-  $("#detailBrand").textContent=p.station==="LB"?"LA BANDEJA":"BEER STATION";
-  $("#detailName").textContent=p.name; $("#detailDescription").textContent=p.description||""; $("#itemNote").value="";
-  const groups=state.links.filter(x=>x.product_id===p.id).map(x=>state.groups.find(g=>g.id===x.option_group_id)).filter(Boolean);
-  const wrap=$("#optionGroups"); wrap.innerHTML="";
-  groups.forEach(g=>{const box=document.createElement("div");box.className="option-group";box.innerHTML="<h4>"+escapeHtml(g.name)+(g.required?" *":"")+"</h4>";state.options.filter(o=>o.option_group_id===g.id).forEach(o=>{const row=document.createElement("label");row.className="option";const type=g.max_selections===1?"radio":"checkbox";row.innerHTML='<span><input type="'+type+'" name="g_'+g.id+'" value="'+o.id+'"> '+escapeHtml(o.name)+'</span><b>'+(Number(o.price_delta)?("+"+money(o.price_delta)):"")+"</b>";row.querySelector("input").onchange=()=>refreshConfiguredPrice();box.append(row)});wrap.append(box)});
-  refreshConfiguredPrice(); $("#productDialog").showModal();
-}
-function selectedOptionIds(){ return [...$("#optionGroups").querySelectorAll("input:checked")].map(x=>x.value); }
-function refreshConfiguredPrice(){ const ids=selectedOptionIds();const extra=ids.reduce((s,id)=>s+Number(state.options.find(o=>o.id===id)?.price_delta||0),0);$("#detailPrice").textContent=money(Number(state.current?.product.price||0)+extra); }
-$("#addConfigured").onclick=()=>{
-  if(!state.current)return; const p=state.current.product; const option_ids=selectedOptionIds();
-  state.cart.push({product_id:p.id,qty:1,option_ids,note:$("#itemNote").value.trim()}); updateDock(); $("#productDialog").close(); toast("Agregado al pedido");
-};
-function renderCart(){
-  const box=$("#cartItems"); box.innerHTML="";
-  state.cart.forEach((i,idx)=>{const p=state.products.find(x=>x.id===i.product_id);const el=document.createElement("div");el.className="cart-line";el.innerHTML='<div><b>'+escapeHtml(p?.name||"Producto")+'</b><small>'+i.qty+' × '+money(productTotal({...i,qty:1}))+(i.note?" · "+escapeHtml(i.note):"")+'</small></div><div><b>'+money(productTotal(i))+'</b><button data-i="'+idx+'">Quitar</button></div>';el.querySelector("button").onclick=()=>{state.cart.splice(idx,1);renderCart();updateDock()};box.append(el)});
-  $("#cartTotal").textContent=money(cartTotal());
-  if(!state.cart.length)box.innerHTML='<div class="empty">Tu carrito está vacío.</div>';
-}
-$("#sendOrder").onclick=async()=>{
-  const name=$("#customerName").value.trim(); if(!name)return toast("Escribe tu nombre"); if(!state.cart.length)return toast("Agrega productos");
-  const btn=$("#sendOrder"); btn.disabled=true; btn.textContent="Enviando…";
-  const payload={place,name,items:state.cart.map(x=>({product_id:x.product_id,qty:x.qty,option_ids:x.option_ids,note:x.note}))};
-  const {data,error}=await sb.rpc("place_public_order",{p_payload:payload});
-  btn.disabled=false;btn.textContent="Enviar pedido";
-  if(error)return toast(error.message||"No se pudo enviar");
-  const saved=JSON.parse(localStorage.getItem("d504_orders")||"[]"); saved.unshift({order_id:data.order_id,tracking_token:data.tracking_token,total:data.total,created_at:new Date().toISOString()}); localStorage.setItem("d504_orders",JSON.stringify(saved.slice(0,10)));
-  state.cart=[];updateDock();$("#cartDialog").close();toast("Pedido enviado ✅");
-};
-async function callStaff(reason){
-  $("#bellMessage").textContent="Enviando solicitud…";
-  const {error}=await sb.rpc("call_staff_public",{p_payload:{place,reason}});
-  $("#bellMessage").textContent=error?(error.message||"No se pudo enviar"):"Solicitud enviada. Ya avisamos al personal.";
-}
-async function showOrderStatus(){
-  const saved=JSON.parse(localStorage.getItem("d504_orders")||"[]"); const box=$("#orderStatus"); box.innerHTML="";
-  if(!saved.length){box.innerHTML='<div class="empty">Todavía no has enviado pedidos desde este dispositivo.</div>';$("#statusDialog").showModal();return}
-  for(const it of saved){const {data}=await sb.rpc("get_public_order_status",{p_tracking_token:it.tracking_token});const el=document.createElement("div");el.className="status-card";el.innerHTML="<b>"+statusLabel(data?.status||"RECEIVED")+"</b><div>"+money(data?.total??it.total)+"</div><small>"+new Date(data?.created_at||it.created_at).toLocaleString("es-HN")+"</small>";box.append(el)}
-  $("#statusDialog").showModal();
-}
-function statusLabel(s){return {RECEIVED:"Recibido",PREPARING:"Preparando",READY:"Listo",ON_THE_WAY:"En camino",DELIVERED:"Entregado",CANCELLED:"Cancelado"}[s]||s}
-function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
-load();
+function restoreDiner(){try{const x=JSON.parse(localStorage.getItem("d504_diner_"+place)||"null");if(x?.session_id&&x?.diner_id){state.diner=x;state.session={id:x.session_id};$("#dinerName").textContent=x.name}}catch{}}
+function renderBrands(){const el=$("#brands");el.innerHTML=state.brands.map(b=>`<button class="brand ${b.id===state.activeBrand?"active":""}" data-brand="${b.id}"><img src="${b.logo_url||""}"><span>${safe(b.short_name||b.name)}</span></button>`).join("");el.querySelectorAll("[data-brand]").forEach(x=>x.onclick=()=>selectBrand(x.dataset.brand))}
+function selectBrand(id){state.activeBrand=id;renderBrands();const cats=state.categories.filter(c=>c.brand_id===id);state.activeCategory=cats[0]?.id||null;renderCategories();renderProducts()}
+function renderCategories(){const cats=state.categories.filter(c=>c.brand_id===state.activeBrand),el=$("#categories");el.innerHTML=cats.map(c=>`<button class="${c.id===state.activeCategory?"active":""}" data-cat="${c.id}"><span>${safe(c.name)}</span></button>`).join("");el.querySelectorAll("[data-cat]").forEach(x=>x.onclick=()=>{state.activeCategory=x.dataset.cat;renderCategories();renderProducts()})}
+function renderProducts(){const q=$("#search").value.trim().toLowerCase();const list=state.products.filter(p=>p.brand_id===state.activeBrand&&p.category_id===state.activeCategory&&(!q||(p.name+" "+(p.description||"")).toLowerCase().includes(q)));const el=$("#products");el.innerHTML=list.length?list.map(p=>`<article class="product"><img src="${p.image_url}" alt=""><div class="product-body"><small>${p.brand_id==="LB"?"LA BANDEJA":"BEER STATION"}</small><h3>${safe(p.name)}</h3><p>${safe(p.description||"")}</p><footer><b>${money(p.price)}</b><button data-add="${p.id}">Agregar</button></footer></div></article>`).join(""):`<div class="empty">No hay productos en esta categoría.</div>`;el.querySelectorAll("[data-add]").forEach(b=>b.onclick=()=>addProduct(b.dataset.add))}
+function addProduct(id){const p=state.products.find(x=>x.id===id);if(!p)return;const found=state.cart.find(x=>x.product_id===id);if(found)found.qty++;else state.cart.push({product_id:id,qty:1,note:""});updateCart();toast(p.name+" agregado")}
+function updateCart(){const count=state.cart.reduce((a,b)=>a+b.qty,0),total=state.cart.reduce((a,i)=>a+(state.products.find(p=>p.id===i.product_id)?.price||0)*i.qty,0);$("#cartCount").textContent=count;$("#cartTotalDock").textContent=money(total);$("#cartDock").classList.toggle("hidden",!count)}
+function renderCart(){const el=$("#cartItems");el.innerHTML=state.cart.map((i,n)=>{const p=state.products.find(x=>x.id===i.product_id);return `<div class="cart-line"><div><b>${safe(p?.name)}</b><small>${money(p?.price)} c/u</small></div><div class="qty"><button data-less="${n}">−</button><strong>${i.qty}</strong><button data-more="${n}">+</button></div></div>`}).join("")||'<div class="empty">Tu pedido está vacío.</div>';$("#cartGrand").textContent=money(state.cart.reduce((a,i)=>a+(state.products.find(p=>p.id===i.product_id)?.price||0)*i.qty,0));el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{state.cart[+b.dataset.more].qty++;renderCart();updateCart()});el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const i=+b.dataset.less;if(--state.cart[i].qty<=0)state.cart.splice(i,1);renderCart();updateCart()})}
+async function joinTable(){const name=$("#joinName").value.trim();if(!name)return toast("Escribe tu nombre");const {data,error}=await sb.rpc("join_table_public",{p_place:place,p_name:name});if(error)return toast(error.message);state.diner={...data,name};state.session={id:data.session_id};localStorage.setItem("d504_diner_"+place,JSON.stringify(state.diner));$("#dinerName").textContent=name;$("#joinDialog").close();await refreshDiners();toast("Te uniste a "+state.place.name)}
+async function refreshDiners(){if(!state.session?.id)return;const {data}=await sb.rpc("get_table_diners_public",{p_session:state.session.id});const list=Array.isArray(data)?data:[];$("#diners").innerHTML=list.map(d=>`<span class="diner">${safe(d.name).slice(0,1).toUpperCase()}</span>`).join("");$("#dinerCount").textContent=list.length+" comensal"+(list.length===1?"":"es")}
+async function sendOrder(){if(!state.diner){$("#joinDialog").showModal();return}if(!state.cart.length)return toast("Agrega productos");const payload={session_id:state.session.id,diner_id:state.diner.diner_id,items:state.cart};const btn=$("#sendOrder");btn.disabled=true;btn.textContent="Enviando…";const {data,error}=await sb.rpc("place_order_public",{p_payload:payload});btn.disabled=false;btn.textContent="Enviar pedido";if(error)return toast(error.message);const saved=JSON.parse(localStorage.getItem("d504_orders")||"[]");saved.unshift({token:data.tracking_token,total:data.total,created_at:new Date().toISOString()});localStorage.setItem("d504_orders",JSON.stringify(saved.slice(0,12)));state.cart=[];updateCart();$("#cartDialog").close();toast("Pedido enviado ✅")}
+async function callStaff(reason){if(!state.diner){$("#joinDialog").showModal();return}const {error}=await sb.rpc("call_staff_public",{p_payload:{session_id:state.session.id,diner_id:state.diner.diner_id,reason}});toast(error?error.message:"Solicitud enviada")}
+function renderPromos(){if(!state.promos.length)return;const p=state.promos[state.promoIndex%state.promos.length];$("#promoHero").innerHTML=`<img src="${p.image_url}"><div class="promo-copy"><small>DESTACADO</small><h2>${safe(p.title)}</h2><p>${safe(p.subtitle||"")}</p><button data-promo-brand="${p.brand_id||"LB"}">${safe(p.cta||"Explorar")}</button></div>`;$("#promoHero button").onclick=()=>selectBrand($("#promoHero button").dataset.promoBrand);$("#promoDots").innerHTML=state.promos.map((_,i)=>`<button class="${i===state.promoIndex?"active":""}" data-dot="${i}"></button>`).join("");$("#promoDots").querySelectorAll("[data-dot]").forEach(d=>d.onclick=()=>{state.promoIndex=+d.dataset.dot;renderPromos()})}
+function nextPromo(){if(!state.promos.length)return;state.promoIndex=(state.promoIndex+1)%state.promos.length;renderPromos()}
+function renderPromoGrid(){const el=$("#promoGrid");el.innerHTML=state.promos.slice(0,4).map(p=>`<article><img src="${p.image_url}"><div><b>${safe(p.title)}</b><span>${safe(p.subtitle||"")}</span></div></article>`).join("")}
+$("#search").oninput=renderProducts;$("#cartDock").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#cartTop").onclick=()=>{renderCart();$("#cartDialog").showModal()};$("#joinButton").onclick=joinTable;$("#sendOrder").onclick=sendOrder;$("#bellButton").onclick=()=>$("#serviceDialog").showModal();document.querySelectorAll("[data-service]").forEach(b=>b.onclick=()=>{callStaff(b.dataset.service);$("#serviceDialog").close()});document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());init();

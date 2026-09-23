@@ -1,146 +1,47 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#08090c">
-  <title>Distrito 504 · Premium Lounge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/app.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090a0d">
+<title>Distrito 504 · Menú QR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
 </head>
 <body>
-  <div id="splash">
-    <div class="splash-ring"><div class="mark">D504</div></div>
-    <b>Distrito 504</b>
-    <span>Preparando tu experiencia premium…</span>
-  </div>
-
-  <header class="topbar">
-    <div class="brand-lockup">
-      <span class="brand-monogram">D504</span>
-      <div>
-        <strong>Distrito 504</strong>
-        <small>Servicio Premium en Mesa</small>
-      </div>
-    </div>
-
-    <button id="placeButton" class="place">
-      <small>ESTÁS EN</small>
-      <strong id="placeName">Distrito 504</strong>
-    </button>
-
-    <div class="header-actions">
-      <button id="bellButton" class="icon-button" aria-label="Llamar al personal"><span>✦</span><em>Atención</em></button>
-      <button id="orderButton" class="icon-button" aria-label="Ver pedidos"><span>◫</span><em>Pedidos</em></button>
-      <button id="cartButton" class="cart-button"><span>Bag</span><b id="cartCount">0</b></button>
-    </div>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow">DISTRITO 504 · PREMIUM LOUNGE</div>
-        <h1>Una experiencia premium en tu mesa.</h1>
-        <p>La Bandeja y Beer Station reunidos en un solo menú, pensado para disfrutar con estilo.</p>
-        <div class="hero-actions">
-          <button id="heroAction">Descubrir menú</button>
-          <button class="hero-ghost" type="button" onclick="document.querySelector('#orderButton').click()">Ver mi pedido</button>
-        </div>
-        <div class="hero-meta">
-          <span>Servicio a mesa</span>
-          <span>Selección premium</span>
-          <span>Pedido directo</span>
-        </div>
-      </div>
-      <div class="hero-ornament" aria-hidden="true">
-        <div class="gold-ring ring-a"></div>
-        <div class="gold-ring ring-b"></div>
-        <div class="hero-seal">D504</div>
-      </div>
-    </section>
-
-    <section class="menu-shell">
-      <div class="menu-head">
-        <div>
-          <small>EXPLORA NUESTRO MENÚ</small>
-          <h2>Selecciona tus favoritos</h2>
-          <p>Una selección pensada para acompañar tu experiencia en mesa.</p>
-        </div>
-        <button id="searchButton">⌕ <span>Buscar</span></button>
-      </div>
-
-      <input id="search" class="search hidden" placeholder="Busca cócteles, hamburguesas, cortes, smoothies…">
-      <nav id="categories" class="categories"></nav>
-      <section id="products" class="products"></section>
-    </section>
-  </main>
-
-  <button id="cartDock" class="cart-dock hidden">
-    <span><b id="dockCount">0</b> productos</span>
-    <strong id="dockTotal">L 0.00 →</strong>
-  </button>
-
-  <dialog id="productDialog">
-    <button class="dialog-close" data-close>×</button>
-    <div class="dialog-body">
-      <small id="detailBrand"></small>
-      <h2 id="detailName"></h2>
-      <p id="detailDescription"></p>
-      <div id="optionGroups"></div>
-      <label>Indicaciones especiales
-        <textarea id="itemNote" placeholder="Ej. sin cebolla, poco hielo, término medio…"></textarea>
-      </label>
-      <div class="dialog-total">
-        <div><small>TOTAL</small><b id="detailPrice"></b></div>
-        <button id="addConfigured">Agregar al pedido</button>
-      </div>
-    </div>
-  </dialog>
-
-  <dialog id="cartDialog">
-    <button class="dialog-close" data-close>×</button>
-    <div class="dialog-body">
-      <small>TU PEDIDO</small>
-      <h2>Todo listo para disfrutar</h2>
-      <p>Revisa cada detalle antes de enviarlo a cocina o barra.</p>
-      <div id="cartItems"></div>
-      <div class="grand"><span>Total</span><b id="cartTotal">L 0.00</b></div>
-      <label>Nombre para el pedido
-        <input id="customerName" maxlength="60" placeholder="¿A nombre de quién va el pedido?">
-      </label>
-      <button id="sendOrder" class="primary">Confirmar pedido</button>
-    </div>
-  </dialog>
-
-  <dialog id="statusDialog">
-    <button class="dialog-close" data-close>×</button>
-    <div class="dialog-body">
-      <small>ESTADO DE TU PEDIDO</small>
-      <h2>Así va tu experiencia</h2>
-      <p>Consulta en tiempo real el avance de tus pedidos.</p>
-      <div id="orderStatus"></div>
-    </div>
-  </dialog>
-
-  <dialog id="bellDialog">
-    <button class="dialog-close" data-close>×</button>
-    <div class="dialog-body">
-      <small>ATENCIÓN EN MESA</small>
-      <h2>¿En qué podemos ayudarte?</h2>
-      <p>Selecciona el tipo de asistencia que necesitas.</p>
-      <div class="bell-options">
-        <button data-reason="ATENCION"><span>✦</span><b>Necesito atención</b></button>
-        <button data-reason="CUENTA"><span>◇</span><b>Quiero la cuenta</b></button>
-        <button data-reason="LIMPIEZA"><span>✧</span><b>Necesitamos limpieza</b></button>
-        <button data-reason="PEDIDO"><span>◫</span><b>Consulta sobre mi pedido</b></button>
-      </div>
-      <p id="bellMessage"></p>
-    </div>
-  </dialog>
-
-  <div id="toast" role="status"></div>
-  <script type="module" src="/app.js"></script>
-</body>
-</html>
+<header class="topbar">
+ <div class="place"><small>ESTÁS EN</small><strong id="placeName">Distrito 504</strong></div>
+ <div class="table-party"><div id="diners"></div><span id="dinerCount">0 comensales</span><b id="dinerName">Invitado</b></div>
+ <div class="actions"><button id="bellButton" aria-label="Llamar personal">🔔</button><button id="cartTop">🛒 <span id="cartCount">0</span></button></div>
+</header>
+<main>
+<section class="intro">
+ <div><span class="eyebrow">DISTRITO 504</span><h1>Tu mesa. Tu grupo. Tu pedido.</h1><p>La Bandeja y Beer Station juntos, sin levantarte de tu mesa.</p></div>
+</section>
+<section class="promo-wrap">
+ <div id="promoHero" class="promo-hero"></div>
+ <div id="promoDots" class="promo-dots"></div>
+</section>
+<section class="brand-section"><div class="section-head"><small>ELIGE TU EXPERIENCIA</small><h2>¿Dónde quieres pedir?</h2></div><div id="brands" class="brands"></div></section>
+<section class="menu-section">
+ <div class="section-head menu-title"><div><small>MENÚ</small><h2>Explora por categoría</h2></div><input id="search" placeholder="Buscar en esta categoría…"></div>
+ <nav id="categories" class="categories"></nav>
+ <section id="products" class="products"></section>
+</section>
+<section class="more-promos"><div class="section-head"><small>PARA TI</small><h2>Más para disfrutar</h2></div><div id="promoGrid" class="promo-grid"></div></section>
+</main>
+<button id="cartDock" class="cart-dock hidden"><span>Ver pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
+<dialog id="joinDialog">
+ <div class="dialog-card"><div class="dialog-icon">👋</div><small>BIENVENIDO A TU MESA</small><h2>¿Cómo te llamas?</h2><p>Así identificamos tu pedido dentro de esta mesa.</p><input id="joinName" maxlength="50" placeholder="Tu nombre"><button id="joinButton" class="primary">Unirme a la mesa</button></div>
+</dialog>
+<dialog id="cartDialog">
+ <button class="close" data-close>×</button><div class="dialog-card"><small>TU PEDIDO</small><h2>Revisa antes de enviar</h2><div id="cartItems"></div><div class="grand"><span>Total</span><b id="cartGrand">L 0.00</b></div><button id="sendOrder" class="primary">Enviar pedido</button></div>
+</dialog>
+<dialog id="serviceDialog">
+ <button class="close" data-close>×</button><div class="dialog-card"><small>SERVICIO EN MESA</small><h2>¿En qué te ayudamos?</h2><div class="service-grid"><button data-service="ATENCION">🙋 Atención</button><button data-service="CUENTA">🧾 La cuenta</button><button data-service="LIMPIEZA">✨ Limpieza</button><button data-service="PEDIDO">🍽️ Mi pedido</button></div></div>
+</dialog>
+<div id="toast"></div>
+<script type="module" src="/app.js"></script>
+</body></html>
