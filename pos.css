@@ -31,3 +31,5 @@ body[data-station="BS"]{--gold:#f5a400;--accent:#f5a400}
 .origin.CANCHA{background:#0f2d19;color:#7bea8f;border:1px solid #245e35}
 @media(max-width:760px){header{gap:10px}.station-pill{font-size:.75rem;padding:7px 10px}.station-order{grid-template-columns:1fr}.station-order>span,.station-order>select{margin-top:8px}}
 
+
+.pos-online{font-size:.72rem;font-weight:900;letter-spacing:.08em;color:#82e49c;padding:7px 10px;border:1px solid #28583a;border-radius:999px;background:#102017}

@@ -8,12 +8,10 @@ const state={products:[],categories:[],places:[],groups:[],options:[],links:[],o
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)};
 const label=station==="LB"?"La Bandeja":"Beer Station";
 $("#posTitle").textContent="POS "+label;
-$("#authTitle").textContent="POS "+label;
 $("#stationPill").textContent=station;
 $("#ordersTitle").textContent="Pedidos "+label;
 document.title="POS "+label;document.body.dataset.station=station;
-async function boot(){const {data:{session}}=await sb.auth.getSession();if(session)enter();else $("#posAuth").classList.remove("hidden")}
-async function enter(){const {data}=await sb.rpc("is_admin");if(!data)return toast("Acceso no autorizado");$("#posAuth").classList.add("hidden");$("#posApp").classList.remove("hidden");await load();renderAll();startRealtime()}
+async function boot(){await load();renderAll();startRealtime()}
 async function load(){
  const [p,c,pl,g,o,l,ord]=await Promise.all([
   sb.from("products").select("*").eq("active",true).order("sort_order"),
@@ -22,7 +20,7 @@ async function load(){
   sb.from("option_groups").select("*").eq("active",true),
   sb.from("options").select("*").eq("active",true).order("sort_order"),
   sb.from("product_option_groups").select("*"),
-  sb.from("orders").select("*,diners(display_name),order_items(*),table_sessions(place_code,places(name,place_type))").eq("station",station).order("created_at",{ascending:false}).limit(80)
+  sb.rpc("get_pos_orders_public",{p_station:station})
  ]);
  const all=p.data||[];
  state.products=all.filter(x=>x.brand_id===station);
@@ -43,7 +41,7 @@ function renderCats(){
 function renderProducts(){
  const q=$("#search").value.toLowerCase().trim();
  const list=q?state.products.filter(p=>(p.name+" "+(p.description||"")).toLowerCase().includes(q)):state.products.filter(p=>p.category_id===state.cat);
- $("#productGrid").innerHTML=list.map(p=>'<article class="p" data-p="'+p.id+'"><img src="'+(p.image_url||"")+'"><div><h3>'+p.name+'</h3><footer><b>'+money(p.price)+'</b><button data-p="'+p.id+'">+</button></footer></div></article>').join("");
+ $("#productGrid").innerHTML=list.map(p=>'<article class="p" data-p="'+p.id+'"><img loading="lazy" decoding="async" width="520" height="520" src="'+(p.image_url||"")+'"><div><h3>'+p.name+'</h3><footer><b>'+money(p.price)+'</b><button data-p="'+p.id+'">+</button></footer></div></article>').join("");
  $("#productGrid").querySelectorAll("[data-p]").forEach(x=>x.onclick=e=>{e.stopPropagation();openProduct(x.dataset.p)});
 }
 function openProduct(id){
@@ -72,7 +70,7 @@ function renderTicket(){
  el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const n=+b.dataset.less;if(--state.cart[n].qty<=0)state.cart.splice(n,1);renderTicket()});
 }
 function originLabel(o){
- const type=o.table_sessions?.places?.place_type||o.order_source||"QR";
+ const type=o.place_type||o.order_source||"QR";
  if(type==="TABLE")return "MESA";
  if(type==="COURT")return "CANCHA";
  if(type==="DELIVERY")return "DELIVERY";
@@ -81,19 +79,17 @@ function originLabel(o){
 }
 function renderOrders(){
  $("#orders").innerHTML=state.orders.map(o=>{
-  const placeName=o.table_sessions?.places?.name||o.table_sessions?.place_code||"";
+  const placeName=o.place_name||o.place_code||"";
   const type=originLabel(o);
-  const items=(o.order_items||[]).map(i=>'<span>'+i.qty+' × '+i.product_name+'</span>').join("");
-  return '<div class="order-row station-order"><div><b>'+(o.customer_name||o.diners?.display_name||"Pedido")+'</b><small>'+new Date(o.created_at).toLocaleString("es-HN")+' · '+money(o.total)+'</small><small class="origin '+type+'">'+type+' · '+placeName+'</small><div class="order-items">'+items+'</div></div><span>'+o.payment_status+'</span><select data-order="'+o.id+'"><option '+(o.status==="RECEIVED"?"selected":"")+'>RECEIVED</option><option '+(o.status==="PREPARING"?"selected":"")+'>PREPARING</option><option '+(o.status==="READY"?"selected":"")+'>READY</option><option '+(o.status==="DELIVERED"?"selected":"")+'>DELIVERED</option><option '+(o.status==="CANCELLED"?"selected":"")+'>CANCELLED</option></select></div>';
+  const items=(o.items||[]).map(i=>'<span>'+i.qty+' × '+i.product_name+'</span>').join("");
+  return '<div class="order-row station-order"><div><b>'+(o.customer_name||o.diner_name||"Pedido")+'</b><small>'+new Date(o.created_at).toLocaleString("es-HN")+' · '+money(o.total)+'</small><small class="origin '+type+'">'+type+' · '+placeName+'</small><div class="order-items">'+items+'</div></div><span>'+(o.payment_status||"PENDING")+'</span><select data-order="'+o.id+'"><option '+(o.status==="RECEIVED"?"selected":"")+'>RECEIVED</option><option '+(o.status==="PREPARING"?"selected":"")+'>PREPARING</option><option '+(o.status==="READY"?"selected":"")+'>READY</option><option '+(o.status==="DELIVERED"?"selected":"")+'>DELIVERED</option><option '+(o.status==="CANCELLED"?"selected":"")+'>CANCELLED</option></select></div>';
  }).join("")||'<div class="empty-pos">Sin pedidos todavía.</div>';
- $("#orders").querySelectorAll("[data-order]").forEach(s=>s.onchange=async()=>{await sb.from("orders").update({status:s.value}).eq("id",s.dataset.order);toast("Estado actualizado")});
+ $("#orders").querySelectorAll("[data-order]").forEach(s=>s.onchange=async()=>{const {error}=await sb.rpc("pos_update_order_status_public",{p_order:s.dataset.order,p_station:station,p_status:s.value});toast(error?error.message:"Estado actualizado")});
 }
 function startRealtime(){
  if(state.realtime)return;state.realtime=true;
- sb.channel("pos-"+station).on("postgres_changes",{event:"*",schema:"public",table:"orders",filter:"station=eq."+station},async payload=>{await load();renderAll();toast(payload.eventType==="INSERT"?"Nueva orden recibida":"Orden actualizada")}).subscribe();
+ setInterval(async()=>{const oldFirst=state.orders[0]?.id;const {data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return;state.orders=Array.isArray(data)?data:[];renderOrders();if(oldFirst&&state.orders[0]?.id&&state.orders[0].id!==oldFirst)toast("Nueva orden recibida")},4000);
 }
-$("#login").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("#email").value.trim(),password:$("#password").value});if(error)return $("#authMsg").textContent=error.message;enter()};
-$("#logout").onclick=async()=>{await sb.auth.signOut();location.reload()};
 $("#placeSelect").onchange=()=>$("#ticketPlace").textContent=$("#placeSelect").selectedOptions[0]?.textContent||"Pedido";
 $("#search").oninput=renderProducts;
 $("#refresh").onclick=async()=>{await load();renderAll()};
