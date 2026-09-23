@@ -1,4 +1,4 @@
-name: Deploy Distrito 504 to Vercel
+name: Deploy MENUSQR Clean
 
 on:
   push:
@@ -9,9 +9,6 @@ on:
 jobs:
   deploy-production:
     runs-on: ubuntu-latest
-    env:
-      VERCEL_ORG_ID: team_ZPJUqlCMZNyQhSeYQnGiefVn
-      VERCEL_PROJECT_ID: prj_HA3g3cJcpMUxzseWLt1y6KXandNX
 
     steps:
       - name: Checkout
@@ -20,13 +17,19 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Deploy source directly to production
+      - name: Ensure clean Vercel project exists
+        shell: bash
+        run: |
+          if vercel project inspect menusqr-clean --scope andreshernan110893-2059s-projects --token=${{ secrets.VERCEL_TOKEN }} >/dev/null 2>&1; then
+            echo "menusqr-clean already exists"
+          else
+            vercel project add menusqr-clean --scope andreshernan110893-2059s-projects --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Deploy clean project to production
         id: deploy
         shell: bash
         run: |
-          DEPLOYMENT_URL=$(vercel deploy --prod --yes --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null | tail -n 1)
+          DEPLOYMENT_URL=$(vercel deploy --prod --yes --project menusqr-clean --scope andreshernan110893-2059s-projects --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null | tail -n 1)
           echo "deployment_url=$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
           echo "Deployment: $DEPLOYMENT_URL"
-
-      - name: Assign permanent production alias
-        run: vercel alias set "${{ steps.deploy.outputs.deployment_url }}" distrito-504-pos.vercel.app --token=${{ secrets.VERCEL_TOKEN }}
