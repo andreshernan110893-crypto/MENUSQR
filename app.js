@@ -165,11 +165,16 @@ function aiCart(){
 }
 function aiCandidates(selected){
  const seen=new Set(selected?[selected.id]:[]),out=[];
+ state.cart.forEach(x=>seen.add(x.product_id));
+ recHistory.recommended.forEach(id=>seen.add(id));
  const add=p=>{if(p&&!seen.has(p.id)){seen.add(p.id);out.push(aiProduct(p))}};
- const combos=state.products.filter(p=>p.category_id==="combos");
+ const combos=state.products.filter(p=>String(p.category_id||"").includes("combos"));
  const drinks=new Set(["cervezas","cocktails","mocktails","vinos","tequila","ron","whiskey","vodka","gin","daiquiris"]);
- if(selected?.brand_id==="LB")state.products.filter(p=>p.brand_id==="BS"&&drinks.has(p.category_id)).forEach(add);
- else if(selected?.brand_id==="BS")state.products.filter(p=>p.brand_id==="LB").forEach(add);
+ const cartProducts=state.cart.map(i=>state.products.find(x=>x.id===i.product_id)).filter(Boolean);
+ const hasDrink=cartProducts.some(p=>p.brand_id==="BS"&&drinks.has(p.category_id));
+ const hasFood=cartProducts.some(p=>!(p.brand_id==="BS"&&drinks.has(p.category_id)));
+ if(selected?.brand_id==="LB"&&!hasDrink)state.products.filter(p=>p.brand_id==="BS"&&drinks.has(p.category_id)).forEach(add);
+ else if(selected?.brand_id==="BS"&&!hasFood)state.products.filter(p=>p.brand_id==="LB"||p.brand_id==="MIX").forEach(add);
  combos.forEach(add);
  state.products.filter(p=>p.featured).forEach(add);
  state.products.forEach(add);
@@ -199,6 +204,21 @@ async function requestProductSuggestion(p){
   if(seq===__aiSuggestionSeq){box.classList.add("hidden");box.classList.remove("loading")}
  }
 }
+
+async function sendProductAIReply(message){
+ const p=state.current;if(!p||!message)return;
+ const text=$("#aiSuggestionText"),actions=$("#aiSuggestionActions");
+ text.textContent="Pensando…";actions.innerHTML="";
+ try{
+  const data=await askMenuAI({mode:"product",message:"El cliente responde dentro de la ficha del producto: "+message+". Continúa la misma conversación, considera el carrito completo y evita ciclos de recomendaciones.",selected:Object.assign(aiProduct(p),{opened_from_ai:recHistory.recommended.includes(p.id)}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  text.textContent=data.message||"";
+  actions.innerHTML=(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);if(!rp||recHistory.recommended.includes(rp.id))return "";recHistory.recommended.push(rp.id);return '<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>'}).join("");
+  actions.querySelectorAll("[data-ai-open]").forEach(b=>b.onclick=()=>{$("#productDialog").close();openProduct(b.dataset.aiOpen)});
+ }catch{text.textContent="Ahorita no pude responderte. Intenta otra vez."}
+}
+$("#productAiForm").onsubmit=e=>{e.preventDefault();const input=$("#productAiInput"),q=input.value.trim();if(!q)return;input.value="";sendProductAIReply(q)};
+document.querySelectorAll("[data-ai-reply]").forEach(b=>b.onclick=()=>sendProductAIReply(b.dataset.aiReply));
+
 function addAIMessage(role,html){
  const el=document.createElement("div");el.className="ai-msg "+role;el.innerHTML=html;$("#aiMessages").append(el);$("#aiMessages").scrollTop=$("#aiMessages").scrollHeight;return el;
 }

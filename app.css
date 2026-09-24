@@ -535,3 +535,13 @@ body[data-place-type="COURT"] .global-search{
 .cart-ai-form button{border:0;border-radius:13px;background:var(--gold);color:#111;font-weight:900;padding:0 14px}
 #aiFab,#aiDialog{display:none!important}
 
+
+
+.ai-quick-replies{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+.ai-quick-replies button{border:1px solid rgba(255,255,255,.09);background:#10151b;color:#fff;border-radius:999px;padding:8px 10px;font-size:.72rem;font-weight:800}
+.ai-quick-replies button:hover{border-color:var(--gold);color:var(--gold)}
+.product-ai-form{display:flex;gap:8px;margin-top:8px}
+.product-ai-form input{flex:1;min-width:0;border:1px solid var(--line);background:#0f141a;color:#fff;border-radius:12px;padding:10px 11px}
+.product-ai-form button{border:0;border-radius:12px;background:var(--gold);color:#111;font-weight:900;padding:0 13px}
+@media(max-width:620px){.ai-quick-replies{gap:6px}.ai-quick-replies button{font-size:.68rem;padding:7px 9px}.product-ai-form input{font-size:.82rem}}
+
