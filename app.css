@@ -1812,3 +1812,54 @@ body[data-place-type="COURT"] .order-phone-field input:focus{border-color:#7ba7d
   body[data-place-type="COURT"] .court-search-wrap{height:48px;margin-top:8px}
 }
 
+
+/* MINUTO90 V12 */
+body[data-place-type="COURT"] .court-scoreboard{
+  background-image:linear-gradient(180deg,rgba(2,7,16,.22),rgba(5,12,22,.84)),var(--court-header-art)!important;
+  background-size:cover!important;background-position:center 48%!important;
+  border-color:rgba(105,168,255,.34)!important;min-height:148px
+}
+body[data-place-type="COURT"] .court-scoreboard::before{
+  inset:0!important;width:auto!important;height:auto!important;border-radius:inherit!important;
+  background:linear-gradient(90deg,rgba(0,0,0,.54),transparent 36%,transparent 64%,rgba(0,0,0,.54))!important
+}
+body[data-place-type="COURT"] .court-scoreboard::after{display:none!important}
+body[data-place-type="COURT"] .court-score-center{background:rgba(4,10,18,.76);box-shadow:0 0 28px rgba(75,139,255,.12)}
+body[data-place-type="COURT"] #courtClock{animation:minute90Pulse 2.4s ease-in-out infinite}
+@keyframes minute90Pulse{50%{text-shadow:0 0 16px rgba(185,255,79,.58)}}
+body[data-place-type="COURT"] .team-search-box{display:flex;align-items:center;gap:9px;margin:14px 0 8px;padding:10px 12px;border:1px solid rgba(106,168,255,.28);border-radius:15px;background:#0b121bcc}
+body[data-place-type="COURT"] .team-search-box input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;font:inherit}
+body[data-place-type="COURT"] .team-search-box button{border:0;background:transparent;color:#aab6c3;font-size:1.4rem;cursor:pointer}
+body[data-place-type="COURT"] .combo-builder-meta{display:flex;justify-content:space-between;align-items:center;padding:8px 2px;color:#b9ff4f;font-weight:800}
+body[data-place-type="COURT"] .combo-pick-row{border:1px solid rgba(255,255,255,.08);background:linear-gradient(145deg,rgba(18,27,39,.96),rgba(8,13,20,.96));transition:transform .16s ease,border-color .16s ease}
+body[data-place-type="COURT"] .combo-pick-row.selected{border-color:rgba(185,255,79,.46);transform:translateY(-1px)}
+body[data-place-type="COURT"] .combo-pick-copy{min-width:0}
+body[data-place-type="COURT"] .combo-pick-copy b,body[data-place-type="COURT"] .combo-pick-copy small,body[data-place-type="COURT"] .combo-pick-copy em{display:block}
+body[data-place-type="COURT"] .combo-pick-copy em{margin-top:3px;color:#7f91a3;font-size:.7rem;font-style:normal}
+body[data-place-type="COURT"] .combo-stepper button{background:#152231;color:#fff;border-color:#2c4257}
+body[data-place-type="COURT"] .combo-stepper button:last-child{background:linear-gradient(135deg,#b9ff4f,#79d935);color:#071006;border:0}
+body[data-place-type="COURT"] #serviceDialog .dialog-card{background:linear-gradient(180deg,#0d1720,#07100d)}
+body[data-place-type="COURT"] .service-pitch{position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:22px;padding:34px 22px;border:2px solid rgba(255,255,255,.34);border-radius:22px;background:linear-gradient(90deg,rgba(50,135,70,.88),rgba(25,103,51,.9));box-shadow:inset 0 0 35px rgba(0,0,0,.24)}
+body[data-place-type="COURT"] .service-pitch::before{content:"";position:absolute;inset:9px;border:1px solid rgba(255,255,255,.48);border-radius:10px;pointer-events:none}
+body[data-place-type="COURT"] .service-pitch::after{content:"";position:absolute;left:50%;top:9px;bottom:9px;width:1px;background:rgba(255,255,255,.45);pointer-events:none}
+body[data-place-type="COURT"] .service-pitch button{position:relative;z-index:2;min-height:74px;border:1px solid rgba(255,255,255,.24);border-radius:18px;background:rgba(5,13,10,.72);color:#fff;font-weight:900;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+body[data-place-type="COURT"] .service-pitch button:hover{transform:translateY(-2px);border-color:#b9ff4f;color:#b9ff4f}
+body[data-place-type="COURT"] #feedbackPhoneField{margin:12px 0 4px;text-align:left}
+@media(max-width:680px){
+  body[data-place-type="COURT"] .court-scoreboard{min-height:132px;background-position:center 42%!important}
+  body[data-place-type="COURT"] .team-search-box{margin-top:10px}
+  body[data-place-type="COURT"] .service-pitch{gap:14px;padding:28px 16px}
+  body[data-place-type="COURT"] .service-pitch button{min-height:66px}
+}
+
+/* MINUTO90 V12 mobile scoreboard */
+@media(max-width:680px){
+  body[data-place-type="COURT"] .court-scoreboard{grid-template-columns:minmax(0,1fr) auto!important;gap:10px!important;padding:16px!important}
+  body[data-place-type="COURT"] .court-brand-lockup{min-width:0}
+  body[data-place-type="COURT"] .court-score-center{padding:8px 10px!important}
+  body[data-place-type="COURT"] #courtComboShortcut{grid-column:1/-1;width:100%;justify-self:stretch;white-space:nowrap}
+}
+
+@media(max-width:680px){
+  body[data-place-type="COURT"] #courtComboShortcut{grid-column:1/-1!important;grid-row:3!important;width:100%!important;justify-self:stretch!important}
+}
