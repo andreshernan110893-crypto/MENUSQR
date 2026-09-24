@@ -1037,3 +1037,201 @@ body[data-place-type="COURT"] .brand-mark{
   .goal-celebration-card>div{padding:24px}
 }
 
+
+
+/* CANCHAS V6 · Sports Lounge */
+body[data-place-type="COURT"]{
+  --court-bg:#0b0f14;
+  --court-panel:#111820;
+  --court-panel-2:#151d27;
+  --court-line:#202b36;
+  --court-text:#f3f6f9;
+  --court-muted:#9ba8b5;
+  --court-accent:#b8ff5a;
+  --court-accent-2:#6fdc7b;
+  background:#0b0f14!important;
+  color:var(--court-text);
+}
+body[data-place-type="COURT"]::before,
+body[data-place-type="COURT"]::after{display:none!important}
+body[data-place-type="COURT"] main{background:transparent!important}
+body[data-place-type="COURT"] .topbar{
+  background:rgba(11,15,20,.96)!important;
+  border-bottom:1px solid var(--court-line)!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .header-brand small{
+  color:var(--court-accent)!important;
+  letter-spacing:.08em;
+}
+body[data-place-type="COURT"] #promoSection,
+body[data-place-type="COURT"] .menu-section{
+  width:min(1480px,96vw);
+  margin-left:auto;
+  margin-right:auto;
+}
+body[data-place-type="COURT"] #promoSection{
+  margin-top:28px!important;
+  padding:22px;
+  border:1px solid var(--court-line);
+  border-radius:26px;
+  background:linear-gradient(180deg,#111820,#0e141b);
+}
+body[data-place-type="COURT"] .section-head{
+  border-left:0!important;
+  padding-left:0!important;
+}
+body[data-place-type="COURT"] .section-head small{
+  color:var(--court-accent)!important;
+  font-size:.68rem!important;
+  letter-spacing:.14em!important;
+}
+body[data-place-type="COURT"] .section-head h2{
+  text-transform:none!important;
+  letter-spacing:-.025em!important;
+}
+body[data-place-type="COURT"] #promoSection .section-head h2::after{
+  content:" · antes, durante o después del partido";
+  color:var(--court-muted);
+  font-size:.9rem;
+  font-weight:600;
+  letter-spacing:0;
+}
+body[data-place-type="COURT"] .promo-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+body[data-place-type="COURT"] .promo-card{
+  height:220px!important;
+  border-radius:20px!important;
+  border:1px solid var(--court-line)!important;
+  background:#0f151c!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .promo-card:hover{
+  transform:translateY(-2px)!important;
+  border-color:#34414d!important;
+}
+body[data-place-type="COURT"] .promo-card>div{
+  padding:52px 16px 16px!important;
+  background:linear-gradient(180deg,transparent,rgba(6,9,13,.94))!important;
+}
+body[data-place-type="COURT"] .promo-card small{color:var(--court-accent)!important}
+body[data-place-type="COURT"] .menu-section{
+  margin-top:22px!important;
+  padding:24px!important;
+  border:1px solid var(--court-line)!important;
+  border-radius:26px!important;
+  background:linear-gradient(180deg,#10161d,#0d1319)!important;
+  backdrop-filter:none!important;
+}
+body[data-place-type="COURT"] .menu-title{
+  align-items:center!important;
+}
+body[data-place-type="COURT"] .menu-title h2{
+  font-size:clamp(2rem,4vw,3.3rem)!important;
+}
+body[data-place-type="COURT"] .build-combo-btn{
+  background:var(--court-accent)!important;
+  color:#0b1117!important;
+  border-radius:14px!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .categories{
+  gap:8px!important;
+  padding:16px 0 18px!important;
+}
+body[data-place-type="COURT"] .category-tile{
+  flex:0 0 auto!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  border-radius:999px!important;
+  border:1px solid var(--court-line)!important;
+  background:#151d27!important;
+  padding:0!important;
+}
+body[data-place-type="COURT"] .category-tile span{
+  display:block!important;
+  width:auto!important;
+  height:auto!important;
+  padding:10px 14px!important;
+  background:none!important;
+  font-size:.78rem!important;
+  text-transform:none!important;
+  text-shadow:none!important;
+  white-space:nowrap;
+}
+body[data-place-type="COURT"] .category-tile.active{
+  outline:0!important;
+  background:#1c2732!important;
+  border-color:#405061!important;
+}
+body[data-place-type="COURT"] .category-tile.active span{color:var(--court-accent)!important}
+body[data-place-type="COURT"] .products{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:14px!important;
+}
+body[data-place-type="COURT"] .product{
+  border:1px solid var(--court-line)!important;
+  border-radius:20px!important;
+  background:#121922!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .product:hover{
+  transform:translateY(-2px)!important;
+  border-color:#354453!important;
+}
+body[data-place-type="COURT"] .product-media{
+  height:180px!important;
+  border-radius:18px 18px 0 0!important;
+}
+body[data-place-type="COURT"] .product-body{
+  padding:14px!important;
+}
+body[data-place-type="COURT"] .product-body h3{
+  font-size:1rem!important;
+  font-weight:800!important;
+}
+body[data-place-type="COURT"] .product-body p{
+  color:var(--court-muted)!important;
+  line-height:1.45!important;
+}
+body[data-place-type="COURT"] .product-body footer b{
+  color:#fff!important;
+}
+body[data-place-type="COURT"] .quick-add{
+  background:#fff!important;
+  color:#0c1117!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .brand-mark{
+  background:rgba(12,18,25,.88)!important;
+  color:#dce5ed!important;
+  border-color:rgba(255,255,255,.08)!important;
+}
+body[data-place-type="COURT"] .experience-end{
+  width:min(1480px,96vw);
+  margin:24px auto!important;
+  border-top:1px solid var(--court-line)!important;
+}
+body[data-place-type="COURT"] .icon-btn{
+  background:#121922!important;
+  border-color:var(--court-line)!important;
+}
+@media(max-width:1100px){
+  body[data-place-type="COURT"] .promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body[data-place-type="COURT"] .products{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:700px){
+  body[data-place-type="COURT"] #promoSection,
+  body[data-place-type="COURT"] .menu-section{width:94vw;padding:16px!important;border-radius:20px!important}
+  body[data-place-type="COURT"] .promo-grid{display:flex!important;overflow-x:auto!important}
+  body[data-place-type="COURT"] .promo-card{flex:0 0 80vw!important;height:190px!important}
+  body[data-place-type="COURT"] #promoSection .section-head h2::after{display:none}
+  body[data-place-type="COURT"] .products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body[data-place-type="COURT"] .product-media{height:145px!important}
+  body[data-place-type="COURT"] .menu-title{align-items:flex-start!important;flex-direction:column!important}
+}
+
