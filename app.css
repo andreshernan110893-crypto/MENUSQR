@@ -1863,3 +1863,130 @@ body[data-place-type="COURT"] #feedbackPhoneField{margin:12px 0 4px;text-align:l
 @media(max-width:680px){
   body[data-place-type="COURT"] #courtComboShortcut{grid-column:1/-1!important;grid-row:3!important;width:100%!important;justify-self:stretch!important}
 }
+
+/* TABLE PREMIUM V14 */
+body[data-place-type="TABLE"]{
+  background:
+    radial-gradient(circle at 12% 12%,rgba(255,173,32,.10),transparent 28%),
+    radial-gradient(circle at 88% 22%,rgba(0,190,190,.08),transparent 30%),
+    linear-gradient(180deg,#07090c 0%,#0a0d12 52%,#080a0d 100%)!important;
+}
+body[data-place-type="TABLE"] .topbar{
+  background:linear-gradient(90deg,rgba(8,10,14,.97),rgba(24,17,8,.96) 46%,rgba(5,19,22,.96))!important;
+  border-bottom:1px solid rgba(255,177,31,.20)!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.24);
+}
+body[data-place-type="TABLE"] .header-brand small,
+body[data-place-type="TABLE"] .section-head small,
+body[data-place-type="TABLE"] .menu-title small{color:#ffb11f!important}
+body[data-place-type="TABLE"] .cinema-hero .hero-ambient{
+  border:1px solid rgba(255,185,57,.26)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.42),0 0 0 1px rgba(35,218,206,.05)!important;
+}
+body[data-place-type="TABLE"] .cinema-slide>img{
+  filter:saturate(1.16) contrast(1.04) brightness(.88);
+}
+body[data-place-type="TABLE"] .cinema-shade{
+  background:
+    radial-gradient(circle at 78% 18%,rgba(0,204,190,.12),transparent 28%),
+    linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.44) 48%,rgba(0,0,0,.10) 80%),
+    linear-gradient(0deg,rgba(0,0,0,.46),transparent 48%)!important;
+}
+
+body[data-place-type="TABLE"] .cinema-copy h1{
+  text-shadow:0 5px 30px rgba(0,0,0,.52);
+}
+body[data-place-type="TABLE"] .cinema-copy b{color:#ffc247!important}
+body[data-place-type="TABLE"] .hero-dots button.active{
+  background:linear-gradient(90deg,#ffb11f,#39d3c5)!important;
+  box-shadow:0 0 16px rgba(255,177,31,.30);
+}
+body[data-place-type="TABLE"] .home-section{
+  position:relative;
+  border-radius:28px;
+  padding:30px 20px 10px;
+  margin-top:18px;
+}
+body[data-place-type="TABLE"] #promoSection{
+  background:linear-gradient(145deg,rgba(255,177,31,.055),rgba(255,255,255,.012) 48%,rgba(45,210,198,.035));
+  border:1px solid rgba(255,177,31,.10);
+}
+body[data-place-type="TABLE"] .global-search{
+  border:1px solid rgba(56,211,198,.14)!important;
+  background:linear-gradient(145deg,rgba(12,17,23,.96),rgba(19,14,9,.92))!important;
+  box-shadow:0 18px 50px rgba(0,0,0,.20);
+}
+body[data-place-type="TABLE"] .search-box:focus-within{
+  border-color:rgba(255,177,31,.52)!important;
+  box-shadow:0 0 0 3px rgba(255,177,31,.08);
+}
+body[data-place-type="TABLE"] .drink-categories,
+body[data-place-type="TABLE"] .categories{padding-bottom:18px!important}
+
+body[data-place-type="TABLE"] .category-tile,
+body[data-place-type="TABLE"] .drink-category-tile{
+  border-color:rgba(255,255,255,.12)!important;
+  box-shadow:0 10px 26px rgba(0,0,0,.20);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body[data-place-type="TABLE"] .category-tile:hover,
+body[data-place-type="TABLE"] .drink-category-tile:hover{
+  transform:translateY(-3px);
+  border-color:rgba(255,177,31,.46)!important;
+  box-shadow:0 16px 34px rgba(0,0,0,.28);
+}
+body[data-place-type="TABLE"] .category-tile.active,
+body[data-place-type="TABLE"] .drink-category-tile.active{
+  outline-color:#ffb11f!important;
+  box-shadow:0 0 0 1px rgba(255,177,31,.18),0 12px 30px rgba(255,177,31,.10);
+}
+body[data-place-type="TABLE"] .product{
+  border-color:rgba(255,255,255,.09)!important;
+  background:linear-gradient(165deg,rgba(18,22,28,.98),rgba(9,12,16,.98))!important;
+  box-shadow:0 14px 32px rgba(0,0,0,.20);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body[data-place-type="TABLE"] .product:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,177,31,.24)!important;
+  box-shadow:0 20px 46px rgba(0,0,0,.30);
+}
+body[data-place-type="TABLE"] .quick-add{
+  background:linear-gradient(135deg,#ffb11f,#ffd15f)!important;
+  color:#171006!important;
+  box-shadow:0 8px 20px rgba(255,177,31,.20);
+}
+
+body[data-place-type="TABLE"] .promo-card{
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 18px 38px rgba(0,0,0,.24);
+}
+body[data-place-type="TABLE"] .promo-card:nth-child(3n+1){border-color:rgba(255,177,31,.24)!important}
+body[data-place-type="TABLE"] .promo-card:nth-child(3n+2){border-color:rgba(54,211,198,.20)!important}
+body[data-place-type="TABLE"] .promo-card:nth-child(3n){border-color:rgba(211,86,162,.18)!important}
+body[data-place-type="TABLE"] .experience-end{
+  border:1px solid rgba(255,185,57,.18)!important;
+  background:
+    radial-gradient(circle at 12% 18%,rgba(255,177,31,.12),transparent 32%),
+    radial-gradient(circle at 86% 76%,rgba(40,205,191,.08),transparent 34%),
+    linear-gradient(145deg,#11151b,#0b0e12)!important;
+  box-shadow:0 26px 70px rgba(0,0,0,.28);
+}
+body[data-place-type="TABLE"] .rating-card{
+  background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018))!important;
+  border-color:rgba(255,255,255,.10)!important;
+}
+body[data-place-type="TABLE"] #feedbackPhoneField{
+  display:grid!important;
+  margin:12px 0 5px;
+}
+body[data-place-type="TABLE"] .rating-stars button.active{
+  background:linear-gradient(135deg,#ffb11f,#ffd966)!important;
+  color:#181006!important;
+  border-color:transparent!important;
+}
+body[data-place-type="TABLE"] #sendFeedback{
+  background:linear-gradient(135deg,#ffb11f,#f6c24b)!important;
+  color:#171006!important;
+  box-shadow:0 12px 28px rgba(255,177,31,.18);
+}

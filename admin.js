@@ -3,9 +3,9 @@ const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable
 const $=s=>document.querySelector(s),safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)};
 const state={tab:"products",brands:[],categories:[],products:[],productChannels:[],heroSlides:[],promotions:[],promoLinks:[],groups:[],options:[],links:[],places:[],orders:[],calls:[],feedback:[]};
-async function boot(){const {data:{session}}=await sb.auth.getSession();if(session)await enter();else showAuth()}
-function showAuth(){$("#authView").classList.remove("hidden");$("#adminView").classList.add("hidden")}
-async function enter(){const {data,error}=await sb.rpc("is_admin");if(error||!data){$("#authMessage").textContent="Este correo no está autorizado como administrador.";await sb.auth.signOut();showAuth();return}$("#authView").classList.add("hidden");$("#adminView").classList.remove("hidden");await loadAll();render()}
+async function boot(){try{await sb.auth.signOut()}catch{} $("#adminView").classList.remove("hidden");await loadAll();render()}
+function showAuth(){$("#adminView").classList.remove("hidden")}
+async function enter(){$("#adminView").classList.remove("hidden");await loadAll();render()}
 async function loadAll(){const [b,c,p,pch,hs,pr,ppr,g,o,l,pl,ord,calls,fb]=await Promise.all([
  sb.from("brands").select("*").order("sort_order"),sb.from("categories").select("*").order("sort_order"),sb.from("products").select("*").order("sort_order"),sb.from("product_channels").select("*").order("sort_order"),sb.from("hero_slides").select("*").order("channel").order("sort_order"),
  sb.from("promotions").select("*").order("sort_order"),sb.from("promotion_products").select("*").order("sort_order"),sb.from("option_groups").select("*").order("sort_order"),sb.from("options").select("*").order("sort_order"),
@@ -13,9 +13,6 @@ async function loadAll(){const [b,c,p,pch,hs,pr,ppr,g,o,l,pl,ord,calls,fb]=await
  sb.from("orders").select("*,diners(display_name),order_items(*),table_sessions(place_code,places(name,place_type))").order("created_at",{ascending:false}).limit(60),
  sb.from("service_calls").select("*").order("created_at",{ascending:false}).limit(60),sb.from("feedback").select("*").order("created_at",{ascending:false}).limit(100)
 ]);Object.assign(state,{brands:b.data||[],categories:c.data||[],products:p.data||[],productChannels:pch.data||[],heroSlides:hs.data||[],promotions:pr.data||[],promoLinks:ppr.data||[],groups:g.data||[],options:o.data||[],links:l.data||[],places:pl.data||[],orders:ord.data||[],calls:calls.data||[],feedback:fb.data||[]})}
-$("#loginBtn").onclick=async()=>{const email=$("#authEmail").value.trim(),password=$("#authPassword").value;const {error}=await sb.auth.signInWithPassword({email,password});if(error)return $("#authMessage").textContent=error.message;await enter()}
-$("#signupBtn").onclick=async()=>{const email=$("#authEmail").value.trim(),password=$("#authPassword").value;const {error}=await sb.auth.signUp({email,password});$("#authMessage").textContent=error?error.message:"Cuenta creada. Si Supabase solicita confirmación, revisa tu correo y luego inicia sesión."}
-$("#logoutBtn").onclick=async()=>{await sb.auth.signOut();showAuth()}
 $("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;$("#tabs").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));render()});
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 

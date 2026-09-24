@@ -8,14 +8,9 @@
 <link rel="stylesheet" href="/admin.css">
 </head>
 <body>
-<section id="authView" class="auth-view">
- <div class="auth-card"><span>ADMINISTRACIÓN</span><h1>La Bandeja + Beer Station</h1><p>Gestiona todo el ecosistema desde un solo lugar.</p>
- <input id="authEmail" type="email" value="andreshernandez170393@gmail.com" placeholder="Correo administrador"><input id="authPassword" type="password" placeholder="Contraseña">
- <button id="loginBtn" class="primary">Iniciar sesión</button><button id="signupBtn" class="secondary">Crear acceso</button><small id="authMessage"></small></div>
-</section>
-<section id="adminView" class="hidden">
+<section id="adminView">
 <header class="admin-top"><div><small>ADMIN</small><strong>La Bandeja + Beer Station</strong></div><nav id="tabs">
-<button data-tab="products" class="active">Productos</button><button data-tab="combos">Combos</button><button data-tab="categories">Categorías</button><button data-tab="banners">Banners</button><button data-tab="promotions">Promociones</button><button data-tab="extras">Extras</button><button data-tab="branding">Logos</button><button data-tab="places">Ubicaciones</button><button data-tab="orders">Pedidos</button><button data-tab="feedback">Feedback</button></nav><button id="logoutBtn">Salir</button></header>
+<button data-tab="products" class="active">Productos</button><button data-tab="combos">Combos</button><button data-tab="categories">Categorías</button><button data-tab="banners">Banners</button><button data-tab="promotions">Promociones</button><button data-tab="extras">Extras</button><button data-tab="branding">Logos</button><button data-tab="places">Ubicaciones</button><button data-tab="orders">Pedidos</button><button data-tab="feedback">Feedback</button></nav></header>
 <main>
 <div class="toolbar"><div><span id="sectionEyebrow">CATÁLOGO</span><h1 id="sectionTitle">Productos</h1></div><div id="toolbarActions"></div></div>
 <section id="content"></section>
