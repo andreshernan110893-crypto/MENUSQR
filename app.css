@@ -928,3 +928,112 @@ body[data-place-type="COURT"] .combo-builder-dialog .dialog-card{max-height:86vh
   body[data-place-type="COURT"] .product-media{height:145px!important}
 }
 
+
+
+/* CANCHAS V5 · Champions dark */
+body[data-place-type="COURT"]{
+  --gold:#dfe8ff;
+  --accent:#5fa8ff;
+  --court-green:#4f8dff;
+  --court-yellow:#dfe8ff;
+  background:
+    linear-gradient(180deg,rgba(2,5,14,.72) 0%,rgba(3,7,18,.88) 42%,rgba(2,4,10,.96) 100%),
+    url("/assets/new/court-champions.jpg") center top/cover no-repeat!important;
+  color:#f7f9ff;
+}
+body[data-place-type="COURT"] .topbar{
+  background:rgba(2,5,12,.92)!important;
+  border-bottom:1px solid rgba(126,177,255,.16)!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.34);
+}
+body[data-place-type="COURT"] .header-brand small,
+body[data-place-type="COURT"] .section-head small{color:#8fc0ff!important}
+body[data-place-type="COURT"] #promoSection .section-head,
+body[data-place-type="COURT"] .menu-section .section-head{
+  border-left-color:#7fb3ff!important;
+}
+body[data-place-type="COURT"] .promo-card{
+  border-color:rgba(145,188,255,.18)!important;
+  background:linear-gradient(180deg,rgba(13,24,52,.94),rgba(5,10,24,.98))!important;
+  box-shadow:0 18px 48px rgba(0,0,0,.28)!important;
+}
+body[data-place-type="COURT"] .promo-card:hover{border-color:rgba(146,191,255,.42)!important}
+body[data-place-type="COURT"] .promo-card small{color:#8fc0ff!important}
+body[data-place-type="COURT"] .menu-section{
+  background:linear-gradient(180deg,rgba(5,10,24,.84),rgba(2,5,14,.92))!important;
+  border:1px solid rgba(145,188,255,.12)!important;
+  backdrop-filter:blur(8px);
+}
+body[data-place-type="COURT"] .category-tile,
+body[data-place-type="COURT"] .product{
+  border-color:rgba(145,188,255,.12)!important;
+  background:linear-gradient(180deg,#10182b,#080d19)!important;
+}
+body[data-place-type="COURT"] .category-tile.active{
+  outline-color:#8fc0ff!important;
+  box-shadow:0 0 0 3px rgba(143,192,255,.08)!important;
+}
+body[data-place-type="COURT"] .quick-add,
+body[data-place-type="COURT"] .build-combo-btn,
+body[data-place-type="COURT"] .primary{
+  background:linear-gradient(135deg,#dce8ff,#77aef7)!important;
+  color:#06101f!important;
+}
+body[data-place-type="COURT"] .product-body footer b{color:#dce8ff!important}
+body[data-place-type="COURT"] .brand-mark{
+  background:rgba(5,12,28,.86)!important;
+  color:#9dc8ff!important;
+  border-color:rgba(145,188,255,.16)!important;
+}
+
+/* celebración de pedido */
+.goal-celebration{
+  position:fixed;inset:0;z-index:99999;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  background:rgba(1,4,12,.78);
+  backdrop-filter:blur(10px);
+  transition:opacity .22s ease;
+}
+.goal-celebration.hidden{display:none!important}
+.goal-celebration-card{
+  width:min(760px,92vw);
+  min-height:360px;
+  display:grid;grid-template-columns:minmax(240px,42%) 1fr;
+  align-items:center;
+  overflow:hidden;
+  border-radius:30px;
+  border:1px solid rgba(155,198,255,.28);
+  background:
+    radial-gradient(circle at 82% 15%,rgba(77,145,255,.22),transparent 34%),
+    linear-gradient(145deg,#071127,#030711 70%);
+  box-shadow:0 36px 120px rgba(0,0,0,.65),0 0 60px rgba(74,135,255,.14);
+  animation:goalPop .34s cubic-bezier(.2,.8,.2,1);
+}
+.goal-celebration-card img{
+  width:100%;height:100%;min-height:360px;
+  object-fit:cover;object-position:center;
+}
+.goal-celebration-card>div{padding:34px}
+.goal-celebration-card small{
+  color:#8fc0ff;font-weight:1000;letter-spacing:.18em;font-size:.72rem
+}
+.goal-celebration-card h2{
+  margin:8px 0 10px;
+  font-size:clamp(2.6rem,6vw,5.6rem);
+  line-height:.9;
+  color:#fff;
+  letter-spacing:-.055em;
+}
+.goal-celebration-card p{margin:0;color:#c8d6ef;font-size:1.05rem}
+@keyframes goalPop{
+  from{transform:scale(.92) translateY(16px);opacity:0}
+  to{transform:scale(1) translateY(0);opacity:1}
+}
+@media(max-width:700px){
+  .goal-celebration{padding:14px}
+  .goal-celebration-card{grid-template-columns:1fr;min-height:0}
+  .goal-celebration-card img{height:280px;min-height:0}
+  .goal-celebration-card>div{padding:24px}
+}
+
