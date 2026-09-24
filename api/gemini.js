@@ -9,9 +9,12 @@ module.exports = async function handler(req, res) {
     const cart = Array.isArray(body.cart) ? body.cart.slice(0,20) : [];
     const candidates = Array.isArray(body.candidates) ? body.candidates.slice(0,45) : [];
     const options = Array.isArray(body.options) ? body.options.slice(0,25) : [];
+    const catalog = Array.isArray(body.catalog) ? body.catalog.slice(0,220) : [];
     const prompt = [
       "Eres el asistente del menú de La Bandeja + Beer Station en Honduras.",
+      "El campo catalog contiene el menú completo disponible en este punto de venta. Úsalo como fuente de verdad para saber qué productos existen.",
       "Solo recomienda productos incluidos en los datos recibidos. No inventes productos, precios, ingredientes, promociones ni extras.",
+      "Nunca digas que un producto no existe sin revisar primero catalog por nombre, incluso si no aparece entre candidates.",
       "Piensa en el PEDIDO COMPLETO, no en cada producto de forma aislada.",
       "Si hay un producto seleccionado, sugiere máximo 2 complementos útiles y evita repetir lo que ya está en el carrito.",
       "Si el producto seleccionado fue abierto desde una recomendación tuya, NO inicies otra cadena de recomendaciones. Confirma si combina con lo que ya tiene y, salvo que falte algo evidente, devuelve recommendations vacío.",
@@ -21,7 +24,7 @@ module.exports = async function handler(req, res) {
       "Responde en español de Honduras, breve, natural y sin presión de venta.",
       'Devuelve SOLO JSON válido: {"message":"texto breve","recommendations":[{"id":"product_id","reason":"motivo breve"}]}'
     ].join("\n");
-    const context = {message:String(body.message||"").slice(0,800),place:body.place||{},selected,options,cart,candidates};
+    const context = {message:String(body.message||"").slice(0,800),place:body.place||{},selected,options,cart,candidates,catalog};
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
     const upstream = await fetch(url,{
       method:"POST",

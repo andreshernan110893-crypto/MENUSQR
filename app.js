@@ -163,6 +163,7 @@ function aiProduct(p){
 function aiCart(){
  return state.cart.map(i=>{const p=state.products.find(x=>x.id===i.product_id);return p?{...aiProduct(p),qty:i.qty}:null}).filter(Boolean).slice(0,20);
 }
+function aiCatalog(){return state.products.map(aiProduct)}
 function aiCandidates(selected){
  const seen=new Set(selected?[selected.id]:[]),out=[];
  state.cart.forEach(x=>seen.add(x.product_id));
@@ -194,7 +195,7 @@ async function requestProductSuggestion(p){
  const box=$("#aiSuggestion"),text=$("#aiSuggestionText"),actions=$("#aiSuggestionActions");
  const cameFromAI=recHistory.recommended.includes(p.id); const seq=++__aiSuggestionSeq;box.classList.remove("hidden");box.classList.add("loading");text.textContent=cameFromAI?"Revisando cómo queda con tu pedido…":"Pensando en qué combina mejor…";actions.innerHTML="";
  try{
-  const data=await askMenuAI({mode:"product",message:cameFromAI?"Este producto fue abierto desde una recomendación anterior. Confirma si combina con el pedido y no inicies otra cadena de recomendaciones.":"Recomienda algo útil considerando también el pedido actual.",selected:Object.assign(aiProduct(p),{opened_from_ai:cameFromAI}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  const data=await askMenuAI({mode:"product",message:cameFromAI?"Este producto fue abierto desde una recomendación anterior. Confirma si combina con el pedido y no inicies otra cadena de recomendaciones.":"Recomienda algo útil considerando también el pedido actual.",selected:Object.assign(aiProduct(p),{opened_from_ai:cameFromAI}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),catalog:aiCatalog(),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
   if(seq!==__aiSuggestionSeq||state.current?.id!==p.id)return;
   text.textContent=data.message||"";
   actions.innerHTML=cameFromAI?"":(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);if(rp&&!recHistory.recommended.includes(rp.id))recHistory.recommended.push(rp.id);return rp?'<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>':""}).join("");
@@ -210,7 +211,7 @@ async function sendProductAIReply(message){
  const text=$("#aiSuggestionText"),actions=$("#aiSuggestionActions");
  text.textContent="Pensando…";actions.innerHTML="";
  try{
-  const data=await askMenuAI({mode:"product",message:"El cliente responde dentro de la ficha del producto: "+message+". Continúa la misma conversación, considera el carrito completo y evita ciclos de recomendaciones.",selected:Object.assign(aiProduct(p),{opened_from_ai:recHistory.recommended.includes(p.id)}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  const data=await askMenuAI({mode:"product",message:"El cliente responde dentro de la ficha del producto: "+message+". Continúa la misma conversación, considera el carrito completo y evita ciclos de recomendaciones.",selected:Object.assign(aiProduct(p),{opened_from_ai:recHistory.recommended.includes(p.id)}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),catalog:aiCatalog(),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
   text.textContent=data.message||"";
   actions.innerHTML=(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);if(!rp||recHistory.recommended.includes(rp.id))return "";recHistory.recommended.push(rp.id);return '<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>'}).join("");
   actions.querySelectorAll("[data-ai-open]").forEach(b=>b.onclick=()=>{$("#productDialog").close();openProduct(b.dataset.aiOpen)});
@@ -228,7 +229,7 @@ $("#aiForm").onsubmit=async e=>{
  addAIMessage("user",safe(q));input.value="";
  const wait=addAIMessage("assistant","Pensando…");
  try{
-  const data=await askMenuAI({mode:"cart",message:"Analiza mi pedido completo. "+q,selected:null,options:[],cart:aiCart(),candidates:aiCandidates(null),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  const data=await askMenuAI({mode:"cart",message:"Analiza mi pedido completo. "+q,selected:null,options:[],cart:aiCart(),candidates:aiCandidates(null),catalog:aiCatalog(),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
   wait.innerHTML=safe(data.message||"");
   (data.recommendations||[]).forEach(r=>{const p=state.products.find(x=>x.id===r.id);if(!p)return;if(!recHistory.recommended.includes(p.id))recHistory.recommended.push(p.id);const b=document.createElement("button");b.className="ai-chat-rec";b.innerHTML="<b>"+safe(p.name)+"</b><small>"+safe(r.reason||money(p.price))+"</small>";b.onclick=()=>{$("#cartDialog").close();openProduct(p.id)};wait.append(b)});
  }catch{wait.textContent="Ahorita no pude conectarme. Intenta de nuevo en un momento."}
