@@ -1714,3 +1714,101 @@ body[data-place-type="COURT"] .court-media-credit{
   text-align:center;
 }
 
+
+
+/* MINUTO 90 · menu visual */
+body[data-place-type="COURT"] .menu-section{
+  position:relative!important;
+  isolation:isolate;
+  overflow:hidden!important;
+  background:
+    linear-gradient(180deg,rgba(8,14,22,.78),rgba(8,13,20,.93)),
+    var(--court-menu-bg) center 42%/cover no-repeat!important;
+  border-color:rgba(126,178,236,.18)!important;
+}
+body[data-place-type="COURT"] .menu-section::before{
+  content:"";
+  position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(9,14,20,.22),transparent 45%,rgba(9,14,20,.35));
+}
+body[data-place-type="COURT"] .menu-section::after{display:none!important}
+body[data-place-type="COURT"] .court-search-wrap{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  margin:12px 0 16px;
+  padding:0 14px;
+  height:52px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  background:rgba(5,9,14,.78);
+  backdrop-filter:blur(10px);
+}
+body[data-place-type="COURT"] .court-search-wrap>span{
+  color:var(--court-accent);font-size:1.45rem;font-weight:900
+}
+body[data-place-type="COURT"] .court-search-wrap input{
+  width:100%;border:0;outline:0;background:transparent;color:#fff;
+  font:700 .94rem "DM Sans",sans-serif;
+}
+body[data-place-type="COURT"] .court-search-wrap input::placeholder{color:#8795a4}
+body[data-place-type="COURT"] .court-search-wrap button{
+  width:32px;height:32px;border-radius:50%;border:0;background:#17212b;color:#c8d3dd;
+  font-size:1.05rem;cursor:pointer;
+}
+
+
+
+body[data-place-type="COURT"] .categories{
+  display:flex!important;gap:10px!important;overflow-x:auto!important;
+  padding:2px 0 16px!important;scroll-snap-type:x proximity;
+}
+body[data-place-type="COURT"] .category-tile{
+  flex:0 0 158px!important;
+  width:158px!important;height:94px!important;
+  border-radius:16px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  background-image:
+    linear-gradient(180deg,rgba(2,5,8,.08),rgba(2,5,8,.82)),
+    var(--cat-bg)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  overflow:hidden!important;
+  scroll-snap-align:start;
+  padding:0!important;
+}
+body[data-place-type="COURT"] .category-tile span{
+  display:flex!important;align-items:flex-end!important;
+  width:100%!important;height:100%!important;
+  padding:12px!important;
+  background:none!important;
+  color:#fff!important;
+  font-family:"Barlow Condensed",sans-serif!important;
+  font-size:1.05rem!important;font-weight:900!important;
+  line-height:.92!important;text-transform:uppercase!important;
+  text-shadow:0 2px 10px rgba(0,0,0,.72)!important;
+  white-space:normal!important;
+}
+body[data-place-type="COURT"] .category-tile.active{
+  outline:2px solid var(--court-accent)!important;
+  outline-offset:2px!important;
+  border-color:transparent!important;
+}
+body[data-place-type="COURT"] .category-tile.active span{color:#fff!important}
+.order-phone-field{
+  display:grid;gap:7px;margin:14px 0 4px;
+}
+.order-phone-field>span{font-weight:800;color:#e8eef4}
+.order-phone-field em{font-style:normal;color:#8f9ca9;font-size:.78rem;font-weight:600}
+.order-phone-field input{
+  width:100%;padding:12px 13px;border-radius:13px;border:1px solid var(--line);
+  background:#0c1218;color:#fff;font:inherit;outline:none;
+}
+body[data-place-type="COURT"] .order-phone-field input:focus{border-color:#7ba7d4}
+@media(max-width:700px){
+  body[data-place-type="COURT"] .category-tile{flex-basis:136px!important;width:136px!important;height:84px!important}
+  body[data-place-type="COURT"] .category-tile span{font-size:.95rem!important}
+  body[data-place-type="COURT"] .court-search-wrap{height:48px;margin-top:8px}
+}
+
