@@ -545,3 +545,210 @@ body[data-place-type="COURT"] .global-search{
 .product-ai-form button{border:0;border-radius:12px;background:var(--gold);color:#111;font-weight:900;padding:0 13px}
 @media(max-width:620px){.ai-quick-replies{gap:6px}.ai-quick-replies button{font-size:.68rem;padding:7px 9px}.product-ai-form input{font-size:.82rem}}
 
+
+
+/* CANCHAS V2 · estadio dinámico */
+body[data-place-type="COURT"]{
+  --gold:#d7ff37;
+  --accent:#8cff3f;
+  --court-green:#31df67;
+  --court-yellow:#f5d837;
+  background:
+    radial-gradient(circle at 12% 0%,rgba(64,255,118,.16),transparent 26%),
+    radial-gradient(circle at 88% 8%,rgba(215,255,55,.10),transparent 24%),
+    linear-gradient(180deg,#06110a 0%,#050a07 42%,#030504 100%);
+}
+body[data-place-type="COURT"]::before{
+  content:"";
+  position:fixed;inset:0;pointer-events:none;z-index:-2;
+  background:
+    linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.032) 49.8%,rgba(255,255,255,.032) 50.2%,transparent 50.3%),
+    linear-gradient(0deg,transparent 49.7%,rgba(255,255,255,.015) 49.8%,rgba(255,255,255,.015) 50.2%,transparent 50.3%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 72px),
+    radial-gradient(ellipse at 50% 18%,transparent 0 115px,rgba(255,255,255,.026) 116px 118px,transparent 119px);
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 88%);
+}
+body[data-place-type="COURT"]::after{
+  content:"";
+  position:fixed;left:0;right:0;top:0;height:220px;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(235,255,220,.28) 0 2px,transparent 3px),
+    radial-gradient(circle at 14% 0%,rgba(235,255,220,.22) 0 2px,transparent 3px),
+    radial-gradient(circle at 86% 0%,rgba(235,255,220,.24) 0 2px,transparent 3px),
+    radial-gradient(circle at 92% 0%,rgba(235,255,220,.30) 0 2px,transparent 3px);
+  filter:blur(.2px);
+}
+body[data-place-type="COURT"] .topbar{
+  background:linear-gradient(180deg,rgba(3,10,5,.97),rgba(4,12,7,.91));
+  border-bottom:1px solid rgba(140,255,90,.16);
+  box-shadow:0 14px 40px rgba(0,0,0,.24);
+}
+body[data-place-type="COURT"] .header-brand small{color:#d7ff37;letter-spacing:.12em}
+body[data-place-type="COURT"] .icon-btn{
+  border-color:rgba(140,255,90,.18);
+  background:rgba(10,24,14,.76);
+}
+body[data-place-type="COURT"] .icon-btn:hover{border-color:rgba(215,255,55,.42);transform:translateY(-1px)}
+
+body[data-place-type="COURT"] .cinema-hero{position:relative}
+body[data-place-type="COURT"] .cinema-hero::before{
+  content:"MATCH DAY";
+  position:absolute;z-index:5;left:18px;top:16px;
+  font-size:.58rem;font-weight:1000;letter-spacing:.18em;color:#071009;
+  background:#d7ff37;border-radius:999px;padding:7px 10px;
+  box-shadow:0 10px 24px rgba(0,0,0,.28);
+}
+body[data-place-type="COURT"] .cinema-hero .hero-ambient{
+  border:1px solid rgba(140,255,90,.22);
+  box-shadow:0 32px 100px rgba(0,0,0,.44),0 0 0 1px rgba(215,255,55,.035) inset;
+  background:#06110a;
+}
+body[data-place-type="COURT"] .cinema-slide:after{content:none!important;display:none!important;animation:none!important}
+body[data-place-type="COURT"] .cinema-slide:before{
+  content:"";
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:
+    linear-gradient(115deg,rgba(215,255,55,.15),transparent 22%),
+    linear-gradient(90deg,transparent 76%,rgba(49,223,103,.09));
+  mix-blend-mode:screen;
+}
+body[data-place-type="COURT"] .cinema-copy small:before{content:"CANCHA · "!important}
+body[data-place-type="COURT"] .cinema-copy h1{
+  text-transform:uppercase;
+  letter-spacing:-.035em;
+  text-shadow:0 10px 34px rgba(0,0,0,.48);
+}
+body[data-place-type="COURT"] .cinema-copy b{color:#d7ff37}
+body[data-place-type="COURT"] .hero-dots button.active{
+  width:34px;background:#d7ff37;box-shadow:0 0 18px rgba(215,255,55,.35)
+}
+
+body[data-place-type="COURT"] .home-section,
+body[data-place-type="COURT"] .menu-section{position:relative}
+body[data-place-type="COURT"] .section-head{
+  border-left:3px solid #d7ff37;
+  padding-left:12px;
+}
+body[data-place-type="COURT"] .section-head small{
+  color:#d7ff37!important;
+  letter-spacing:.15em;
+}
+body[data-place-type="COURT"] .section-head h2{
+  text-transform:uppercase;
+  letter-spacing:-.02em;
+}
+body[data-place-type="COURT"] #promoSection .section-head small:before{content:"PARTIDO · "!important}
+body[data-place-type="COURT"] #comboSection .section-head small:before{content:"TERCER TIEMPO · "!important}
+body[data-place-type="COURT"] #newSection .section-head small:before{content:"NUEVO EN CANCHA · "}
+
+body[data-place-type="COURT"] .promo-grid{gap:13px}
+body[data-place-type="COURT"] .promo-card{
+  border:1px solid rgba(140,255,90,.13);
+  background:linear-gradient(145deg,#102016,#09110c);
+  box-shadow:0 18px 44px rgba(0,0,0,.20);
+}
+body[data-place-type="COURT"] .promo-card::after{
+  content:"";
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 45%,rgba(215,255,55,.07) 52%,transparent 59%);
+  transform:translateX(-120%);
+  transition:transform .55s ease;
+}
+body[data-place-type="COURT"] .promo-card:hover::after{transform:translateX(120%)}
+body[data-place-type="COURT"] .promo-card:hover{
+  transform:translateY(-5px) scale(1.01);
+  border-color:rgba(215,255,55,.34);
+  box-shadow:0 24px 58px rgba(0,0,0,.32);
+}
+body[data-place-type="COURT"] .promo-card small{color:#d7ff37}
+
+body[data-place-type="COURT"] .categories,
+body[data-place-type="COURT"] .drink-categories{gap:9px!important}
+body[data-place-type="COURT"] .category-tile,
+body[data-place-type="COURT"] .drink-category-tile{
+  border:1px solid rgba(140,255,90,.16)!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  isolation:isolate;
+}
+body[data-place-type="COURT"] .category-tile::after,
+body[data-place-type="COURT"] .drink-category-tile::after{
+  content:"";
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(135deg,rgba(215,255,55,.13),transparent 35%,rgba(49,223,103,.10));
+  opacity:0;transition:.2s;
+}
+body[data-place-type="COURT"] .category-tile:hover::after,
+body[data-place-type="COURT"] .drink-category-tile:hover::after{opacity:1}
+body[data-place-type="COURT"] .category-tile:hover,
+body[data-place-type="COURT"] .drink-category-tile:hover{
+  transform:translateY(-3px);
+  border-color:rgba(215,255,55,.36)!important;
+}
+body[data-place-type="COURT"] .category-tile span,
+body[data-place-type="COURT"] .drink-category-tile span{
+  text-transform:uppercase;
+  letter-spacing:.02em;
+  text-shadow:0 2px 14px #000;
+}
+
+body[data-place-type="COURT"] .product{
+  border:1px solid rgba(140,255,90,.11);
+  background:linear-gradient(180deg,#111a13 0%,#0a100c 100%);
+  box-shadow:0 16px 34px rgba(0,0,0,.18);
+}
+body[data-place-type="COURT"] .product:hover{
+  transform:translateY(-4px);
+  border-color:rgba(215,255,55,.30);
+  box-shadow:0 22px 46px rgba(0,0,0,.28);
+}
+body[data-place-type="COURT"] .product-media{
+  background:linear-gradient(180deg,#122118,#0b120e);
+}
+body[data-place-type="COURT"] .product-media::after{
+  box-shadow:inset 0 -70px 70px -54px rgba(1,8,3,.92);
+}
+body[data-place-type="COURT"] .product-body h3{font-weight:900}
+body[data-place-type="COURT"] .product-body footer b{color:#d7ff37}
+body[data-place-type="COURT"] .quick-add{
+  background:#d7ff37!important;
+  color:#071009!important;
+  box-shadow:0 8px 24px rgba(215,255,55,.24);
+}
+body[data-place-type="COURT"] .brand-mark{
+  background:rgba(4,17,8,.84);
+  color:#d7ff37;
+  border-color:rgba(215,255,55,.18);
+}
+body[data-place-type="COURT"] .global-search{
+  border:1px solid rgba(140,255,90,.15);
+  background:
+    linear-gradient(135deg,rgba(49,223,103,.08),transparent 32%),
+    rgba(8,18,11,.70);
+}
+body[data-place-type="COURT"] .search-box:focus-within{
+  border-color:#d7ff37;
+  box-shadow:0 0 0 3px rgba(215,255,55,.08);
+}
+
+body[data-place-type="COURT"] #productDialog .product-modal,
+body[data-place-type="COURT"] #cartDialog .dialog-card{
+  border-color:rgba(140,255,90,.14);
+  box-shadow:0 30px 90px rgba(0,0,0,.48);
+}
+body[data-place-type="COURT"] .primary{
+  background:linear-gradient(135deg,#d7ff37,#73e943)!important;
+  color:#071009!important;
+}
+body[data-place-type="COURT"] .ai-suggestion{
+  border-color:rgba(215,255,55,.14);
+  background:linear-gradient(145deg,rgba(215,255,55,.08),rgba(49,223,103,.035));
+}
+body[data-place-type="COURT"] .ai-suggestion-head{color:#d7ff37}
+
+@media(max-width:620px){
+  body[data-place-type="COURT"] .cinema-hero::before{left:12px;top:12px;font-size:.52rem;padding:6px 9px}
+  body[data-place-type="COURT"] .section-head{padding-left:9px}
+  body[data-place-type="COURT"] .promo-card:hover,
+  body[data-place-type="COURT"] .product:hover{transform:none}
+}
+
