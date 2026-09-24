@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20260924-matchday8">
+<link rel="stylesheet" href="/app.css?v=20260924-minute90-v9">
 </head>
 <body>
 <section id="experienceIntro" class="experience-intro">
@@ -24,7 +24,7 @@
   </div>
 </header>
 <main>
-  <section id="courtMatchHub" class="court-match-hub hidden"><div class="court-scoreboard"><div><small>MATCH DAY</small><strong id="courtHubPlace">CANCHA</strong></div><div class="court-score-center"><span class="live-dot"></span><b>EN JUEGO</b><em>90:00</em></div><button id="courtComboShortcut" type="button">ARMA TU COMBO</button></div><div class="court-ticker"><div><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span><span>⚽ ARMA TU JUGADA</span><span>🏆 TERCER TIEMPO</span><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span></div></div></section>
+  <section id="courtMatchHub" class="court-match-hub hidden"><div class="court-scoreboard"><div class="court-brand-lockup"><small>MINUTO 90</small><strong id="courtHubPlace">CANCHA</strong><span>LA BANDEJA + BEER STATION</span></div><div class="court-score-center"><span class="live-dot"></span><b id="courtPhase">PRIMER TIEMPO</b><em id="courtClock">00:00</em></div><button id="courtComboShortcut" type="button">ARMA TU EQUIPO</button></div><div class="court-ticker"><div><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span><span>⚽ ARMA TU EQUIPO</span><span>🏆 TERCER TIEMPO</span><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span></div></div></section>
   <section class="cinema-hero"><div id="heroAmbient" class="hero-ambient"></div><div id="heroDots" class="hero-dots"></div></section>
   <section id="promoSection" class="home-section"><div class="section-head"><div><small>AHORA</small><h2>Promociones y recomendados</h2></div></div><div id="promoGrid" class="promo-grid"></div></section>
   <section id="newSection" class="home-section"><div class="section-head"><div><small>RECIÉN LLEGADOS</small><h2>Nuevos productos</h2></div></div><div id="newProducts" class="product-rail"></div></section>
@@ -35,6 +35,7 @@
     <div class="experience-copy"><small>ANTES DE IRTE</small><h2>Queremos saber cómo estuvo.</h2><p>Califica tu experiencia y ayúdanos a seguir mejorando.</p></div>
     <div class="rating-card"><div id="ratingStars" class="rating-stars"><button data-rating="1">1</button><button data-rating="2">2</button><button data-rating="3">3</button><button data-rating="4">4</button><button data-rating="5">5</button></div><textarea id="feedbackComment" placeholder="Cuéntanos algo más, si quieres"></textarea><button id="sendFeedback" class="primary">Enviar opinión</button></div>
   </section>
+  <div id="courtMediaCredit" class="court-media-credit hidden">Fotos de celebración: Bryan Berlin / WikiPortraits y YantsImages / Asatur Yesayants, vía Wikimedia Commons · CC BY-SA 4.0.</div>
 </main>
 <button id="cartDock" class="cart-dock hidden"><span>Pedido</span><strong id="cartTotalDock">L 0.00</strong></button>
 <dialog id="productDialog"><button class="close" data-close>×</button><div class="product-modal"><img id="detailImage" alt=""><div class="product-modal-body"><small id="detailBrand"></small><h2 id="detailName"></h2><p id="detailDescription"></p><section id="aiSuggestion" class="ai-suggestion hidden"><div class="ai-suggestion-head"><span>✦</span><b>Sugerencia inteligente</b></div><p id="aiSuggestionText"></p><div id="aiSuggestionActions" class="ai-suggestion-actions"></div><div id="aiQuickReplies" class="ai-quick-replies"><button type="button" data-ai-reply="Sí, recomiéndame algo">Sí, recomiéndame algo</button><button type="button" data-ai-reply="No, así está bien">No, así está bien</button><button type="button" data-ai-reply="Algo para compartir">Algo para compartir</button></div><form id="productAiForm" class="product-ai-form"><input id="productAiInput" maxlength="220" autocomplete="off" placeholder="Respóndeme aquí…"><button type="submit">Enviar</button></form></section><div id="detailOptions"></div><label class="note-label">Indicaciones especiales<textarea id="detailNote" placeholder="Escribe una indicación si la necesitas"></textarea></label><div class="product-modal-footer"><div><small>PRECIO</small><b id="detailPrice">L 0.00</b></div><button id="addConfigured" class="primary compact">Agregar</button></div></div></div></dialog>
@@ -46,6 +47,6 @@
 <button id="aiFab" class="ai-fab" aria-label="Asistente del menú"><span>✦</span><b>Te ayudo</b></button><dialog id="aiDialog" class="ai-dialog"><button class="close" data-close>×</button><div class="ai-chat"><div class="ai-chat-head"><small>ASISTENTE DEL MENÚ</small><h2>¿Qué se te antoja?</h2><p>Pregúntame por comida, bebidas, combos o qué combina mejor con tu pedido.</p></div><div id="aiMessagesFull" class="ai-messages"><div class="ai-msg assistant">Hola 👋 Puedo ayudarte a elegir algo del menú.</div></div><form id="aiFormFull" class="ai-form"><input id="aiInputFull" maxlength="300" autocomplete="off" placeholder="Ej. Quiero una pizza y algo frío"><button type="submit">Enviar</button></form></div></dialog><div id="toast"></div>
 <div id="goalCelebration" class="goal-celebration hidden" aria-hidden="true"><div class="goal-celebration-card"><img id="goalCelebrationImage" alt=""><div><small id="goalCelebrationKicker">PEDIDO EN JUEGO</small><h2 id="goalCelebrationTitle">¡GOOOL!</h2><p id="goalCelebrationText">Tu pedido fue enviado.</p></div></div></div><button id="backToTop" hidden></button>
 <script src="/supabase.js"></script>
-<script type="module" src="/app.js?v=20260924-matchday8"></script>
+<script type="module" src="/app.js?v=20260924-minute90-v9"></script>
 </body>
 </html>

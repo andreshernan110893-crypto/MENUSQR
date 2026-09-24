@@ -1561,3 +1561,156 @@ body[data-place-type="COURT"] .product-body p{font-size:.78rem!important;margin-
   body[data-place-type="COURT"] .products{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   body[data-place-type="COURT"] .product-media{height:138px!important}
 }
+
+
+/* CANCHAS V9 · MINUTO 90 */
+body[data-place-type="COURT"]{
+  --court-accent:#b7ff45;
+  --court-blue:#6da8ff;
+  background:
+    radial-gradient(circle at 16% 0%,rgba(83,145,255,.12),transparent 26%),
+    radial-gradient(circle at 84% 0%,rgba(183,255,69,.08),transparent 22%),
+    linear-gradient(180deg,#080c11,#090d12 42%,#070a0e 100%)!important;
+}
+body[data-place-type="COURT"] .topbar{
+  background:rgba(7,11,16,.96)!important;
+  border-bottom:1px solid #1c2732!important;
+}
+body[data-place-type="COURT"] .header-brand small{
+  color:var(--court-accent)!important;
+  font-family:"Barlow Condensed",sans-serif!important;
+  font-size:.78rem!important;
+  letter-spacing:.12em!important;
+}
+body[data-place-type="COURT"] .court-scoreboard{
+  min-height:190px!important;
+  grid-template-columns:1fr auto 1fr!important;
+  align-items:end!important;
+  padding:24px!important;
+  background:
+    linear-gradient(180deg,rgba(3,7,12,.18),rgba(3,7,12,.88)),
+    linear-gradient(90deg,rgba(5,10,16,.82),rgba(5,10,16,.34) 52%,rgba(5,10,16,.82)),
+    url("/assets/new/court-stadium.jpg") center 44%/cover no-repeat!important;
+  border-color:rgba(126,173,230,.22)!important;
+  box-shadow:0 22px 58px rgba(0,0,0,.34)!important;
+}
+body[data-place-type="COURT"] .court-scoreboard::before{
+  content:""!important;
+  position:absolute!important;
+  inset:auto 0 0 0!important;
+  height:38%!important;
+  background:linear-gradient(180deg,transparent,rgba(34,119,61,.13))!important;
+  border-radius:0!important;
+  pointer-events:none!important;
+}
+body[data-place-type="COURT"] .court-scoreboard::after{
+  content:"MINUTO 90"!important;
+  position:absolute!important;
+  right:22px!important;
+  top:12px!important;
+  width:auto!important;height:auto!important;
+  border-radius:0!important;
+  background:none!important;
+  color:rgba(255,255,255,.07)!important;
+  font-family:"Barlow Condensed",sans-serif!important;
+  font-size:clamp(3rem,7vw,7rem)!important;
+  font-weight:900!important;
+  letter-spacing:.02em!important;
+}
+body[data-place-type="COURT"] .court-brand-lockup{
+  position:relative;z-index:2;
+  display:grid;gap:2px;
+}
+body[data-place-type="COURT"] .court-brand-lockup small{
+  color:var(--court-accent)!important;
+  font-size:.76rem!important;
+}
+body[data-place-type="COURT"] .court-brand-lockup strong{
+  font-family:"Barlow Condensed",sans-serif!important;
+  font-size:clamp(2.2rem,4vw,4rem)!important;
+  line-height:.82!important;
+}
+body[data-place-type="COURT"] .court-brand-lockup span{
+  margin-top:7px;
+  color:#c8d4df;
+  font-size:.66rem;
+  font-weight:800;
+  letter-spacing:.12em;
+}
+body[data-place-type="COURT"] .court-score-center{
+  align-self:end!important;
+  min-width:250px;
+  justify-content:center!important;
+  padding:13px 17px!important;
+  background:rgba(4,9,14,.84)!important;
+  backdrop-filter:blur(8px);
+  border-color:rgba(255,255,255,.12)!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.3);
+}
+body[data-place-type="COURT"] #courtPhase{
+  color:#fff;
+  min-width:104px;
+  text-align:center;
+}
+body[data-place-type="COURT"] #courtClock{
+  min-width:62px;
+  color:var(--court-accent)!important;
+  font-size:1rem!important;
+  font-variant-numeric:tabular-nums;
+}
+body[data-place-type="COURT"] #courtComboShortcut,
+body[data-place-type="COURT"] .build-combo-btn{
+  background:linear-gradient(135deg,#c7ff5e,#93eb38)!important;
+  color:#091006!important;
+  box-shadow:0 10px 28px rgba(163,239,66,.18)!important;
+}
+body[data-place-type="COURT"] #courtComboShortcut{
+  align-self:end!important;
+  justify-self:end!important;
+}
+body[data-place-type="COURT"] .menu-title small::before{
+  content:"⚽ ";
+}
+body[data-place-type="COURT"] .goal-celebration-card{
+  background:
+    radial-gradient(circle at 80% 12%,rgba(87,153,255,.18),transparent 34%),
+    linear-gradient(145deg,#0a1320,#03070d 72%)!important;
+}
+body[data-place-type="COURT"] .goal-celebration-card img{
+  object-position:center 20%!important;
+}
+body[data-place-type="COURT"] .goal-celebration-card small{
+  color:var(--court-accent)!important;
+}
+@media(max-width:760px){
+  body[data-place-type="COURT"] .court-scoreboard{
+    min-height:220px!important;
+    grid-template-columns:1fr auto!important;
+    align-items:end!important;
+    padding:18px!important;
+  }
+  body[data-place-type="COURT"] .court-score-center{
+    grid-column:1/-1!important;
+    grid-row:2!important;
+    justify-self:stretch!important;
+    min-width:0!important;
+  }
+  body[data-place-type="COURT"] #courtComboShortcut{
+    grid-column:2!important;
+    grid-row:1!important;
+  }
+  body[data-place-type="COURT"] .court-brand-lockup strong{font-size:2.7rem!important}
+  body[data-place-type="COURT"] .court-scoreboard::after{font-size:3.8rem!important;right:12px!important;top:8px!important}
+}
+
+
+
+body[data-place-type="COURT"] .court-media-credit{
+  width:min(1480px,94vw);
+  margin:14px auto 90px;
+  color:#71808d;
+  font-size:.62rem;
+  line-height:1.5;
+  text-align:center;
+}
+
