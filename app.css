@@ -752,3 +752,57 @@ body[data-place-type="COURT"] .ai-suggestion-head{color:#d7ff37}
   body[data-place-type="COURT"] .product:hover{transform:none}
 }
 
+
+
+/* CANCHAS V2.1 · performance patch */
+body[data-place-type="COURT"]{
+  background:linear-gradient(180deg,#07110a 0%,#050907 44%,#030504 100%)!important;
+}
+body[data-place-type="COURT"]::before{
+  background:
+    linear-gradient(90deg,transparent 49.8%,rgba(255,255,255,.022) 49.9%,rgba(255,255,255,.022) 50.1%,transparent 50.2%),
+    linear-gradient(0deg,transparent 49.8%,rgba(255,255,255,.010) 49.9%,rgba(255,255,255,.010) 50.1%,transparent 50.2%)!important;
+  mask-image:none!important;
+}
+body[data-place-type="COURT"]::after{display:none!important}
+body[data-place-type="COURT"] .cinema-slide:before{display:none!important}
+body[data-place-type="COURT"] .promo-card::after{display:none!important}
+body[data-place-type="COURT"] .category-tile::after,
+body[data-place-type="COURT"] .drink-category-tile::after{display:none!important}
+body[data-place-type="COURT"] .cold-mist,
+body[data-place-type="COURT"] .steam-layer{display:none!important}
+body[data-place-type="COURT"] .product.cold .product-media::before,
+body[data-place-type="COURT"] .product.hot .product-media::before,
+body[data-place-type="COURT"] .product.cold .product-media::after{animation:none!important;filter:none!important;opacity:.16!important}
+body[data-place-type="COURT"] .promo-card,
+body[data-place-type="COURT"] .product,
+body[data-place-type="COURT"] .category-tile,
+body[data-place-type="COURT"] .drink-category-tile,
+body[data-place-type="COURT"] .icon-btn{
+  transition:transform .16s ease,border-color .16s ease!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .promo-card:hover,
+body[data-place-type="COURT"] .product:hover,
+body[data-place-type="COURT"] .category-tile:hover,
+body[data-place-type="COURT"] .drink-category-tile:hover{
+  transform:translateY(-2px)!important;
+  box-shadow:none!important;
+}
+body[data-place-type="COURT"] .cinema-hero .hero-ambient{
+  box-shadow:0 18px 52px rgba(0,0,0,.28)!important;
+}
+body[data-place-type="COURT"] .cinema-copy h1,
+body[data-place-type="COURT"] .section-head h2{
+  text-shadow:none!important;
+}
+body[data-place-type="COURT"] .hero-dots button.active{
+  box-shadow:none!important;
+}
+@media(max-width:900px){
+  body[data-place-type="COURT"] .promo-card,
+  body[data-place-type="COURT"] .product,
+  body[data-place-type="COURT"] .category-tile,
+  body[data-place-type="COURT"] .drink-category-tile{transition:none!important}
+}
+
