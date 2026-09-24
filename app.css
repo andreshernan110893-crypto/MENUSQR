@@ -544,6 +544,8 @@ body[data-place-type="COURT"] .global-search{
 .product-ai-form input{flex:1;min-width:0;border:1px solid var(--line);background:#0f141a;color:#fff;border-radius:12px;padding:10px 11px}
 .product-ai-form button{border:0;border-radius:12px;background:var(--gold);color:#111;font-weight:900;padding:0 13px}
 @media(max-width:620px){.ai-quick-replies{gap:6px}.ai-quick-replies button{font-size:.68rem;padding:7px 9px}.product-ai-form input{font-size:.82rem}}
+/* CANCHAS V3 */
+body[data-place-type="COURT"]::before,body[data-place-type="COURT"]::after{display:none!important}
 
 
 
@@ -806,3 +808,19 @@ body[data-place-type="COURT"] .hero-dots button.active{
   body[data-place-type="COURT"] .drink-category-tile{transition:none!important}
 }
 
+
+/* CANCHAS V3 FINAL */
+body[data-place-type="COURT"]::before,body[data-place-type="COURT"]::after{display:none!important}
+body[data-place-type="COURT"] .promo-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important;overflow:visible!important}
+body[data-place-type="COURT"] .promo-card{min-width:0!important;height:220px!important;position:relative!important;overflow:hidden!important;border-radius:22px!important;background:#08100b!important;border:1px solid rgba(255,255,255,.12)!important}
+body[data-place-type="COURT"] .promo-card img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;display:block!important}
+body[data-place-type="COURT"] .promo-card:nth-child(2) img,body[data-place-type="COURT"] .promo-card:nth-child(4) img{object-position:center 20%!important}
+body[data-place-type="COURT"] .promo-card>div{position:absolute!important;left:0;right:0;bottom:0;z-index:2;padding:42px 16px 16px!important;background:linear-gradient(180deg,transparent,rgba(0,0,0,.94))}
+body[data-place-type="COURT"] .promo-card small{color:#d7ff37!important;font-weight:1000!important;letter-spacing:.12em!important}
+body[data-place-type="COURT"] .promo-card b{display:block!important;color:#fff!important;font-size:1.25rem!important;line-height:1!important;margin:4px 0 5px!important}
+body[data-place-type="COURT"] .promo-card span{color:rgba(255,255,255,.8)!important;font-size:.74rem!important}
+body[data-place-type="COURT"] .product-media,body[data-place-type="COURT"] .catalog-products .product-media{height:190px!important;overflow:hidden!important;padding:0!important}
+body[data-place-type="COURT"] .product-media img,body[data-place-type="COURT"] .catalog-products .product-media img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;padding:0!important;transform:none!important}
+body[data-place-type="COURT"] .product.fit-contain .product-media img{object-fit:cover!important;padding:0!important}
+@media(max-width:1100px){body[data-place-type="COURT"] .promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:620px){body[data-place-type="COURT"] .promo-grid{display:flex!important;overflow-x:auto!important;gap:10px!important;padding-right:3vw!important}body[data-place-type="COURT"] .promo-card{flex:0 0 78vw!important;height:190px!important}body[data-place-type="COURT"] .product-media,body[data-place-type="COURT"] .catalog-products .product-media{height:148px!important}}

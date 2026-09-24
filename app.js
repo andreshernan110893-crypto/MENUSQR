@@ -24,7 +24,7 @@ async function init(){
  const allowed=new Set(state.channels.filter(x=>x.channel===state.place.place_type).map(x=>x.product_id));
  state.products=state.allProducts.filter(x=>allowed.has(x.id));
  const categoryIds=new Set(state.products.map(x=>x.category_id));state.categories=state.categories.filter(x=>categoryIds.has(x.id));
- document.body.dataset.placeType=state.place.place_type;document.body.dataset.theme=state.place.theme_key||state.place.place_type;$("#placeName").textContent=state.place.name;if(state.place.place_type==="COURT"){document.querySelector(".menu-title small").textContent="MENÚ DE CANCHA";document.querySelector(".menu-title h2").textContent="Antojitos para el partido"}
+ document.body.dataset.placeType=state.place.place_type;document.body.dataset.theme=state.place.theme_key||state.place.place_type;$("#placeName").textContent=state.place.name;if(state.place.place_type==="COURT"){document.body.style.backgroundImage="linear-gradient(180deg,rgba(2,7,4,.84),rgba(3,8,5,.91) 45%,rgba(3,5,4,.96)),url(https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Well_lit_soccer_stadium_%28Unsplash%29.jpg/1280px-Well_lit_soccer_stadium_%28Unsplash%29.jpg)";document.body.style.backgroundSize="cover";document.body.style.backgroundPosition="center top";document.body.style.backgroundRepeat="no-repeat";document.querySelector(".menu-title small").textContent="MENÚ DE CANCHA";document.querySelector(".menu-title h2").textContent="Antojitos para el partido"}
  renderHeaderLogos();setupExperience();state.activeCategory=state.categories[0]?.id||null;renderCategories();renderProducts();renderPromos();renderPromoGrid();restoreDiner();updateCart();setInterval(nextPromo,Number(state.place.hero_interval_ms||4800));
  if(state.diner)await refreshDiners();
 }
@@ -151,7 +151,23 @@ function runGlobalSearch(){
  });
  openCatalog('Resultados para “'+input.value.trim()+'”',list,'RESULTADOS');
 }
-function renderPromoGrid(){const el=$("#promoGrid"),list=state.promos.slice(0,10);$("#promoSection").classList.toggle("hidden",!list.length);el.innerHTML=list.map(function(p){return '<article class="promo-card" data-promo="'+p.id+'"><img loading="lazy" decoding="async" src="'+(p.image_url||'')+'" width="820" height="460"><div><small>'+safe((p.promo_type||"PROMO").replace("_"," "))+'</small><b>'+safe(p.title)+'</b><span>'+safe(p.subtitle||"")+'</span></div></article>'}).join("");el.querySelectorAll("[data-promo]").forEach(function(x){x.onclick=function(){openPromotion(x.dataset.promo)}});renderHomeSectionsV2()}
+function renderPromoGrid(){
+ const el=$("#promoGrid");
+ let list=state.promos.slice(0,10);
+ if(state.place.place_type==="COURT"){
+  const footballPromos=[
+   {title:"LA POTRA",subtitle:"El combo grande para compartir después del partido.",promo_type:"CANCHA",image_url:"https://images.unsplash.com/photo-1676746424139-77f8bd8922a8?auto=format&fit=crop&w=1400&q=82"},
+   {title:"ROJA DEL ÁRBITRO",subtitle:"Picante, frío y sin discusión.",promo_type:"PARTIDO",image_url:"https://upload.wikimedia.org/wikipedia/commons/2/23/Cristiano_Ronaldo_WC2022_-_01.jpg"},
+   {title:"NOCHE DE CHAMPIONS",subtitle:"Partido grande, comida grande.",promo_type:"FÚTBOL",image_url:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Well_lit_soccer_stadium_%28Unsplash%29.jpg/1280px-Well_lit_soccer_stadium_%28Unsplash%29.jpg"},
+   {title:"MODO MUNDIAL",subtitle:"Pide, comparte y vive el partido completo.",promo_type:"MUNDIAL",image_url:"https://upload.wikimedia.org/wikipedia/commons/c/c8/Lionel_Messi_WC2022.jpg"}
+  ];
+  list=footballPromos.map(function(p,i){const base=state.promos[i]||{};return Object.assign({},base,p,{id:base.id||("court-promo-"+i)})});
+ }
+ $("#promoSection").classList.toggle("hidden",!list.length);
+ el.innerHTML=list.map(function(p){return '<article class="promo-card" data-promo="'+p.id+'"><img loading="lazy" decoding="async" src="'+(p.image_url||'')+'" width="820" height="460"><div><small>'+safe((p.promo_type||"PROMO").replace("_"," "))+'</small><b>'+safe(p.title)+'</b><span>'+safe(p.subtitle||"")+'</span></div></article>'}).join("");
+ el.querySelectorAll("[data-promo]").forEach(function(x){x.onclick=function(){const hit=state.promos.find(p=>p.id===x.dataset.promo);if(hit)openPromotion(x.dataset.promo)}});
+ renderHomeSectionsV2();
+}
 if($('#seeDrinks'))$('#seeDrinks').onclick=function(){const c=state.categories.find(function(c){return ['daiquiris','cervezas','cocktails','mocktails'].includes(c.id)});if(c){state.activeCategory=c.id;renderCategories();renderProducts();document.querySelector('.menu-section').scrollIntoView({behavior:'smooth'})}};
 if($('#backToPromos'))$('#backToPromos').onclick=function(){$('#promoSection').scrollIntoView({behavior:'smooth'})};
 document.querySelectorAll('[data-service-end]').forEach(function(b){b.onclick=function(){callStaff(b.dataset.serviceEnd)}});
