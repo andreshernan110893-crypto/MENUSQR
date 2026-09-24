@@ -1235,3 +1235,259 @@ body[data-place-type="COURT"] .icon-btn{
   body[data-place-type="COURT"] .menu-title{align-items:flex-start!important;flex-direction:column!important}
 }
 
+
+
+/* CANCHAS V7 · Matchday Club */
+body[data-place-type="COURT"]{
+  --court-bg:#090d12;
+  --court-panel:#101720;
+  --court-panel-soft:#151e29;
+  --court-line:#23303c;
+  --court-text:#f7f9fc;
+  --court-muted:#93a1af;
+  --court-accent:#b9ff4f;
+  --court-blue:#6aa8ff;
+  background:
+    radial-gradient(circle at 12% -8%,rgba(75,139,255,.17),transparent 28%),
+    radial-gradient(circle at 88% 4%,rgba(185,255,79,.10),transparent 24%),
+    linear-gradient(180deg,#0a0f15 0%,#090d12 50%,#070a0e 100%)!important;
+}
+body[data-place-type="COURT"] .court-match-hub{
+  width:min(1480px,96vw);
+  margin:18px auto 0;
+}
+body[data-place-type="COURT"] .court-scoreboard{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:18px;
+  padding:18px 20px;
+  overflow:hidden;
+  border:1px solid #253240;
+  border-radius:24px 24px 10px 10px;
+  background:
+    radial-gradient(circle at 50% -40%,rgba(105,167,255,.18),transparent 45%),
+    linear-gradient(145deg,#131b25,#0d131a);
+  box-shadow:0 18px 48px rgba(0,0,0,.24);
+}
+body[data-place-type="COURT"] .court-scoreboard::before,
+body[data-place-type="COURT"] .court-scoreboard::after{
+  content:"";
+  position:absolute;top:-55px;width:180px;height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.09),transparent 66%);
+  pointer-events:none;
+}
+body[data-place-type="COURT"] .court-scoreboard::before{left:-45px}
+body[data-place-type="COURT"] .court-scoreboard::after{right:-45px}
+body[data-place-type="COURT"] .court-scoreboard>div:first-child{display:grid;gap:3px;z-index:1}
+body[data-place-type="COURT"] .court-scoreboard small{
+  color:var(--court-accent);
+  font-size:.64rem;
+  font-weight:1000;
+  letter-spacing:.18em;
+}
+body[data-place-type="COURT"] .court-scoreboard strong{
+  font-size:1.35rem;
+  letter-spacing:-.02em;
+}
+body[data-place-type="COURT"] .court-score-center{
+  z-index:1;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  border:1px solid #2b3946;
+  border-radius:999px;
+  background:#0b1118;
+}
+body[data-place-type="COURT"] .court-score-center b{
+  font-size:.78rem;letter-spacing:.11em
+}
+body[data-place-type="COURT"] .court-score-center em{
+  font-style:normal;
+  color:#d7e1ea;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+body[data-place-type="COURT"] .live-dot{
+  width:9px;height:9px;border-radius:50%;
+  background:#9dff4f;
+  box-shadow:0 0 0 5px rgba(157,255,79,.08);
+  animation:courtLive 1.4s ease-in-out infinite;
+}
+@keyframes courtLive{50%{opacity:.35;transform:scale(.78)}}
+body[data-place-type="COURT"] #courtComboShortcut{
+  justify-self:end;
+  z-index:1;
+  border:0;
+  border-radius:14px;
+  padding:12px 16px;
+  background:var(--court-accent);
+  color:#091007;
+  font-size:.74rem;
+  font-weight:1000;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+body[data-place-type="COURT"] .court-ticker{
+  overflow:hidden;
+  border:1px solid #202c37;
+  border-top:0;
+  border-radius:0 0 16px 16px;
+  background:#0c1218;
+}
+body[data-place-type="COURT"] .court-ticker>div{
+  width:max-content;
+  display:flex;gap:34px;
+  padding:10px 18px;
+  animation:courtTicker 24s linear infinite;
+}
+body[data-place-type="COURT"] .court-ticker span{
+  color:#b7c3cf;
+  font-size:.68rem;
+  font-weight:900;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+@keyframes courtTicker{to{transform:translateX(-50%)}}
+
+body[data-place-type="COURT"] #promoSection{
+  margin-top:16px!important;
+  background:transparent!important;
+  border:0!important;
+  padding:14px 0 0!important;
+}
+body[data-place-type="COURT"] #promoSection .section-head{
+  padding:0 2px 4px!important;
+}
+body[data-place-type="COURT"] #promoSection .section-head h2::after{content:""!important}
+body[data-place-type="COURT"] #promoSection .section-head h2{
+  font-size:clamp(2rem,4vw,3.5rem)!important;
+}
+body[data-place-type="COURT"] .promo-card{
+  isolation:isolate;
+  transition:transform .2s ease,border-color .2s ease!important;
+}
+body[data-place-type="COURT"] .promo-card:nth-child(1){transform:rotate(-.35deg)}
+body[data-place-type="COURT"] .promo-card:nth-child(2){transform:rotate(.35deg)}
+body[data-place-type="COURT"] .promo-card:nth-child(3){transform:rotate(-.2deg)}
+body[data-place-type="COURT"] .promo-card:nth-child(4){transform:rotate(.2deg)}
+body[data-place-type="COURT"] .promo-card:hover{transform:translateY(-4px) rotate(0deg)!important}
+body[data-place-type="COURT"] .promo-card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:4px;
+  z-index:3;
+  background:var(--court-accent);
+}
+body[data-place-type="COURT"] .promo-card:nth-child(2)::before{background:#ff5f5f}
+body[data-place-type="COURT"] .promo-card:nth-child(3)::before{background:#6aa8ff}
+body[data-place-type="COURT"] .promo-card:nth-child(4)::before{background:#ffcf5a}
+
+body[data-place-type="COURT"] .menu-section{
+  position:relative;
+  overflow:hidden;
+  margin-top:24px!important;
+  padding:26px!important;
+  border:1px solid #22303c!important;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(102,168,255,.08),transparent 30%),
+    linear-gradient(180deg,#101720,#0c1218)!important;
+}
+body[data-place-type="COURT"] .menu-section::after{
+  content:"90'";
+  position:absolute;
+  right:20px;bottom:-22px;
+  color:rgba(255,255,255,.025);
+  font-size:9rem;
+  font-weight:1000;
+  line-height:1;
+  pointer-events:none;
+}
+body[data-place-type="COURT"] .build-combo-btn{
+  position:relative;
+  overflow:hidden;
+}
+body[data-place-type="COURT"] .build-combo-btn::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.34),transparent 72%);
+  transform:translateX(-120%);
+  animation:comboSweep 3.8s ease-in-out infinite;
+}
+@keyframes comboSweep{55%,100%{transform:translateX(120%)}}
+body[data-place-type="COURT"] .categories{
+  margin-top:6px;
+}
+body[data-place-type="COURT"] .category-tile{
+  transition:transform .15s ease,border-color .15s ease,background .15s ease!important;
+}
+body[data-place-type="COURT"] .category-tile:hover{transform:translateY(-2px)}
+body[data-place-type="COURT"] .category-tile.active{
+  background:#202b36!important;
+  border-color:#405365!important;
+}
+body[data-place-type="COURT"] .category-tile.active span{
+  color:var(--court-accent)!important;
+}
+body[data-place-type="COURT"] .product{
+  overflow:hidden;
+}
+body[data-place-type="COURT"] .product::after{
+  content:"";
+  position:absolute;
+  left:14px;right:14px;bottom:0;height:2px;
+  background:linear-gradient(90deg,var(--court-accent),transparent);
+  opacity:.38;
+}
+body[data-place-type="COURT"] .product:nth-child(2n)::after{
+  background:linear-gradient(90deg,var(--court-blue),transparent);
+}
+body[data-place-type="COURT"] .product-media::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent 58%,rgba(8,12,17,.34));
+}
+body[data-place-type="COURT"] .quick-add{
+  z-index:3;
+  transition:transform .16s ease!important;
+}
+body[data-place-type="COURT"] .quick-add:hover{transform:scale(1.08)}
+body[data-place-type="COURT"] .experience-end{
+  background:transparent!important;
+}
+
+@media(max-width:760px){
+  body[data-place-type="COURT"] .court-match-hub{width:94vw;margin-top:12px}
+  body[data-place-type="COURT"] .court-scoreboard{
+    grid-template-columns:1fr auto;
+    gap:10px;
+    padding:14px;
+    border-radius:18px 18px 8px 8px;
+  }
+  body[data-place-type="COURT"] .court-score-center{
+    grid-column:1/-1;
+    grid-row:2;
+    justify-self:start;
+    padding:8px 12px;
+  }
+  body[data-place-type="COURT"] #courtComboShortcut{
+    grid-column:2;grid-row:1;
+    padding:10px 11px;
+    font-size:.67rem;
+  }
+  body[data-place-type="COURT"] .court-scoreboard strong{font-size:1rem}
+  body[data-place-type="COURT"] .court-ticker>div{gap:24px;animation-duration:18s}
+  body[data-place-type="COURT"] .promo-card{transform:none!important}
+  body[data-place-type="COURT"] .menu-section{padding:18px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-place-type="COURT"] .court-ticker>div,
+  body[data-place-type="COURT"] .live-dot,
+  body[data-place-type="COURT"] .build-combo-btn::after{animation:none!important}
+}
+
