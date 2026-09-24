@@ -521,3 +521,17 @@ body[data-place-type="COURT"] .global-search{
   background:linear-gradient(145deg,rgba(60,190,90,.07),rgba(255,255,255,.018));
 }
 
+
+
+/* Asistente integrado al pedido */
+.cart-ai{margin:16px 0 18px;padding:14px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:linear-gradient(145deg,rgba(212,175,55,.08),rgba(255,255,255,.02))}
+.cart-ai-head{display:flex;gap:9px;align-items:center;margin-bottom:10px}
+.cart-ai-head>span{color:var(--gold);font-size:1.1rem}
+.cart-ai-head b,.cart-ai-head small{display:block}
+.cart-ai-head small{color:var(--muted);margin-top:2px}
+.cart-ai-messages{max-height:220px;min-height:0;padding:4px 0 10px;overflow:auto}
+.cart-ai-form{display:flex;gap:8px}
+.cart-ai-form input{flex:1;min-width:0;border:1px solid var(--line);background:#11161c;color:#fff;border-radius:13px;padding:11px 12px}
+.cart-ai-form button{border:0;border-radius:13px;background:var(--gold);color:#111;font-weight:900;padding:0 14px}
+#aiFab,#aiDialog{display:none!important}
+

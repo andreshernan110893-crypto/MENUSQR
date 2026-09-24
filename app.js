@@ -156,7 +156,7 @@ if($('#seeDrinks'))$('#seeDrinks').onclick=function(){const c=state.categories.f
 if($('#backToPromos'))$('#backToPromos').onclick=function(){$('#promoSection').scrollIntoView({behavior:'smooth'})};
 document.querySelectorAll('[data-service-end]').forEach(function(b){b.onclick=function(){callStaff(b.dataset.serviceEnd)}});
 
-let __aiSuggestionSeq=0;
+let __aiSuggestionSeq=0; let recHistory={recommended:[],viewed:[],openedFromAI:null};
 function aiProduct(p){
  return {id:p.id,name:p.name,price:Number(p.price||0),category:p.category_id,brand:p.brand_id,description:String(p.description||"").slice(0,180)};
 }
@@ -187,13 +187,13 @@ async function askMenuAI(payload){
 
 async function requestProductSuggestion(p){
  const box=$("#aiSuggestion"),text=$("#aiSuggestionText"),actions=$("#aiSuggestionActions");
- const seq=++__aiSuggestionSeq;box.classList.remove("hidden");box.classList.add("loading");text.textContent="Pensando en qué combina mejor…";actions.innerHTML="";
+ const cameFromAI=recHistory.recommended.includes(p.id); const seq=++__aiSuggestionSeq;box.classList.remove("hidden");box.classList.add("loading");text.textContent=cameFromAI?"Revisando cómo queda con tu pedido…":"Pensando en qué combina mejor…";actions.innerHTML="";
  try{
-  const data=await askMenuAI({mode:"product",message:"Recomienda algo útil antes de agregar este producto.",selected:aiProduct(p),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  const data=await askMenuAI({mode:"product",message:cameFromAI?"Este producto fue abierto desde una recomendación anterior. Confirma si combina con el pedido y no inicies otra cadena de recomendaciones.":"Recomienda algo útil considerando también el pedido actual.",selected:Object.assign(aiProduct(p),{opened_from_ai:cameFromAI}),options:aiOptionsFor(p.id),cart:aiCart(),candidates:aiCandidates(p),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
   if(seq!==__aiSuggestionSeq||state.current?.id!==p.id)return;
   text.textContent=data.message||"";
-  actions.innerHTML=(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);return rp?'<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>':""}).join("");
-  actions.querySelectorAll("[data-ai-open]").forEach(b=>b.onclick=()=>{$("#productDialog").close();openProduct(b.dataset.aiOpen)});
+  actions.innerHTML=cameFromAI?"":(data.recommendations||[]).map(r=>{const rp=state.products.find(x=>x.id===r.id);if(rp&&!recHistory.recommended.includes(rp.id))recHistory.recommended.push(rp.id);return rp?'<button type="button" data-ai-open="'+rp.id+'"><span>'+safe(rp.name)+'</span><small>'+safe(r.reason||money(rp.price))+'</small></button>':""}).join("");
+  actions.querySelectorAll("[data-ai-open]").forEach(b=>b.onclick=()=>{recHistory.openedFromAI=b.dataset.aiOpen;$("#productDialog").close();openProduct(b.dataset.aiOpen)});
   box.classList.remove("loading");box.classList.toggle("hidden",!text.textContent&&!actions.children.length);
  }catch{
   if(seq===__aiSuggestionSeq){box.classList.add("hidden");box.classList.remove("loading")}
@@ -208,8 +208,8 @@ $("#aiForm").onsubmit=async e=>{
  addAIMessage("user",safe(q));input.value="";
  const wait=addAIMessage("assistant","Pensando…");
  try{
-  const data=await askMenuAI({mode:"chat",message:q,selected:state.current?aiProduct(state.current):null,options:state.current?aiOptionsFor(state.current.id):[],cart:aiCart(),candidates:aiCandidates(null),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
+  const data=await askMenuAI({mode:"cart",message:"Analiza mi pedido completo. "+q,selected:null,options:[],cart:aiCart(),candidates:aiCandidates(null),place:{code:state.place.code,name:state.place.name,type:state.place.place_type}});
   wait.innerHTML=safe(data.message||"");
-  (data.recommendations||[]).forEach(r=>{const p=state.products.find(x=>x.id===r.id);if(!p)return;const b=document.createElement("button");b.className="ai-chat-rec";b.innerHTML="<b>"+safe(p.name)+"</b><small>"+safe(r.reason||money(p.price))+"</small>";b.onclick=()=>{$("#aiDialog").close();openProduct(p.id)};wait.append(b)});
+  (data.recommendations||[]).forEach(r=>{const p=state.products.find(x=>x.id===r.id);if(!p)return;if(!recHistory.recommended.includes(p.id))recHistory.recommended.push(p.id);const b=document.createElement("button");b.className="ai-chat-rec";b.innerHTML="<b>"+safe(p.name)+"</b><small>"+safe(r.reason||money(p.price))+"</small>";b.onclick=()=>{$("#cartDialog").close();openProduct(p.id)};wait.append(b)});
  }catch{wait.textContent="Ahorita no pude conectarme. Intenta de nuevo en un momento."}
 };

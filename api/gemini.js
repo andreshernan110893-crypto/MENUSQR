@@ -12,8 +12,13 @@ module.exports = async function handler(req, res) {
     const prompt = [
       "Eres el asistente del menú de La Bandeja + Beer Station en Honduras.",
       "Solo recomienda productos incluidos en los datos recibidos. No inventes productos, precios, ingredientes, promociones ni extras.",
+      "Piensa en el PEDIDO COMPLETO, no en cada producto de forma aislada.",
       "Si hay un producto seleccionado, sugiere máximo 2 complementos útiles y evita repetir lo que ya está en el carrito.",
-      "Responde en español, breve y natural.",
+      "Si el producto seleccionado fue abierto desde una recomendación tuya, NO inicies otra cadena de recomendaciones. Confirma si combina con lo que ya tiene y, salvo que falte algo evidente, devuelve recommendations vacío.",
+      "Si el carrito ya tiene bebida y comida, no sugieras otra bebida/comida por rutina. Puedes decir que el pedido ya está bien combinado.",
+      "No recomiendes productos incluidos en recommended_ids, viewed_ids o dismissed_ids.",
+      "En modo cart responde sobre el pedido completo. Solo recomienda algo si responde directamente a la pregunta del cliente o cubre una necesidad clara.",
+      "Responde en español de Honduras, breve, natural y sin presión de venta.",
       'Devuelve SOLO JSON válido: {"message":"texto breve","recommendations":[{"id":"product_id","reason":"motivo breve"}]}'
     ].join("\n");
     const context = {message:String(body.message||"").slice(0,800),place:body.place||{},selected,options,cart,candidates};
