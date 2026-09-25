@@ -3,11 +3,11 @@ const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable
 const $=s=>document.querySelector(s),safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const qs=new URLSearchParams(location.search),station=(qs.get("station")||"LB").toUpperCase()==="BS"?"BS":"LB",label=station==="LB"?"La Bandeja":"Beer Station";
-const state={products:[],categories:[],activeTables:[],groups:[],options:[],links:[],orders:[],cart:[],cat:"ALL",current:null,realtime:false,origin:"ALL",billing:null,report:null};
+const state={products:[],categories:[],activeTables:[],groups:[],options:[],links:[],orders:[],cart:[],cat:"ALL",current:null,realtime:false,origin:"ALL",billing:null,report:null,saleType:"CONTADO",billType:"CONTADO"};
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)};
 $("#posTitle").textContent=label;$("#stationPill").textContent=station;$("#ordersTitle").textContent="Pedidos "+label;document.title="Receptor · "+label;document.body.dataset.station=station;
 
-async function boot(){await load();renderAll();setReportPreset("TODAY");startRealtime()}
+async function boot(){await load();renderAll();setSaleType("CONTADO");setReportPreset("TODAY");startRealtime()}
 async function load(){
  const [p,c,t,g,o,l,ord]=await Promise.all([
   sb.from("products").select("*").eq("active",true).order("sort_order"),
@@ -55,32 +55,72 @@ async function refreshOrders(){const{data,error}=await sb.rpc("get_pos_orders_pu
 async function refreshActiveTables(){const{data,error}=await sb.rpc("get_active_tables_public");if(error)return toast(error.message);const selected=$("#placeSelect")?.value||"";state.activeTables=Array.isArray(data)?data:[];renderActiveTables(selected)}
 function paymentFieldsHTML(method,prefix,total,data={}){
  const m=(method||"").toUpperCase();
- if(["CASH","EFECTIVO"].includes(m))return '<label>Efectivo recibido<input id="'+prefix+'Cash" type="number" min="'+Number(total||0)+'" step="0.01" value="'+(data.cash_received||'')+'" placeholder="Ej. 500"></label><div class="change-box" id="'+prefix+'Change">Cambio: '+money(Math.max(0,Number(data.cash_received||0)-Number(total||0)))+'</div>';
- if(["CARD","TARJETA"].includes(m))return '<label>Últimos 4 dígitos<input id="'+prefix+'Card" inputmode="numeric" maxlength="4" value="'+safe(data.card_last4||'')+'" placeholder="1234"></label>';
- if(["TRANSFER","TRANSFERENCIA"].includes(m))return '<label>Referencia de transferencia<input id="'+prefix+'Transfer" maxlength="80" value="'+safe(data.transfer_reference||'')+'" placeholder="Referencia / comprobante"></label>';
+ if(m==="EFECTIVO")return '<label>Efectivo recibido<input id="'+prefix+'Cash" type="number" min="'+Number(total||0)+'" step="0.01" value="'+(data.cash_received||'')+'" placeholder="Ej. 500"></label><div class="change-box" id="'+prefix+'Change">Cambio: '+money(Math.max(0,Number(data.cash_received||0)-Number(total||0)))+'</div>';
+ if(m==="TARJETA")return '<label>Últimos 4 dígitos<input id="'+prefix+'Card" inputmode="numeric" maxlength="4" value="'+safe(data.card_last4||'')+'" placeholder="1234"></label>';
+ if(m==="TRANSFERENCIA")return '<label>Referencia de transferencia<input id="'+prefix+'Transfer" maxlength="80" value="'+safe(data.transfer_reference||'')+'" placeholder="Referencia / comprobante"></label>';
  if(m==="CHEQUE")return '<label>Número de cheque<input id="'+prefix+'Check" maxlength="80" value="'+safe(data.check_number||'')+'" placeholder="Número de cheque"></label>';
- if(m==="CREDIT")return '<div class="change-box">Venta al crédito</div>';
  return '';
 }
-function bindCashPreview(methodEl,prefix,total){
- const m=methodEl.value;const wrap=$("#"+prefix+"PaymentDetail");if(!wrap)return;
- wrap.innerHTML=paymentFieldsHTML(m,prefix,total,prefix==="bill"?state.billing||{}:{});
+function bindPaymentFields(methodEl,prefix,total){
+ const wrap=$("#"+prefix+"PaymentDetail");if(!wrap)return;
+ wrap.innerHTML=paymentFieldsHTML(methodEl.value,prefix,total,prefix==="bill"?state.billing||{}:{});
  const cash=$("#"+prefix+"Cash"),chg=$("#"+prefix+"Change");if(cash&&chg)cash.oninput=()=>chg.textContent="Cambio: "+money(Math.max(0,Number(cash.value||0)-Number(total||0)));
 }
-function collectPayment(prefix,method,total){
- const m=(method||"").toUpperCase(),p={payment_method:m,payment_status:prefix==="bill"?$("#billStatus").value:$("#paymentStatus").value};
- if(["CASH","EFECTIVO"].includes(m)){p.cash_received=$("#"+prefix+"Cash")?.value||"";if(Number(p.cash_received)<Number(total||0))throw new Error("El efectivo recibido debe ser igual o mayor al total")}
- if(["CARD","TARJETA"].includes(m)){p.card_last4=$("#"+prefix+"Card")?.value.trim()||"";if(!/^\d{4}$/.test(p.card_last4))throw new Error("Ingresa los últimos 4 dígitos de la tarjeta")}
- if(["TRANSFER","TRANSFERENCIA"].includes(m)){p.transfer_reference=$("#"+prefix+"Transfer")?.value.trim()||"";if(!p.transfer_reference)throw new Error("Ingresa la referencia de transferencia")}
+function collectCashPayment(prefix,method,total){
+ const m=(method||"").toUpperCase(),p={sale_type:"CONTADO",payment_method:m};
+ if(m==="EFECTIVO"){p.cash_received=$("#"+prefix+"Cash")?.value||"";if(Number(p.cash_received)<Number(total||0))throw new Error("El efectivo recibido debe ser igual o mayor al total")}
+ if(m==="TARJETA"){p.card_last4=$("#"+prefix+"Card")?.value.trim()||"";if(!/^\d{4}$/.test(p.card_last4))throw new Error("Ingresa los últimos 4 dígitos de la tarjeta")}
+ if(m==="TRANSFERENCIA"){p.transfer_reference=$("#"+prefix+"Transfer")?.value.trim()||"";if(!p.transfer_reference)throw new Error("Ingresa la referencia de transferencia")}
  if(m==="CHEQUE"){p.check_number=$("#"+prefix+"Check")?.value.trim()||"";if(!p.check_number)throw new Error("Ingresa el número de cheque")}
  return p;
 }
-function openBilling(id){const o=state.orders.find(x=>x.id===id);if(!o)return;state.billing=o;$("#billTitle").textContent=(o.customer_name||o.diner_name||"Pedido")+" · "+money(o.total);$("#billMeta").textContent=originLabel(o)+" · "+(o.place_name||o.place_code||"");$("#billMethod").value=mapPayment(o.payment_method);$("#billStatus").value=o.payment_status==="PAID"?"PAID":o.payment_status==="CREDIT"?"CREDIT":"PENDING";bindCashPreview($("#billMethod"),"bill",o.total);$("#billDialog").showModal()}
-function mapPayment(v){const x=(v||"").toUpperCase();if(["EFECTIVO","CASH"].includes(x))return"EFECTIVO";if(["TARJETA","CARD"].includes(x))return"TARJETA";if(["TRANSFERENCIA","TRANSFER"].includes(x))return"TRANSFERENCIA";if(x==="CHEQUE")return"CHEQUE";if(x==="CREDIT")return"CREDIT";return"EFECTIVO"}
-$("#billMethod").onchange=()=>state.billing&&bindCashPreview($("#billMethod"),"bill",state.billing.total);
-$("#billConfirm").onclick=async()=>{if(!state.billing)return;let payload;try{payload=collectPayment("bill",$("#billMethod").value,state.billing.total)}catch(e){return toast(e.message)}const{data,error}=await sb.rpc("pos_register_payment_public",{p_order:state.billing.id,p_station:station,p_payload:payload});if(error)return toast(error.message);const o=state.billing;$("#billDialog").close();await refreshOrders();printReceipt(o,payload.payment_method,payload.payment_status,data);toast("Pago registrado")}
-function printReceipt(o,method,status){const items=(o.items||[]).map(i=>'<tr><td>'+i.qty+' × '+safe(i.product_name)+'</td><td>'+money(i.line_total)+'</td></tr>').join(""),w=window.open("","_blank","width=440,height=720");if(!w)return;w.document.write('<!doctype html><title>Comprobante</title><style>body{font-family:Arial;padding:28px;color:#111}img{max-width:90px}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:last-child{text-align:right}.total{font-size:22px;font-weight:bold;text-align:right}</style><img src="/assets/brand/'+(station==="LB"?"lb":"bs")+'.webp"><h1>'+label+'</h1><p><b>'+(o.customer_name||o.diner_name||"Pedido")+'</b><br>'+(o.place_name||o.place_code||"")+'</p><table>'+items+'</table><div class="total">'+money(o.total)+'</div><p>Pago: '+method+' · '+status+'</p><script>window.onload=()=>window.print()<\/script>');w.document.close()}
-
+function setSaleType(type){
+ state.saleType=type;$("#saleTypeSwitch").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.saleType===type));
+ $("#saleCashBlock").classList.toggle("hidden",type!=="CONTADO");$("#saleCreditBlock").classList.toggle("hidden",type!=="CREDITO");
+ $("#sendSale").textContent=type==="CREDITO"?"Generar factura a crédito":"Registrar pago y venta";
+ if(type==="CONTADO")refreshSalePayment();
+}
+function setBillType(type){
+ state.billType=type;$("#billTypeSwitch").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.billType===type));
+ $("#billCashBlock").classList.toggle("hidden",type!=="CONTADO");$("#billCreditBlock").classList.toggle("hidden",type!=="CREDITO");
+ $("#billConfirm").textContent=type==="CREDITO"?"Generar factura a crédito":"Registrar pago";
+ if(type==="CONTADO"&&state.billing)bindPaymentFields($("#billMethod"),"bill",state.billing.total);
+}
+function openBilling(id){
+ const o=state.orders.find(x=>x.id===id);if(!o)return;state.billing=o;
+ $("#billTitle").textContent=(o.customer_name||o.diner_name||"Pedido")+" · "+money(o.total);$("#billMeta").textContent=originLabel(o)+" · "+(o.place_name||o.place_code||"");
+ const type=o.sale_type==="CREDITO"?"CREDITO":"CONTADO";state.billType=type;$("#billMethod").value=mapPayment(o.payment_method);setBillType(type);$("#billDialog").showModal()
+}
+function mapPayment(v){const x=(v||"").toUpperCase();if(["EFECTIVO","CASH"].includes(x))return"EFECTIVO";if(["TARJETA","CARD"].includes(x))return"TARJETA";if(["TRANSFERENCIA","TRANSFER"].includes(x))return"TRANSFERENCIA";if(x==="CHEQUE")return"CHEQUE";return"EFECTIVO"}
+$("#billMethod").onchange=()=>state.billing&&bindPaymentFields($("#billMethod"),"bill",state.billing.total);
+$("#billTypeSwitch").querySelectorAll("[data-bill-type]").forEach(b=>b.onclick=()=>setBillType(b.dataset.billType));
+$("#saleTypeSwitch").querySelectorAll("[data-sale-type]").forEach(b=>b.onclick=()=>setSaleType(b.dataset.saleType));
+$("#billConfirm").onclick=async()=>{
+ if(!state.billing)return;let payload={sale_type:state.billType};
+ if(state.billType==="CONTADO"){try{payload=collectCashPayment("bill",$("#billMethod").value,state.billing.total)}catch(e){return toast(e.message)}}
+ const{data,error}=await sb.rpc("pos_finalize_sale_public",{p_order:state.billing.id,p_station:station,p_payload:payload});if(error)return toast(error.message);
+ const o=state.billing;$("#billDialog").close();await refreshOrders();
+ if(state.billType==="CREDITO")printCreditInvoice(o,data);else printReceipt(o,data);
+ toast(state.billType==="CREDITO"?"Factura a crédito generada":"Pago registrado")
+}
+function paymentDetailText(o){
+ if(o.sale_type==="CREDITO")return "CRÉDITO"+(o.invoice_number?" · "+o.invoice_number:"");
+ const m=(o.payment_method||"").toUpperCase();
+ if(m==="EFECTIVO")return "EFECTIVO"+(o.cash_received?(" · recibió "+money(o.cash_received)+" · cambio "+money(o.cash_change)):"");
+ if(m==="TARJETA")return "TARJETA · **** "+(o.card_last4||"");
+ if(m==="TRANSFERENCIA")return "TRANSFERENCIA · "+(o.transfer_reference||"");
+ if(m==="CHEQUE")return "CHEQUE · "+(o.check_number||"");
+ return m||"—";
+}
+function printReceipt(o,data){
+ const items=(o.items||[]).map(i=>'<tr><td>'+i.qty+' × '+safe(i.product_name)+'</td><td>'+money(i.line_total)+'</td></tr>').join(""),w=window.open("","_blank","width=440,height=720");if(!w)return;
+ const detail=data.payment_method==="EFECTIVO"?"Efectivo: "+money(data.cash_received)+" · Cambio: "+money(data.cash_change):data.payment_method==="TARJETA"?"Tarjeta **** "+data.card_last4:data.payment_method==="TRANSFERENCIA"?"Transferencia "+data.transfer_reference:"Cheque "+data.check_number;
+ w.document.write('<!doctype html><title>Comprobante</title><style>body{font-family:Arial;padding:28px;color:#111}img{max-width:90px}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:last-child{text-align:right}.total{font-size:22px;font-weight:bold;text-align:right}</style><img src="/assets/brand/'+(station==="LB"?"lb":"bs")+'.webp"><h1>'+label+'</h1><h3>VENTA CONTADO</h3><p><b>'+(o.customer_name||o.diner_name||"Consumidor final")+'</b><br>'+(o.place_name||o.place_code||"")+'</p><table>'+items+'</table><div class="total">'+money(o.total)+'</div><p>'+safe(detail)+'</p><script>window.onload=()=>window.print()<\/script>');w.document.close()
+}
+function printCreditInvoice(o,data){
+ const items=(o.items||[]).map(i=>'<tr><td>'+i.qty+' × '+safe(i.product_name)+'</td><td>'+money(i.line_total)+'</td></tr>').join(""),w=window.open("","_blank","width=500,height=760");if(!w)return;
+ w.document.write('<!doctype html><title>Factura crédito</title><style>body{font-family:Arial;padding:28px;color:#111}img{max-width:90px}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:last-child{text-align:right}.total{font-size:22px;font-weight:bold;text-align:right}.box{padding:12px;background:#f4f4f4;border-radius:8px}</style><img src="/assets/brand/'+(station==="LB"?"lb":"bs")+'.webp"><h1>'+label+'</h1><h2>FACTURA A CRÉDITO</h2><div class="box"><b>'+safe(data.invoice_number||"")+'</b><br>Cliente: '+safe(o.customer_name||o.diner_name||"Consumidor final")+'<br>'+(o.place_name||o.place_code||"")+'</div><table>'+items+'</table><div class="total">'+money(o.total)+'</div><p>Saldo pendiente: <b>'+money(data.balance||o.total)+'</b></p><small>Documento interno de cuenta por cobrar.</small><script>window.onload=()=>window.print()<\/script>');w.document.close()
+}
 function setPosMode(mode){const direct=mode==="POS";state.origin=mode;$("#originFilters").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x.dataset.origin===mode));$("#manualSale").classList.toggle("hidden",!direct);document.querySelector(".order-board").classList.toggle("hidden",direct);document.querySelector(".receiver-stats").classList.toggle("hidden",direct);$("#ordersTitle").textContent=direct?"Venta directa · "+label:"Pedidos "+label;document.querySelector(".receiver-head p").textContent=direct?"Selecciona una mesa activa y su comensal, o registra la venta sin mesa.":"Recibe, prepara, entrega y cobra. La venta directa queda como función secundaria.";if(direct){state.cat="ALL";refreshActiveTables();renderCats();renderProducts();setTimeout(()=>$("#manualSale").scrollIntoView({behavior:"smooth",block:"start"}),50)}else renderOrdersBoard()}
 $("#originFilters").querySelectorAll("[data-origin]").forEach(b=>b.onclick=()=>setPosMode(b.dataset.origin));$("#refresh").onclick=async()=>{await refreshOrders();if(state.origin==="POS")await refreshActiveTables()};$("#toggleManual").onclick=()=>setPosMode("POS");$("#closeManual").onclick=()=>setPosMode("ALL");
 
@@ -91,17 +131,28 @@ const selected=()=>[...$("#optGroups").querySelectorAll("input:checked")].map(i=
 function unit(i){const p=state.products.find(x=>x.id===i.product_id);return Number(p?.price||0)+(i.option_ids||[]).reduce((a,id)=>a+Number(state.options.find(o=>o.id===id)?.price_delta||0),0)}
 function renderTicket(){const el=$("#ticketItems");el.innerHTML=state.cart.map((i,n)=>{const p=state.products.find(x=>x.id===i.product_id),opts=(i.option_ids||[]).map(id=>state.options.find(o=>o.id===id)?.name).filter(Boolean).join(", ");return '<div class="line"><div><b>'+(p?.name||"")+'</b><small>'+opts+'</small><small>'+money(unit(i))+'</small></div><div class="qty"><button data-less="'+n+'">−</button><strong>'+i.qty+'</strong><button data-more="'+n+'">+</button></div></div>'}).join("")||'<div class="empty-col">Aún no has agregado productos.</div>';$("#ticketTotal").textContent=money(state.cart.reduce((a,i)=>a+unit(i)*i.qty,0));refreshSalePayment();el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{state.cart[+b.dataset.more].qty++;renderTicket()});el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const n=+b.dataset.less;if(--state.cart[n].qty<=0)state.cart.splice(n,1);renderTicket()})}
 $("#placeSelect").onchange=()=>renderTableDiners();$("#customerSelect").onchange=updateDirectContext;$("#search").oninput=renderProducts;
-function refreshSalePayment(){const total=state.cart.reduce((a,i)=>a+unit(i)*i.qty,0);bindCashPreview($("#paymentMethod"),"sale",total)}
-$("#paymentMethod").onchange=refreshSalePayment;$("#paymentStatus").onchange=refreshSalePayment;
+function refreshSalePayment(){const total=state.cart.reduce((a,i)=>a+unit(i)*i.qty,0);if(state.saleType==="CONTADO")bindPaymentFields($("#paymentMethod"),"sale",total)}
+$("#paymentMethod").onchange=refreshSalePayment;
 $("#newCustomerBtn").onclick=()=>{const t=selectedTable();if(!t)return toast("Selecciona una mesa activa");$("#customerForm").reset();$("#customerTableLabel").textContent="Mesa: "+t.place_name;$("#customerDialog").showModal()};
 $("#customerForm").onsubmit=async e=>{e.preventDefault();const t=selectedTable(),name=$("#newCustomerName").value.trim();if(!t)return toast("Selecciona una mesa activa");if(!name)return toast("Escribe el nombre del comensal");const{data,error}=await sb.rpc("add_diner_to_active_table_public",{p_place:t.place_code,p_name:name});if(error)return toast(error.message);await refreshActiveTables();$("#placeSelect").value=t.place_code;renderTableDiners(data.id);$("#customerDialog").close();toast("Comensal agregado a "+t.place_name)};
-$("#sendSale").onclick=async()=>{if(!state.cart.length)return toast("Agrega productos");const t=selectedTable(),d=selectedDiner(),total=state.cart.reduce((a,i)=>a+unit(i)*i.qty,0);let pay;try{pay=collectPayment("sale",$("#paymentMethod").value,total)}catch(e){return toast(e.message)}const payload={station,diner_id:d?.id||null,customer_name:d?.name||"Consumidor final",payment_method:pay.payment_method,payment_status:pay.payment_status,cash_received:pay.cash_received||null,card_last4:pay.card_last4||null,transfer_reference:pay.transfer_reference||null,check_number:pay.check_number||null,note:$("#saleNote").value.trim(),items:state.cart};const{error}=await sb.rpc("pos_place_order",{p_place:t?.place_code||null,p_payload:payload});if(error)return toast(error.message);state.cart=[];$("#saleNote").value="";$("#placeSelect").value="";renderTableDiners();renderTicket();await refreshOrders();toast("Venta directa registrada")};
+$("#sendSale").onclick=async()=>{
+ if(!state.cart.length)return toast("Agrega productos");const t=selectedTable(),d=selectedDiner(),total=state.cart.reduce((a,i)=>a+unit(i)*i.qty,0);
+ let finalPayload={sale_type:state.saleType};
+ if(state.saleType==="CONTADO"){try{finalPayload=collectCashPayment("sale",$("#paymentMethod").value,total)}catch(e){return toast(e.message)}}
+ const payload={station,diner_id:d?.id||null,customer_name:d?.name||"Consumidor final",payment_method:null,payment_status:"PENDING",note:$("#saleNote").value.trim(),items:state.cart};
+ const{data:created,error}=await sb.rpc("pos_place_order",{p_place:t?.place_code||null,p_payload:payload});if(error)return toast(error.message);
+ const orderId=created?.order_id;if(!orderId)return toast("No se pudo crear la venta");
+ const{data:finalized,error:finalError}=await sb.rpc("pos_finalize_sale_public",{p_order:orderId,p_station:station,p_payload:finalPayload});if(finalError)return toast(finalError.message);
+ const pseudo={id:orderId,total,customer_name:d?.name||"Consumidor final",diner_name:d?.name||null,place_name:t?.place_name||"POS "+label,place_code:t?.place_code||("POS-"+station),items:state.cart.map(i=>{const p=state.products.find(x=>x.id===i.product_id);return{qty:i.qty,product_name:p?.name||"",line_total:unit(i)*i.qty}})};
+ if(state.saleType==="CREDITO")printCreditInvoice(pseudo,finalized);else printReceipt(pseudo,finalized);
+ const completedType=state.saleType;state.cart=[];$("#saleNote").value="";$("#placeSelect").value="";renderTableDiners();renderTicket();await refreshOrders();setSaleType("CONTADO");toast(completedType==="CREDITO"?"Factura a crédito generada":"Venta registrada");
+}
 
 function dateYMD(d){const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)}
 function setReportPreset(period){document.querySelectorAll("[data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===period));const now=new Date(),from=new Date(now),to=new Date(now);if(period==="YESTERDAY"){from.setDate(now.getDate()-1);to.setDate(now.getDate()-1)}else if(period==="WEEK"){from.setDate(now.getDate()-6)}else if(period==="MONTH"){from.setDate(1)}$("#reportFrom").value=dateYMD(from);$("#reportTo").value=dateYMD(to);loadSalesReport()}
 async function loadSalesReport(){const f=$("#reportFrom").value,t=$("#reportTo").value;if(!f||!t)return;const from=new Date(f+"T00:00:00"),to=new Date(t+"T00:00:00");to.setDate(to.getDate()+1);const{data,error}=await sb.rpc("get_pos_sales_report_public",{p_station:station,p_from:from.toISOString(),p_to:to.toISOString()});if(error)return toast(error.message);state.report=data||{};renderSalesReport(f,t)}
 function miniRows(list,key){return (list||[]).map(x=>'<div class="mini-report-row"><span>'+safe(x[key]||"")+'</span><b>'+money(x.amount)+'</b><em>'+Number(x.count??x.qty??0).toLocaleString("es-HN")+'</em></div>').join("")||'<div class="empty-col">Sin datos</div>'}
-function renderSalesReport(f,t){const r=state.report||{},s=r.summary||{};$("#reportLogo").src=station==="LB"?"/assets/brand/lb.webp":"/assets/brand/bs.webp";$("#reportTitle").textContent=label;$("#reportRangeLabel").textContent=f===t?new Date(f+"T12:00:00").toLocaleDateString("es-HN",{dateStyle:"long"}):f+" al "+t;$("#reportSales").textContent=money(s.sales_total);$("#reportOrders").textContent=Number(s.orders_count||0);$("#reportAverage").textContent=money(s.avg_ticket);$("#reportCancelled").textContent=Number(s.cancelled_count||0);$("#reportOrigins").innerHTML=miniRows(r.by_origin,"origin");$("#reportPayments").innerHTML=miniRows(r.by_payment,"payment_method");$("#reportProducts").innerHTML=miniRows(r.top_products,"product_name");$("#reportCategories").innerHTML=miniRows(r.categories,"category");const orders=r.orders||[];$("#reportDetailCount").textContent=orders.length+" ventas";$("#reportRows").innerHTML=orders.map(o=>{const origin=o.order_source==="POS"?"Venta directa":o.place_type==="COURT"?"Cancha":o.place_type==="TABLE"?"Mesa":o.order_source,items=(o.items||[]).map(i=>i.qty+"× "+i.product_name).join(", ");return '<tr><td>'+new Date(o.created_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})+'</td><td>#'+String(o.id).slice(0,8)+'</td><td>'+safe(origin)+'</td><td>'+safe(o.place_name||o.place_code||"—")+'</td><td>'+safe(o.diner_name||o.customer_name||"Consumidor final")+'</td><td>'+safe(items)+'</td><td>'+safe(o.payment_method||"—")+'</td><td><b>'+money(o.total)+'</b></td></tr>'}).join("")||'<tr><td colspan="8">Sin ventas en el período.</td></tr>'}
+function renderSalesReport(f,t){const r=state.report||{},s=r.summary||{};$("#reportLogo").src=station==="LB"?"/assets/brand/lb.webp":"/assets/brand/bs.webp";$("#reportTitle").textContent=label;$("#reportRangeLabel").textContent=f===t?new Date(f+"T12:00:00").toLocaleDateString("es-HN",{dateStyle:"long"}):f+" al "+t;$("#reportSales").textContent=money(s.sales_total);$("#reportOrders").textContent=Number(s.orders_count||0);$("#reportAverage").textContent=money(s.avg_ticket);$("#reportCancelled").textContent=Number(s.cancelled_count||0);$("#reportCash").textContent=money(s.cash_sales);$("#reportCredit").textContent=money(s.credit_sales);$("#reportCxC").textContent=money(s.receivable_balance);$("#reportOrigins").innerHTML=miniRows(r.by_origin,"origin");$("#reportSaleTypes").innerHTML=miniRows(r.by_sale_type,"sale_type");$("#reportPayments").innerHTML=miniRows(r.by_payment,"payment_method");$("#reportProducts").innerHTML=miniRows(r.top_products,"product_name");$("#reportCategories").innerHTML=miniRows(r.categories,"category");const orders=r.orders||[];$("#reportDetailCount").textContent=orders.length+" ventas";$("#reportRows").innerHTML=orders.map(o=>{const origin=o.order_source==="POS"?"Venta directa":o.place_type==="COURT"?"Cancha":o.place_type==="TABLE"?"Mesa":o.order_source,items=(o.items||[]).map(i=>i.qty+"× "+i.product_name).join(", ");const detail=paymentDetailText(o),saldo=o.sale_type==="CREDITO"?money(o.receivable_balance||0):"—";return '<tr><td>'+new Date(o.created_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})+'</td><td>#'+String(o.id).slice(0,8)+(o.invoice_number?'<br><small>'+safe(o.invoice_number)+'</small>':'')+'</td><td>'+safe(origin)+'</td><td>'+safe(o.place_name||o.place_code||"—")+'</td><td>'+safe(o.diner_name||o.customer_name||"Consumidor final")+'</td><td>'+safe(items)+'</td><td>'+safe(o.sale_type||"CONTADO")+'</td><td>'+safe(detail)+'</td><td>'+saldo+'</td><td><b>'+money(o.total)+'</b></td></tr>'}).join("")||'<tr><td colspan="10">Sin ventas en el período.</td></tr>'}
 $("#showReport").onclick=()=>{$("#receiverPanel").classList.add("hidden");$("#manualSale").classList.add("hidden");$("#reportPanel").classList.remove("hidden");loadSalesReport();window.scrollTo({top:0})};$("#closeReport").onclick=()=>{$("#reportPanel").classList.add("hidden");$("#receiverPanel").classList.remove("hidden");setPosMode("ALL")};$("#loadReport").onclick=loadSalesReport;document.querySelectorAll("[data-period]").forEach(b=>b.onclick=()=>setReportPreset(b.dataset.period));$("#printReport").onclick=()=>window.print();
 
 function startRealtime(){if(state.realtime)return;state.realtime=true;setInterval(async()=>{const old=state.orders[0]?.id;const{data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return;state.orders=Array.isArray(data)?data:[];if(!$("#reportPanel").classList.contains("hidden"))return;renderOrdersBoard();if(old&&state.orders[0]?.id&&state.orders[0].id!==old)toast("🔔 Nuevo pedido recibido")},3500)}

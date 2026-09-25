@@ -35,3 +35,6 @@ body[data-station] #cats button:first-child.active{background:var(--gold);border
 
 /* PAYMENT V6 */
 .payment-detail{display:grid;gap:8px;margin-top:10px}.payment-detail label{display:grid;gap:6px;color:#d7dee6;font-size:.76rem;font-weight:800}.payment-detail input{width:100%}.change-box{padding:10px 12px;border:1px solid rgba(98,223,128,.22);background:rgba(98,223,128,.07);border-radius:12px;color:#8ee89f;font-weight:900;font-size:.8rem}.card-actions button[data-bill]{border-color:rgba(98,223,128,.25);color:#9beaaa}
+
+/* CONTADO / CREDITO V7 */
+.sale-type-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:5px;background:#0b1016;border:1px solid var(--line);border-radius:14px;margin:12px 0}.sale-type-switch button{border:0;border-radius:10px;padding:11px;background:transparent;color:#8f9aa7;font-weight:900}.sale-type-switch button.active{background:var(--gold);color:#111;box-shadow:0 7px 20px rgba(0,0,0,.18)}.payment-method-label{display:grid;gap:6px;color:#d7dee6;font-size:.76rem;font-weight:800}.credit-box{padding:14px;border:1px solid rgba(255,193,67,.2);border-radius:14px;background:rgba(255,193,67,.07)}.credit-box b,.credit-box small{display:block}.credit-box b{color:#ffd36a}.credit-box small{margin-top:4px;color:#9ca8b5}

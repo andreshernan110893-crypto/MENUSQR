@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-payment-v6"></head>
+<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-cxc-v7"></head>
 <body>
 <section id="posApp">
 <header class="pos-top">
@@ -48,8 +48,12 @@
       <div class="ticket-head"><small>VENTA DIRECTA</small><h2 id="ticketPlace">Sin mesa asignada</h2><p id="ticketCustomer">Consumidor final</p></div>
       <div id="ticketItems"></div>
       <label class="ticket-note">Nota del pedido<textarea id="saleNote" placeholder="Referencia o indicación opcional"></textarea></label>
-      <div class="payment"><select id="paymentMethod"><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option><option value="CHEQUE">Cheque</option><option value="CREDIT">Crédito</option></select><select id="paymentStatus"><option value="PENDING">Pendiente</option><option value="PAID">Pagado</option><option value="CREDIT">Crédito</option></select></div>
-      <div id="salePaymentDetail" class="payment-detail"></div>
+      <div class="sale-type-switch" id="saleTypeSwitch"><button type="button" data-sale-type="CONTADO" class="active">CONTADO</button><button type="button" data-sale-type="CREDITO">CRÉDITO</button></div>
+      <div id="saleCashBlock">
+        <label class="payment-method-label">Medio de pago<select id="paymentMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option></select></label>
+        <div id="salePaymentDetail" class="payment-detail"></div>
+      </div>
+      <div id="saleCreditBlock" class="credit-box hidden"><b>Venta a crédito</b><small>Se generará una factura interna y una cuenta por cobrar en el Admin.</small></div>
       <div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Registrar venta directa</button>
     </aside>
   </main>
@@ -66,16 +70,16 @@
       <article><span>Ventas</span><b id="reportSales">L 0.00</b></article>
       <article><span>Pedidos</span><b id="reportOrders">0</b></article>
       <article><span>Ticket promedio</span><b id="reportAverage">L 0.00</b></article>
-      <article><span>Pedidos anulados</span><b id="reportCancelled">0</b></article>
+      <article><span>Pedidos anulados</span><b id="reportCancelled">0</b></article><article><span>Ventas contado</span><b id="reportCash">L 0.00</b></article><article><span>Ventas crédito</span><b id="reportCredit">L 0.00</b></article><article><span>Saldo CxC</span><b id="reportCxC">L 0.00</b></article>
     </div>
     <div class="report-grids">
       <article class="report-card"><h3>Ventas por origen</h3><div id="reportOrigins"></div></article>
-      <article class="report-card"><h3>Medios de pago</h3><div id="reportPayments"></div></article>
+      <article class="report-card"><h3>Contado / Crédito</h3><div id="reportSaleTypes"></div></article><article class="report-card"><h3>Medios de pago</h3><div id="reportPayments"></div></article>
       <article class="report-card"><h3>Productos más vendidos</h3><div id="reportProducts"></div></article>
       <article class="report-card"><h3>Ventas por categoría</h3><div id="reportCategories"></div></article>
     </div>
     <div class="report-card report-detail"><div class="report-table-head"><div><small>DETALLE</small><h3>Ventas realizadas</h3></div><span id="reportDetailCount"></span></div>
-      <div class="report-table-wrap"><table><thead><tr><th>Hora</th><th>Pedido</th><th>Origen</th><th>Mesa/Cancha</th><th>Comensal</th><th>Productos</th><th>Pago</th><th>Total</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+      <div class="report-table-wrap"><table><thead><tr><th>Hora</th><th>Pedido</th><th>Origen</th><th>Mesa/Cancha</th><th>Comensal</th><th>Productos</th><th>Tipo</th><th>Pago / referencia</th><th>Saldo</th><th>Total</th></tr></thead><tbody id="reportRows"></tbody></table></div>
     </div>
   </div>
 </section>
@@ -83,5 +87,5 @@
 
 <dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
 <dialog id="customerDialog"><button class="close" data-close>×</button><form id="customerForm" class="option-card"><small>NUEVO COMENSAL</small><h2>Agregar a la mesa</h2><p id="customerTableLabel"></p><label>Nombre<input id="newCustomerName" maxlength="100" required placeholder="Nombre del comensal"></label><button class="send" type="submit">Agregar comensal</button></form></dialog>
-<dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>REGISTRAR PAGO</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option><option value="CREDIT">Crédito</option></select></label><div id="billPaymentDetail" class="payment-detail"></div><label>Estado<select id="billStatus"><option value="PAID">Pagado</option><option value="PENDING">Pendiente</option><option value="CREDIT">Crédito</option></select></label><button id="billConfirm" class="send">Registrar pago</button></div></dialog>
-<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-payment-v6"></script></body></html>
+<dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>FINALIZAR VENTA</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><div class="sale-type-switch" id="billTypeSwitch"><button type="button" data-bill-type="CONTADO" class="active">CONTADO</button><button type="button" data-bill-type="CREDITO">CRÉDITO</button></div><div id="billCashBlock"><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option></select></label><div id="billPaymentDetail" class="payment-detail"></div></div><div id="billCreditBlock" class="credit-box hidden"><b>Factura a crédito</b><small>Se generará la cuenta por cobrar automáticamente.</small></div><button id="billConfirm" class="send">Registrar pago</button></div></dialog>
+<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-cxc-v7"></script></body></html>
