@@ -78,12 +78,14 @@ function setSaleType(type){
  state.saleType=type;$("#saleTypeSwitch").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.saleType===type));
  $("#saleCashBlock").classList.toggle("hidden",type!=="CONTADO");$("#saleCreditBlock").classList.toggle("hidden",type!=="CREDITO");
  $("#sendSale").textContent=type==="CREDITO"?"Generar factura a crédito":"Registrar pago y venta";
+ if(type==="CREDITO"){const d=selectedDiner();$("#saleCreditPhone").value=d?.phone||""}
  if(type==="CONTADO")refreshSalePayment();
 }
 function setBillType(type){
  state.billType=type;$("#billTypeSwitch").querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.billType===type));
  $("#billCashBlock").classList.toggle("hidden",type!=="CONTADO");$("#billCreditBlock").classList.toggle("hidden",type!=="CREDITO");
  $("#billConfirm").textContent=type==="CREDITO"?"Generar factura a crédito":"Registrar pago";
+ if(type==="CREDITO"&&state.billing){const d=state.activeTables.flatMap(t=>t.diners||[]).find(x=>x.name===state.billing.diner_name);$("#billCreditPhone").value=d?.phone||state.billing.credit_phone||""}
  if(type==="CONTADO"&&state.billing)bindPaymentFields($("#billMethod"),"bill",state.billing.total);
 }
 function openBilling(id){
@@ -97,7 +99,7 @@ $("#billTypeSwitch").querySelectorAll("[data-bill-type]").forEach(b=>b.onclick=(
 $("#saleTypeSwitch").querySelectorAll("[data-sale-type]").forEach(b=>b.onclick=()=>setSaleType(b.dataset.saleType));
 $("#billConfirm").onclick=async()=>{
  if(!state.billing)return;let payload={sale_type:state.billType};
- if(state.billType==="CONTADO"){try{payload=collectCashPayment("bill",$("#billMethod").value,state.billing.total)}catch(e){return toast(e.message)}}
+ if(state.billType==="CONTADO"){try{payload=collectCashPayment("bill",$("#billMethod").value,state.billing.total)}catch(e){return toast(e.message)}}else{payload.credit_phone=$("#billCreditPhone").value.trim();if(payload.credit_phone.replace(/\D/g,"").length<8)return toast("Ingresa el celular del comensal")}
  const{data,error}=await sb.rpc("pos_finalize_sale_public",{p_order:state.billing.id,p_station:station,p_payload:payload});if(error)return toast(error.message);
  const o=state.billing;$("#billDialog").close();await refreshOrders();
  if(state.billType==="CREDITO")printCreditInvoice(o,data);else printReceipt(o,data);
@@ -138,7 +140,7 @@ $("#customerForm").onsubmit=async e=>{e.preventDefault();const t=selectedTable()
 $("#sendSale").onclick=async()=>{
  if(!state.cart.length)return toast("Agrega productos");const t=selectedTable(),d=selectedDiner(),total=state.cart.reduce((a,i)=>a+unit(i)*i.qty,0);
  let finalPayload={sale_type:state.saleType};
- if(state.saleType==="CONTADO"){try{finalPayload=collectCashPayment("sale",$("#paymentMethod").value,total)}catch(e){return toast(e.message)}}
+ if(state.saleType==="CONTADO"){try{finalPayload=collectCashPayment("sale",$("#paymentMethod").value,total)}catch(e){return toast(e.message)}}else{finalPayload.credit_phone=$("#saleCreditPhone").value.trim();if(finalPayload.credit_phone.replace(/\D/g,"").length<8)return toast("Ingresa el celular del comensal")}
  const payload={station,diner_id:d?.id||null,customer_name:d?.name||"Consumidor final",payment_method:null,payment_status:"PENDING",note:$("#saleNote").value.trim(),items:state.cart};
  const{data:created,error}=await sb.rpc("pos_place_order",{p_place:t?.place_code||null,p_payload:payload});if(error)return toast(error.message);
  const orderId=created?.order_id;if(!orderId)return toast("No se pudo crear la venta");

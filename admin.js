@@ -64,7 +64,7 @@ function renderReceivables(){
    <div class="row ar-row">
      <div>
        <b>${safe(r.invoice_number)} · ${safe(r.customer_name||"Consumidor final")}</b>
-       <small>${new Date(r.created_at).toLocaleString("es-HN")} · ${safe(r.station==="LB"?"La Bandeja":"Beer Station")} · ${safe(r.place_name||r.place_code||"")}</small>
+       <small>${new Date(r.created_at).toLocaleString("es-HN")} · ${safe(r.station==="LB"?"La Bandeja":"Beer Station")} · ${safe(r.place_name||r.place_code||"")}</small><small>Celular: ${safe(r.customer_phone||"No registrado")}</small>
        <small>Original: L ${Number(r.original_amount).toFixed(2)} · Abonado: L ${Number(r.paid_amount).toFixed(2)} · <strong>Saldo: L ${Number(r.balance).toFixed(2)}</strong></small>
        ${(r.payments||[]).length?`<small>${(r.payments||[]).map(p=>`${new Date(p.created_at).toLocaleDateString("es-HN")}: L ${Number(p.amount).toFixed(2)} ${safe(p.payment_method)}${p.reference?" · "+safe(p.reference):""}`).join(" | ")}</small>`:""}
      </div>

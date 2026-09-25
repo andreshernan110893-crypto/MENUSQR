@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-cxc-v7"></head>
+<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-creditphone-v8"></head>
 <body>
 <section id="posApp">
 <header class="pos-top">
@@ -53,7 +53,7 @@
         <label class="payment-method-label">Medio de pago<select id="paymentMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option></select></label>
         <div id="salePaymentDetail" class="payment-detail"></div>
       </div>
-      <div id="saleCreditBlock" class="credit-box hidden"><b>Venta a crédito</b><small>Se generará una factura interna y una cuenta por cobrar en el Admin.</small></div>
+      <div id="saleCreditBlock" class="credit-box hidden"><b>Venta a crédito</b><small>Se generará una factura interna y una cuenta por cobrar en el Admin.</small><label>Celular del comensal<input id="saleCreditPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej. 9999-9999"></label></div>
       <div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Registrar venta directa</button>
     </aside>
   </main>
@@ -87,5 +87,5 @@
 
 <dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
 <dialog id="customerDialog"><button class="close" data-close>×</button><form id="customerForm" class="option-card"><small>NUEVO COMENSAL</small><h2>Agregar a la mesa</h2><p id="customerTableLabel"></p><label>Nombre<input id="newCustomerName" maxlength="100" required placeholder="Nombre del comensal"></label><button class="send" type="submit">Agregar comensal</button></form></dialog>
-<dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>FINALIZAR VENTA</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><div class="sale-type-switch" id="billTypeSwitch"><button type="button" data-bill-type="CONTADO" class="active">CONTADO</button><button type="button" data-bill-type="CREDITO">CRÉDITO</button></div><div id="billCashBlock"><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option></select></label><div id="billPaymentDetail" class="payment-detail"></div></div><div id="billCreditBlock" class="credit-box hidden"><b>Factura a crédito</b><small>Se generará la cuenta por cobrar automáticamente.</small></div><button id="billConfirm" class="send">Registrar pago</button></div></dialog>
-<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-cxc-v7"></script></body></html>
+<dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>FINALIZAR VENTA</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><div class="sale-type-switch" id="billTypeSwitch"><button type="button" data-bill-type="CONTADO" class="active">CONTADO</button><button type="button" data-bill-type="CREDITO">CRÉDITO</button></div><div id="billCashBlock"><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CHEQUE">Cheque</option></select></label><div id="billPaymentDetail" class="payment-detail"></div></div><div id="billCreditBlock" class="credit-box hidden"><b>Factura a crédito</b><small>Se generará la cuenta por cobrar automáticamente.</small><label>Celular del comensal<input id="billCreditPhone" type="tel" inputmode="tel" maxlength="20" placeholder="Ej. 9999-9999"></label></div><button id="billConfirm" class="send">Registrar pago</button></div></dialog>
+<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-creditphone-v8"></script></body></html>
