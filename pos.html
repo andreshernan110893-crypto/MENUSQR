@@ -1,11 +1,14 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-directsale-v3"></head>
+<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-report-v5"></head>
 <body>
 <section id="posApp">
-<header class="pos-top"><div><small>RECEPTOR DE PEDIDOS · EN VIVO</small><strong id="posTitle">La Bandeja</strong></div><div class="top-actions"><span class="station-pill" id="stationPill">LB</span><span class="pos-online">OPERATIVO</span><button id="toggleManual">+ Venta directa</button></div></header>
+<header class="pos-top">
+  <div><small>RECEPTOR DE PEDIDOS · EN VIVO</small><strong id="posTitle">La Bandeja</strong></div>
+  <div class="top-actions"><span class="station-pill" id="stationPill">LB</span><span class="pos-online">OPERATIVO</span><button id="showReport">Reportes</button><button id="toggleManual">+ Venta directa</button></div>
+</header>
 
-<section class="receiver">
+<section id="receiverPanel" class="receiver">
   <div class="receiver-head">
     <div><small>OPERACIÓN</small><h1 id="ordersTitle">Pedidos La Bandeja</h1><p>Recibe, prepara, entrega y cobra. La venta directa queda como función secundaria.</p></div>
     <div class="receiver-stats">
@@ -29,13 +32,14 @@
 </section>
 
 <section id="manualSale" class="manual-sale hidden">
-  <div class="manual-head"><div><small>FUNCIÓN SECUNDARIA</small><h2>Venta directa / facturación</h2></div><button id="closeManual">Cerrar</button></div>
+  <div class="manual-head"><div><small>VENTA DIRECTA</small><h2 id="manualTitle">Asignar venta a comensal</h2><p>Solo aparecen mesas activas. Al seleccionar una mesa se cargan sus comensales.</p></div><button id="closeManual">Cerrar</button></div>
   <main>
     <section class="catalog">
       <div class="direct-context">
-        <div><small>CLIENTE</small><div class="customer-line"><select id="customerSelect"><option value="">Consumidor final / sin cliente</option></select><button id="newCustomerBtn" type="button">+ Crear cliente</button></div></div>
-        <div><small>MESA · OPCIONAL</small><select id="placeSelect"><option value="">Sin mesa asignada</option></select></div>
+        <div><small>MESA ACTIVA · OPCIONAL</small><select id="placeSelect"><option value="">Sin mesa asignada</option></select></div>
+        <div><small>COMENSAL DE LA MESA</small><div class="customer-line"><select id="customerSelect" disabled><option value="">Consumidor final / sin comensal</option></select><button id="newCustomerBtn" type="button" disabled>+ Agregar comensal</button></div></div>
       </div>
+      <div class="active-table-note" id="activeTableNote">Si no asignas mesa, la venta queda como venta directa de mostrador.</div>
       <div class="bar"><input id="search" placeholder="Buscar producto por nombre"><span id="businessCatalogLabel"></span></div>
       <div class="catalog-heading"><div><small>CATEGORÍAS</small><h3 id="catalogBusinessTitle">Productos</h3></div></div>
       <nav id="cats"></nav><div id="productGrid" class="product-grid"></div>
@@ -49,11 +53,34 @@
     </aside>
   </main>
 </section>
+
+<section id="reportPanel" class="report-panel hidden">
+  <div class="report-shell">
+    <div class="report-brand"><img id="reportLogo" alt=""><div><small>REPORTE DE VENTAS</small><h1 id="reportTitle"></h1><p id="reportRangeLabel"></p></div><div class="report-actions"><button id="printReport">Imprimir</button><button id="closeReport">Cerrar</button></div></div>
+    <div class="report-filters">
+      <div class="report-presets"><button data-period="TODAY" class="active">Hoy</button><button data-period="YESTERDAY">Ayer</button><button data-period="WEEK">Semana</button><button data-period="MONTH">Mes</button></div>
+      <label>Desde<input id="reportFrom" type="date"></label><label>Hasta<input id="reportTo" type="date"></label><button id="loadReport">Cargar reporte</button>
+    </div>
+    <div class="report-kpis">
+      <article><span>Ventas</span><b id="reportSales">L 0.00</b></article>
+      <article><span>Pedidos</span><b id="reportOrders">0</b></article>
+      <article><span>Ticket promedio</span><b id="reportAverage">L 0.00</b></article>
+      <article><span>Cancelados</span><b id="reportCancelled">0</b></article>
+    </div>
+    <div class="report-grids">
+      <article class="report-card"><h3>Ventas por origen</h3><div id="reportOrigins"></div></article>
+      <article class="report-card"><h3>Medios de pago</h3><div id="reportPayments"></div></article>
+      <article class="report-card"><h3>Productos más vendidos</h3><div id="reportProducts"></div></article>
+      <article class="report-card"><h3>Ventas por categoría</h3><div id="reportCategories"></div></article>
+    </div>
+    <div class="report-card report-detail"><div class="report-table-head"><div><small>DETALLE</small><h3>Ventas realizadas</h3></div><span id="reportDetailCount"></span></div>
+      <div class="report-table-wrap"><table><thead><tr><th>Hora</th><th>Pedido</th><th>Origen</th><th>Mesa/Cancha</th><th>Comensal</th><th>Productos</th><th>Pago</th><th>Total</th></tr></thead><tbody id="reportRows"></tbody></table></div>
+    </div>
+  </div>
+</section>
 </section>
 
 <dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
-
-
-<dialog id="customerDialog"><button class="close" data-close>×</button><form id="customerForm" class="option-card"><small>NUEVO CLIENTE</small><h2>Crear cliente</h2><label>Nombre<input id="newCustomerName" maxlength="100" required placeholder="Nombre del cliente"></label><label>Teléfono<input id="newCustomerPhone" maxlength="30" placeholder="Opcional"></label><label>Nota<textarea id="newCustomerNotes" maxlength="250" placeholder="Opcional"></textarea></label><button class="send" type="submit">Guardar cliente</button></form></dialog>
+<dialog id="customerDialog"><button class="close" data-close>×</button><form id="customerForm" class="option-card"><small>NUEVO COMENSAL</small><h2>Agregar a la mesa</h2><p id="customerTableLabel"></p><label>Nombre<input id="newCustomerName" maxlength="100" required placeholder="Nombre del comensal"></label><button class="send" type="submit">Agregar comensal</button></form></dialog>
 <dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>COBRO / FACTURACIÓN</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CREDIT">Crédito</option></select></label><label>Estado<select id="billStatus"><option value="PAID">Pagado</option><option value="PENDING">Pendiente</option><option value="CREDIT">Crédito</option></select></label><button id="billConfirm" class="send">Confirmar y generar comprobante</button></div></dialog>
-<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-directsale-v3"></script></body></html>
+<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-report-v5"></script></body></html>

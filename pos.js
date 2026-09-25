@@ -2,19 +2,17 @@ const {createClient}=window.supabase;
 const sb=createClient("https://cnynfycmvmcjzaevhvmw.supabase.co","sb_publishable_9Du-_m5etaGt-vCBkDvROw_-0sdB_jT");
 const $=s=>document.querySelector(s),safe=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 const money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const qs=new URLSearchParams(location.search),station=(qs.get("station")||"LB").toUpperCase()==="BS"?"BS":"LB";
-const label=station==="LB"?"La Bandeja":"Beer Station";
-const state={products:[],categories:[],places:[],customers:[],groups:[],options:[],links:[],orders:[],cart:[],cat:null,current:null,realtime:false,origin:"ALL",billing:null};
-const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2000)};
+const qs=new URLSearchParams(location.search),station=(qs.get("station")||"LB").toUpperCase()==="BS"?"BS":"LB",label=station==="LB"?"La Bandeja":"Beer Station";
+const state={products:[],categories:[],activeTables:[],groups:[],options:[],links:[],orders:[],cart:[],cat:"ALL",current:null,realtime:false,origin:"ALL",billing:null,report:null};
+const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)};
 $("#posTitle").textContent=label;$("#stationPill").textContent=station;$("#ordersTitle").textContent="Pedidos "+label;document.title="Receptor · "+label;document.body.dataset.station=station;
 
-async function boot(){await load();renderAll();startRealtime()}
+async function boot(){await load();renderAll();setReportPreset("TODAY");startRealtime()}
 async function load(){
- const [p,c,pl,cust,g,o,l,ord]=await Promise.all([
+ const [p,c,t,g,o,l,ord]=await Promise.all([
   sb.from("products").select("*").eq("active",true).order("sort_order"),
   sb.from("categories").select("*").eq("active",true).order("sort_order"),
-  sb.from("places").select("*").eq("active",true).order("sort_order"),
-  sb.rpc("get_pos_customers_public"),
+  sb.rpc("get_active_tables_public"),
   sb.from("option_groups").select("*").eq("active",true),
   sb.from("options").select("*").eq("active",true).order("sort_order"),
   sb.from("product_option_groups").select("*"),
@@ -22,85 +20,64 @@ async function load(){
  ]);
  const all=p.data||[];state.products=all.filter(x=>x.brand_id===station);
  const catIds=new Set(state.products.map(x=>x.category_id));state.categories=(c.data||[]).filter(x=>catIds.has(x.id));
- state.places=(pl.data||[]).filter(x=>x.place_type==="TABLE");state.customers=Array.isArray(cust.data)?cust.data:[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];state.orders=Array.isArray(ord.data)?ord.data:[];
- if(!state.categories.some(c=>c.id===state.cat))state.cat=state.categories[0]?.id||null;
+ state.activeTables=Array.isArray(t.data)?t.data:[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];state.orders=Array.isArray(ord.data)?ord.data:[];
+ if(state.cat!=="ALL"&&!state.categories.some(c=>c.id===state.cat))state.cat="ALL";
 }
-function renderAll(){
- renderCustomerSelect();
- $("#placeSelect").innerHTML='<option value="">Sin mesa asignada</option>'+state.places.map(p=>'<option value="'+p.code+'">'+safe(p.name)+'</option>').join("");
- $("#ticketPlace").textContent="Sin mesa asignada";
- $("#businessCatalogLabel").textContent=label;
- $("#catalogBusinessTitle").textContent="Productos de "+label;
- updateDirectContext();
- renderCats();renderProducts();renderTicket();renderOrdersBoard();
+function renderAll(){renderActiveTables();$("#businessCatalogLabel").textContent=label;$("#catalogBusinessTitle").textContent="Todos los productos de "+label;renderCats();renderProducts();renderTicket();renderOrdersBoard();updateDirectContext()}
+function renderActiveTables(selected=""){
+ const el=$("#placeSelect");el.innerHTML='<option value="">Sin mesa asignada</option>'+state.activeTables.map(t=>'<option value="'+t.place_code+'">'+safe(t.place_name)+' · '+(t.diners||[]).length+' comensal'+((t.diners||[]).length===1?"":"es")+'</option>').join("");
+ if(selected&&state.activeTables.some(t=>t.place_code===selected))el.value=selected;
+ renderTableDiners();
 }
-function renderCustomerSelect(selected=""){
- const el=$("#customerSelect");if(!el)return;
- el.innerHTML='<option value="">Consumidor final / sin cliente</option>'+state.customers.map(c=>'<option value="'+c.id+'">'+safe(c.name)+(c.phone?' · '+safe(c.phone):'')+'</option>').join("");
+function selectedTable(){return state.activeTables.find(t=>t.place_code===$("#placeSelect").value)}
+function renderTableDiners(selected=""){
+ const table=selectedTable(),el=$("#customerSelect"),btn=$("#newCustomerBtn");
+ if(!table){el.disabled=true;btn.disabled=true;el.innerHTML='<option value="">Consumidor final / sin comensal</option>';$("#activeTableNote").textContent="Solo se muestran mesas con sesión abierta. Sin mesa, la venta queda como venta directa de mostrador.";updateDirectContext();return}
+ el.disabled=false;btn.disabled=false;
+ el.innerHTML='<option value="">Consumidor final / sin comensal</option>'+(table.diners||[]).map(d=>'<option value="'+d.id+'">'+safe(d.name)+'</option>').join("");
  if(selected)el.value=selected;
+ $("#activeTableNote").textContent=table.place_name+" está activa · "+(table.diners||[]).length+" comensal"+((table.diners||[]).length===1?"":"es")+" registrado"+((table.diners||[]).length===1?"":"s")+".";
+ updateDirectContext();
 }
-function updateDirectContext(){
- const customer=state.customers.find(c=>c.id===$("#customerSelect")?.value);
- $("#ticketCustomer").textContent=customer?customer.name:"Consumidor final";
- const p=state.places.find(x=>x.code===$("#placeSelect")?.value);
- $("#ticketPlace").textContent=p?p.name:"Sin mesa asignada";
-}
-function originLabel(o){if(o.order_source==="POS")return "POS";if(o.place_type==="TABLE")return "MESA";if(o.place_type==="COURT")return "CANCHA";if(o.place_type==="DELIVERY")return "DELIVERY";return o.order_source||"QR"}
+function selectedDiner(){const t=selectedTable();return (t?.diners||[]).find(d=>d.id===$("#customerSelect").value)}
+function updateDirectContext(){const t=selectedTable(),d=selectedDiner();$("#ticketPlace").textContent=t?t.place_name:"Sin mesa asignada";$("#ticketCustomer").textContent=d?d.name:"Consumidor final"}
+function originLabel(o){if(o.order_source==="POS")return"POS";if(o.place_type==="TABLE")return"MESA";if(o.place_type==="COURT")return"CANCHA";if(o.place_type==="DELIVERY")return"DELIVERY";return o.order_source||"QR"}
 function statusText(s){return {RECEIVED:"Recibido",PREPARING:"Preparando",READY:"Listo",DELIVERED:"Entregado",CANCELLED:"Cancelado"}[s]||s}
 function renderOrdersBoard(){
  const filtered=state.origin==="ALL"?state.orders:state.orders.filter(o=>originLabel(o)===state.origin);
  const groups={RECEIVED:[],PREPARING:[],READY:[],DELIVERED:[]};filtered.forEach(o=>{if(groups[o.status])groups[o.status].push(o)});
- ["RECEIVED","PREPARING","READY","DELIVERED"].forEach(s=>{
-  const key=s[0]+s.slice(1).toLowerCase(),el=$("#orders"+key);
-  el.innerHTML=groups[s].map(orderCard).join("")||'<div class="empty-col">Sin pedidos</div>';
-  $("#badge"+key).textContent=groups[s].length;
- });
- $("#countReceived").textContent=groups.RECEIVED.length;$("#countPreparing").textContent=groups.PREPARING.length;$("#countReady").textContent=groups.READY.length;
- bindOrderActions();
+ ["RECEIVED","PREPARING","READY","DELIVERED"].forEach(s=>{const key=s[0]+s.slice(1).toLowerCase(),el=$("#orders"+key);el.innerHTML=groups[s].map(orderCard).join("")||'<div class="empty-col">Sin pedidos</div>';$("#badge"+key).textContent=groups[s].length});
+ $("#countReceived").textContent=groups.RECEIVED.length;$("#countPreparing").textContent=groups.PREPARING.length;$("#countReady").textContent=groups.READY.length;bindOrderActions();
 }
-function orderCard(o){
- const origin=originLabel(o),place=o.place_name||o.place_code||"",items=(o.items||[]).map(i=>'<li><b>'+i.qty+'×</b> '+safe(i.product_name)+(i.note?'<small>'+safe(i.note)+'</small>':'')+'</li>').join("");
- const next={RECEIVED:["PREPARING","Preparar"],PREPARING:["READY","Marcar listo"],READY:["DELIVERED","Entregar"]}[o.status];
- return '<article class="order-card '+o.status+'"><div class="order-card-head"><div><span class="origin '+origin+'">'+origin+'</span><b>'+safe(o.customer_name||o.diner_name||"Pedido")+'</b><small>'+safe(place)+' · '+new Date(o.created_at).toLocaleTimeString("es-HN",{hour:"2-digit",minute:"2-digit"})+'</small></div><strong>'+money(o.total)+'</strong></div>'+
- (o.note?'<div class="delivery-note">'+safe(o.note)+'</div>':'')+
- '<ul>'+items+'</ul><div class="pay-row"><span>'+safe(o.payment_method||"PAGO PENDIENTE")+'</span><em>'+safe(o.payment_status||"PENDING")+'</em></div>'+
- '<div class="card-actions">'+(next?'<button class="primary-action" data-status="'+next[0]+'" data-order="'+o.id+'">'+next[1]+'</button>':'')+
- '<button data-bill="'+o.id+'">Cobrar / facturar</button><button class="more-action" data-cancel="'+o.id+'">Cancelar</button></div></article>';
-}
-function bindOrderActions(){
- document.querySelectorAll("[data-status]").forEach(b=>b.onclick=async()=>{b.disabled=true;const {error}=await sb.rpc("pos_update_order_status_public",{p_order:b.dataset.order,p_station:station,p_status:b.dataset.status});if(error)toast(error.message);else{toast("Estado: "+statusText(b.dataset.status));await refreshOrders()}b.disabled=false});
- document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=async()=>{if(!confirm("¿Cancelar este pedido?"))return;const {error}=await sb.rpc("pos_update_order_status_public",{p_order:b.dataset.cancel,p_station:station,p_status:"CANCELLED"});toast(error?error.message:"Pedido cancelado");await refreshOrders()});
- document.querySelectorAll("[data-bill]").forEach(b=>b.onclick=()=>openBilling(b.dataset.bill));
-}
-async function refreshOrders(){const {data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return toast(error.message);state.orders=Array.isArray(data)?data:[];renderOrdersBoard()}
+function orderCard(o){const origin=originLabel(o),place=o.place_name||o.place_code||"",items=(o.items||[]).map(i=>'<li><b>'+i.qty+'×</b> '+safe(i.product_name)+(i.note?'<small>'+safe(i.note)+'</small>':'')+'</li>').join(""),next={RECEIVED:["PREPARING","Preparar"],PREPARING:["READY","Marcar listo"],READY:["DELIVERED","Entregar"]}[o.status];return '<article class="order-card '+o.status+'"><div class="order-card-head"><div><span class="origin '+origin+'">'+origin+'</span><b>'+safe(o.customer_name||o.diner_name||"Pedido")+'</b><small>'+safe(place)+' · '+new Date(o.created_at).toLocaleTimeString("es-HN",{hour:"2-digit",minute:"2-digit"})+'</small></div><strong>'+money(o.total)+'</strong></div>'+(o.note?'<div class="delivery-note">'+safe(o.note)+'</div>':'')+'<ul>'+items+'</ul><div class="pay-row"><span>'+safe(o.payment_method||"PAGO PENDIENTE")+'</span><em>'+safe(o.payment_status||"PENDING")+'</em></div><div class="card-actions">'+(next?'<button class="primary-action" data-status="'+next[0]+'" data-order="'+o.id+'">'+next[1]+'</button>':'')+'<button data-bill="'+o.id+'">Cobrar / facturar</button><button class="more-action" data-cancel="'+o.id+'">Cancelar</button></div></article>'}
+function bindOrderActions(){document.querySelectorAll("[data-status]").forEach(b=>b.onclick=async()=>{b.disabled=true;const{error}=await sb.rpc("pos_update_order_status_public",{p_order:b.dataset.order,p_station:station,p_status:b.dataset.status});if(error)toast(error.message);else{toast("Estado: "+statusText(b.dataset.status));await refreshOrders()}b.disabled=false});document.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=async()=>{if(!confirm("¿Cancelar este pedido?"))return;const{error}=await sb.rpc("pos_update_order_status_public",{p_order:b.dataset.cancel,p_station:station,p_status:"CANCELLED"});toast(error?error.message:"Pedido cancelado");await refreshOrders()});document.querySelectorAll("[data-bill]").forEach(b=>b.onclick=()=>openBilling(b.dataset.bill))}
+async function refreshOrders(){const{data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return toast(error.message);state.orders=Array.isArray(data)?data:[];renderOrdersBoard()}
+async function refreshActiveTables(){const{data,error}=await sb.rpc("get_active_tables_public");if(error)return toast(error.message);const selected=$("#placeSelect")?.value||"";state.activeTables=Array.isArray(data)?data:[];renderActiveTables(selected)}
 function openBilling(id){const o=state.orders.find(x=>x.id===id);if(!o)return;state.billing=o;$("#billTitle").textContent=(o.customer_name||o.diner_name||"Pedido")+" · "+money(o.total);$("#billMeta").textContent=originLabel(o)+" · "+(o.place_name||o.place_code||"");$("#billMethod").value=mapPayment(o.payment_method);$("#billStatus").value=o.payment_status==="PAID"?"PAID":o.payment_status==="CREDIT"?"CREDIT":"PENDING";$("#billDialog").showModal()}
 function mapPayment(v){const x=(v||"").toUpperCase();if(["EFECTIVO","CASH"].includes(x))return"EFECTIVO";if(["TARJETA","CARD"].includes(x))return"TARJETA";if(["TRANSFERENCIA","TRANSFER"].includes(x))return"TRANSFERENCIA";if(x==="CREDIT")return"CREDIT";return"EFECTIVO"}
-$("#billConfirm").onclick=async()=>{if(!state.billing)return;const {error}=await sb.rpc("pos_finalize_order_public",{p_order:state.billing.id,p_station:station,p_payment_method:$("#billMethod").value,p_payment_status:$("#billStatus").value});if(error)return toast(error.message);const o=state.billing;$("#billDialog").close();await refreshOrders();printReceipt(o,$("#billMethod").value,$("#billStatus").value);toast("Cobro actualizado")}
-function printReceipt(o,method,status){const items=(o.items||[]).map(i=>'<tr><td>'+i.qty+' × '+safe(i.product_name)+'</td><td>'+money(i.line_total)+'</td></tr>').join("");const w=window.open("","_blank","width=440,height=720");if(!w)return;w.document.write('<!doctype html><title>Comprobante</title><style>body{font-family:Arial;padding:28px;color:#111}h1{font-size:20px}small{color:#666}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:last-child{text-align:right}.total{font-size:22px;font-weight:bold;text-align:right}</style><h1>'+label+'</h1><small>Comprobante de pedido · '+new Date(o.created_at).toLocaleString("es-HN")+'</small><p><b>'+(o.customer_name||o.diner_name||"Pedido")+'</b><br>'+(o.place_name||o.place_code||"")+'</p><table>'+items+'</table><div class="total">'+money(o.total)+'</div><p>Pago: '+method+' · '+status+'</p><script>window.onload=()=>window.print()<\/script>');w.document.close()}
+$("#billConfirm").onclick=async()=>{if(!state.billing)return;const{error}=await sb.rpc("pos_finalize_order_public",{p_order:state.billing.id,p_station:station,p_payment_method:$("#billMethod").value,p_payment_status:$("#billStatus").value});if(error)return toast(error.message);const o=state.billing;$("#billDialog").close();await refreshOrders();printReceipt(o,$("#billMethod").value,$("#billStatus").value);toast("Cobro actualizado")}
+function printReceipt(o,method,status){const items=(o.items||[]).map(i=>'<tr><td>'+i.qty+' × '+safe(i.product_name)+'</td><td>'+money(i.line_total)+'</td></tr>').join(""),w=window.open("","_blank","width=440,height=720");if(!w)return;w.document.write('<!doctype html><title>Comprobante</title><style>body{font-family:Arial;padding:28px;color:#111}img{max-width:90px}table{width:100%;border-collapse:collapse;margin:20px 0}td{padding:8px 0;border-bottom:1px solid #ddd}td:last-child{text-align:right}.total{font-size:22px;font-weight:bold;text-align:right}</style><img src="/assets/brand/'+(station==="LB"?"lb":"bs")+'.webp"><h1>'+label+'</h1><p><b>'+(o.customer_name||o.diner_name||"Pedido")+'</b><br>'+(o.place_name||o.place_code||"")+'</p><table>'+items+'</table><div class="total">'+money(o.total)+'</div><p>Pago: '+method+' · '+status+'</p><script>window.onload=()=>window.print()<\/script>');w.document.close()}
 
-$("#originFilters").querySelectorAll("[data-origin]").forEach(b=>b.onclick=()=>{state.origin=b.dataset.origin;$("#originFilters").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));renderOrdersBoard()});
-$("#refresh").onclick=refreshOrders;
-$("#toggleManual").onclick=()=>$("#manualSale").classList.remove("hidden");$("#closeManual").onclick=()=>$("#manualSale").classList.add("hidden");
+function setPosMode(mode){const direct=mode==="POS";state.origin=mode;$("#originFilters").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x.dataset.origin===mode));$("#manualSale").classList.toggle("hidden",!direct);document.querySelector(".order-board").classList.toggle("hidden",direct);document.querySelector(".receiver-stats").classList.toggle("hidden",direct);$("#ordersTitle").textContent=direct?"Venta directa · "+label:"Pedidos "+label;document.querySelector(".receiver-head p").textContent=direct?"Selecciona una mesa activa y su comensal, o registra la venta sin mesa.":"Recibe, prepara, entrega y cobra. La venta directa queda como función secundaria.";if(direct){state.cat="ALL";refreshActiveTables();renderCats();renderProducts();setTimeout(()=>$("#manualSale").scrollIntoView({behavior:"smooth",block:"start"}),50)}else renderOrdersBoard()}
+$("#originFilters").querySelectorAll("[data-origin]").forEach(b=>b.onclick=()=>setPosMode(b.dataset.origin));$("#refresh").onclick=async()=>{await refreshOrders();if(state.origin==="POS")await refreshActiveTables()};$("#toggleManual").onclick=()=>setPosMode("POS");$("#closeManual").onclick=()=>setPosMode("ALL");
 
-function renderCats(){$("#cats").innerHTML=state.categories.map(c=>'<button class="'+(c.id===state.cat?"active":"")+'" data-cat="'+c.id+'">'+c.name+'</button>').join("");$("#cats").querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{state.cat=b.dataset.cat;renderCats();renderProducts()})}
-function renderProducts(){const q=$("#search").value.toLowerCase().trim(),list=q?state.products.filter(p=>(p.name+" "+(p.description||"")).toLowerCase().includes(q)):state.products.filter(p=>p.category_id===state.cat);$("#productGrid").innerHTML=list.map(p=>'<article class="p"><img loading="lazy" src="'+(p.image_url||"")+'"><div><h3>'+safe(p.name)+'</h3><footer><b>'+money(p.price)+'</b><button data-p="'+p.id+'">+</button></footer></div></article>').join("");$("#productGrid").querySelectorAll("[data-p]").forEach(x=>x.onclick=e=>{e.stopPropagation();openProduct(x.dataset.p)})}
+function renderCats(){$("#cats").innerHTML='<button class="'+(state.cat==="ALL"?"active":"")+'" data-cat="ALL">Todos</button>'+state.categories.map(c=>'<button class="'+(c.id===state.cat?"active":"")+'" data-cat="'+c.id+'">'+safe(c.name)+'</button>').join("");$("#cats").querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{state.cat=b.dataset.cat;renderCats();renderProducts()})}
+function renderProducts(){const q=$("#search").value.toLowerCase().trim(),list=q?state.products.filter(p=>(p.name+" "+(p.description||"")).toLowerCase().includes(q)):(state.cat==="ALL"?state.products:state.products.filter(p=>p.category_id===state.cat));$("#productGrid").innerHTML=list.map(p=>'<article class="p"><img loading="lazy" src="'+(p.image_url||"")+'"><div><h3>'+safe(p.name)+'</h3><footer><b>'+money(p.price)+'</b><button data-p="'+p.id+'">+</button></footer></div></article>').join("")||'<div class="empty-col">No hay productos en esta categoría.</div>';$("#productGrid").querySelectorAll("[data-p]").forEach(x=>x.onclick=e=>{e.stopPropagation();openProduct(x.dataset.p)})}
 function openProduct(id){state.current=state.products.find(p=>p.id===id);const linked=state.links.filter(l=>l.product_id===id).map(l=>state.groups.find(g=>g.id===l.group_id)).filter(Boolean);if(!linked.length){state.cart.push({product_id:id,qty:1,option_ids:[]});renderTicket();return}$("#optName").textContent=state.current.name;$("#optGroups").innerHTML=linked.map(g=>'<section class="og" data-g="'+g.id+'"><b>'+g.name+'</b>'+state.options.filter(o=>o.group_id===g.id).map(o=>'<label><span><input type="'+(g.selection_type==="multiple"?"checkbox":"radio")+'" name="g_'+g.id+'" value="'+o.id+'"> '+o.name+'</span><span>'+(o.price_delta?money(o.price_delta):"")+'</span></label>').join("")+'</section>').join("");$("#optionDialog").showModal()}
-const selected=()=>[...$("#optGroups").querySelectorAll("input:checked")].map(i=>i.value);
-$("#optAdd").onclick=()=>{state.cart.push({product_id:state.current.id,qty:1,option_ids:selected()});$("#optionDialog").close();renderTicket()};
+const selected=()=>[...$("#optGroups").querySelectorAll("input:checked")].map(i=>i.value);$("#optAdd").onclick=()=>{state.cart.push({product_id:state.current.id,qty:1,option_ids:selected()});$("#optionDialog").close();renderTicket()};
 function unit(i){const p=state.products.find(x=>x.id===i.product_id);return Number(p?.price||0)+(i.option_ids||[]).reduce((a,id)=>a+Number(state.options.find(o=>o.id===id)?.price_delta||0),0)}
-function renderTicket(){const el=$("#ticketItems");el.innerHTML=state.cart.map((i,n)=>{const p=state.products.find(x=>x.id===i.product_id),opts=(i.option_ids||[]).map(id=>state.options.find(o=>o.id===id)?.name).filter(Boolean).join(", ");return '<div class="line"><div><b>'+(p?.name||"")+'</b><small>'+opts+'</small><small>'+money(unit(i))+'</small></div><div class="qty"><button data-less="'+n+'">−</button><strong>'+i.qty+'</strong><button data-more="'+n+'">+</button></div></div>'}).join("");$("#ticketTotal").textContent=money(state.cart.reduce((a,i)=>a+unit(i)*i.qty,0));el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{state.cart[+b.dataset.more].qty++;renderTicket()});el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const n=+b.dataset.less;if(--state.cart[n].qty<=0)state.cart.splice(n,1);renderTicket()})}
-$("#placeSelect").onchange=updateDirectContext;$("#customerSelect").onchange=updateDirectContext;$("#search").oninput=renderProducts;
-$("#newCustomerBtn").onclick=()=>{$("#customerForm").reset();$("#customerDialog").showModal()};
-$("#customerForm").onsubmit=async e=>{e.preventDefault();const name=$("#newCustomerName").value.trim(),phone=$("#newCustomerPhone").value.trim(),notes=$("#newCustomerNotes").value.trim();if(!name)return toast("Escribe el nombre del cliente");const {data,error}=await sb.rpc("create_pos_customer_public",{p_name:name,p_phone:phone||null,p_notes:notes||null});if(error)return toast(error.message);state.customers.push(data);state.customers.sort((a,b)=>a.name.localeCompare(b.name,"es"));renderCustomerSelect(data.id);updateDirectContext();$("#customerDialog").close();toast("Cliente creado")};
-$("#sendSale").onclick=async()=>{
- if(!state.cart.length)return toast("Agrega productos");
- const customer=state.customers.find(c=>c.id===$("#customerSelect").value);
- const payload={station,customer_id:customer?.id||null,customer_name:customer?.name||"Consumidor final",payment_method:$("#paymentMethod").value,payment_status:$("#paymentStatus").value,note:$("#saleNote").value.trim(),items:state.cart};
- const {data,error}=await sb.rpc("pos_place_order",{p_place:$("#placeSelect").value||null,p_payload:payload});
- if(error)return toast(error.message);
- state.cart=[];$("#saleNote").value="";$("#customerSelect").value="";$("#placeSelect").value="";updateDirectContext();renderTicket();await refreshOrders();toast("Venta directa registrada");
-};
+function renderTicket(){const el=$("#ticketItems");el.innerHTML=state.cart.map((i,n)=>{const p=state.products.find(x=>x.id===i.product_id),opts=(i.option_ids||[]).map(id=>state.options.find(o=>o.id===id)?.name).filter(Boolean).join(", ");return '<div class="line"><div><b>'+(p?.name||"")+'</b><small>'+opts+'</small><small>'+money(unit(i))+'</small></div><div class="qty"><button data-less="'+n+'">−</button><strong>'+i.qty+'</strong><button data-more="'+n+'">+</button></div></div>'}).join("")||'<div class="empty-col">Aún no has agregado productos.</div>';$("#ticketTotal").textContent=money(state.cart.reduce((a,i)=>a+unit(i)*i.qty,0));el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{state.cart[+b.dataset.more].qty++;renderTicket()});el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const n=+b.dataset.less;if(--state.cart[n].qty<=0)state.cart.splice(n,1);renderTicket()})}
+$("#placeSelect").onchange=()=>renderTableDiners();$("#customerSelect").onchange=updateDirectContext;$("#search").oninput=renderProducts;
+$("#newCustomerBtn").onclick=()=>{const t=selectedTable();if(!t)return toast("Selecciona una mesa activa");$("#customerForm").reset();$("#customerTableLabel").textContent="Mesa: "+t.place_name;$("#customerDialog").showModal()};
+$("#customerForm").onsubmit=async e=>{e.preventDefault();const t=selectedTable(),name=$("#newCustomerName").value.trim();if(!t)return toast("Selecciona una mesa activa");if(!name)return toast("Escribe el nombre del comensal");const{data,error}=await sb.rpc("add_diner_to_active_table_public",{p_place:t.place_code,p_name:name});if(error)return toast(error.message);await refreshActiveTables();$("#placeSelect").value=t.place_code;renderTableDiners(data.id);$("#customerDialog").close();toast("Comensal agregado a "+t.place_name)};
+$("#sendSale").onclick=async()=>{if(!state.cart.length)return toast("Agrega productos");const t=selectedTable(),d=selectedDiner();const payload={station,diner_id:d?.id||null,customer_name:d?.name||"Consumidor final",payment_method:$("#paymentMethod").value,payment_status:$("#paymentStatus").value,note:$("#saleNote").value.trim(),items:state.cart};const{error}=await sb.rpc("pos_place_order",{p_place:t?.place_code||null,p_payload:payload});if(error)return toast(error.message);state.cart=[];$("#saleNote").value="";$("#placeSelect").value="";renderTableDiners();renderTicket();await refreshOrders();toast("Venta directa registrada")};
 
-function startRealtime(){if(state.realtime)return;state.realtime=true;setInterval(async()=>{const old=state.orders[0]?.id;const {data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return;state.orders=Array.isArray(data)?data:[];renderOrdersBoard();if(old&&state.orders[0]?.id&&state.orders[0].id!==old){toast("🔔 Nuevo pedido recibido");try{new Audio("data:audio/wav;base64,UklGRl9vT19telephonering").play()}catch{}}},3500)}
-document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
-boot();
+function dateYMD(d){const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10)}
+function setReportPreset(period){document.querySelectorAll("[data-period]").forEach(b=>b.classList.toggle("active",b.dataset.period===period));const now=new Date(),from=new Date(now),to=new Date(now);if(period==="YESTERDAY"){from.setDate(now.getDate()-1);to.setDate(now.getDate()-1)}else if(period==="WEEK"){from.setDate(now.getDate()-6)}else if(period==="MONTH"){from.setDate(1)}$("#reportFrom").value=dateYMD(from);$("#reportTo").value=dateYMD(to);loadSalesReport()}
+async function loadSalesReport(){const f=$("#reportFrom").value,t=$("#reportTo").value;if(!f||!t)return;const from=new Date(f+"T00:00:00"),to=new Date(t+"T00:00:00");to.setDate(to.getDate()+1);const{data,error}=await sb.rpc("get_pos_sales_report_public",{p_station:station,p_from:from.toISOString(),p_to:to.toISOString()});if(error)return toast(error.message);state.report=data||{};renderSalesReport(f,t)}
+function miniRows(list,key){return (list||[]).map(x=>'<div class="mini-report-row"><span>'+safe(x[key]||"")+'</span><b>'+money(x.amount)+'</b><em>'+Number(x.count??x.qty??0).toLocaleString("es-HN")+'</em></div>').join("")||'<div class="empty-col">Sin datos</div>'}
+function renderSalesReport(f,t){const r=state.report||{},s=r.summary||{};$("#reportLogo").src=station==="LB"?"/assets/brand/lb.webp":"/assets/brand/bs.webp";$("#reportTitle").textContent=label;$("#reportRangeLabel").textContent=f===t?new Date(f+"T12:00:00").toLocaleDateString("es-HN",{dateStyle:"long"}):f+" al "+t;$("#reportSales").textContent=money(s.sales_total);$("#reportOrders").textContent=Number(s.orders_count||0);$("#reportAverage").textContent=money(s.avg_ticket);$("#reportCancelled").textContent=Number(s.cancelled_count||0);$("#reportOrigins").innerHTML=miniRows(r.by_origin,"origin");$("#reportPayments").innerHTML=miniRows(r.by_payment,"payment_method");$("#reportProducts").innerHTML=miniRows(r.top_products,"product_name");$("#reportCategories").innerHTML=miniRows(r.categories,"category");const orders=r.orders||[];$("#reportDetailCount").textContent=orders.length+" ventas";$("#reportRows").innerHTML=orders.map(o=>{const origin=o.order_source==="POS"?"Venta directa":o.place_type==="COURT"?"Cancha":o.place_type==="TABLE"?"Mesa":o.order_source,items=(o.items||[]).map(i=>i.qty+"× "+i.product_name).join(", ");return '<tr><td>'+new Date(o.created_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})+'</td><td>#'+String(o.id).slice(0,8)+'</td><td>'+safe(origin)+'</td><td>'+safe(o.place_name||o.place_code||"—")+'</td><td>'+safe(o.diner_name||o.customer_name||"Consumidor final")+'</td><td>'+safe(items)+'</td><td>'+safe(o.payment_method||"—")+'</td><td><b>'+money(o.total)+'</b></td></tr>'}).join("")||'<tr><td colspan="8">Sin ventas en el período.</td></tr>'}
+$("#showReport").onclick=()=>{$("#receiverPanel").classList.add("hidden");$("#manualSale").classList.add("hidden");$("#reportPanel").classList.remove("hidden");loadSalesReport();window.scrollTo({top:0})};$("#closeReport").onclick=()=>{$("#reportPanel").classList.add("hidden");$("#receiverPanel").classList.remove("hidden");setPosMode("ALL")};$("#loadReport").onclick=loadSalesReport;document.querySelectorAll("[data-period]").forEach(b=>b.onclick=()=>setReportPreset(b.dataset.period));$("#printReport").onclick=()=>window.print();
+
+function startRealtime(){if(state.realtime)return;state.realtime=true;setInterval(async()=>{const old=state.orders[0]?.id;const{data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return;state.orders=Array.isArray(data)?data:[];if(!$("#reportPanel").classList.contains("hidden"))return;renderOrdersBoard();if(old&&state.orders[0]?.id&&state.orders[0].id!==old)toast("🔔 Nuevo pedido recibido")},3500)}
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());boot();
