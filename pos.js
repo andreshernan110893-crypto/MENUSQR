@@ -4,16 +4,17 @@ const $=s=>document.querySelector(s),safe=s=>String(s??"").replace(/[&<>"']/g,m=
 const money=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const qs=new URLSearchParams(location.search),station=(qs.get("station")||"LB").toUpperCase()==="BS"?"BS":"LB";
 const label=station==="LB"?"La Bandeja":"Beer Station";
-const state={products:[],categories:[],places:[],groups:[],options:[],links:[],orders:[],cart:[],cat:null,current:null,realtime:false,origin:"ALL",billing:null};
+const state={products:[],categories:[],places:[],customers:[],groups:[],options:[],links:[],orders:[],cart:[],cat:null,current:null,realtime:false,origin:"ALL",billing:null};
 const toast=t=>{const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2000)};
 $("#posTitle").textContent=label;$("#stationPill").textContent=station;$("#ordersTitle").textContent="Pedidos "+label;document.title="Receptor · "+label;document.body.dataset.station=station;
 
 async function boot(){await load();renderAll();startRealtime()}
 async function load(){
- const [p,c,pl,g,o,l,ord]=await Promise.all([
+ const [p,c,pl,cust,g,o,l,ord]=await Promise.all([
   sb.from("products").select("*").eq("active",true).order("sort_order"),
   sb.from("categories").select("*").eq("active",true).order("sort_order"),
   sb.from("places").select("*").eq("active",true).order("sort_order"),
+  sb.rpc("get_pos_customers_public"),
   sb.from("option_groups").select("*").eq("active",true),
   sb.from("options").select("*").eq("active",true).order("sort_order"),
   sb.from("product_option_groups").select("*"),
@@ -21,15 +22,30 @@ async function load(){
  ]);
  const all=p.data||[];state.products=all.filter(x=>x.brand_id===station);
  const catIds=new Set(state.products.map(x=>x.category_id));state.categories=(c.data||[]).filter(x=>catIds.has(x.id));
- state.places=pl.data||[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];state.orders=Array.isArray(ord.data)?ord.data:[];
+ state.places=(pl.data||[]).filter(x=>x.place_type==="TABLE");state.customers=Array.isArray(cust.data)?cust.data:[];state.groups=g.data||[];state.options=o.data||[];state.links=l.data||[];state.orders=Array.isArray(ord.data)?ord.data:[];
  if(!state.categories.some(c=>c.id===state.cat))state.cat=state.categories[0]?.id||null;
 }
 function renderAll(){
- $("#placeSelect").innerHTML=state.places.map(p=>'<option value="'+p.code+'">'+p.name+'</option>').join("");
- $("#ticketPlace").textContent=state.places[0]?.name||"Nuevo pedido";
+ renderCustomerSelect();
+ $("#placeSelect").innerHTML='<option value="">Sin mesa asignada</option>'+state.places.map(p=>'<option value="'+p.code+'">'+safe(p.name)+'</option>').join("");
+ $("#ticketPlace").textContent="Sin mesa asignada";
+ $("#businessCatalogLabel").textContent=label;
+ $("#catalogBusinessTitle").textContent="Productos de "+label;
+ updateDirectContext();
  renderCats();renderProducts();renderTicket();renderOrdersBoard();
 }
-function originLabel(o){if(o.place_type==="TABLE")return "MESA";if(o.place_type==="COURT")return "CANCHA";if(o.place_type==="DELIVERY")return "DELIVERY";if(o.order_source==="POS")return "POS";return o.order_source||"QR"}
+function renderCustomerSelect(selected=""){
+ const el=$("#customerSelect");if(!el)return;
+ el.innerHTML='<option value="">Consumidor final / sin cliente</option>'+state.customers.map(c=>'<option value="'+c.id+'">'+safe(c.name)+(c.phone?' · '+safe(c.phone):'')+'</option>').join("");
+ if(selected)el.value=selected;
+}
+function updateDirectContext(){
+ const customer=state.customers.find(c=>c.id===$("#customerSelect")?.value);
+ $("#ticketCustomer").textContent=customer?customer.name:"Consumidor final";
+ const p=state.places.find(x=>x.code===$("#placeSelect")?.value);
+ $("#ticketPlace").textContent=p?p.name:"Sin mesa asignada";
+}
+function originLabel(o){if(o.order_source==="POS")return "POS";if(o.place_type==="TABLE")return "MESA";if(o.place_type==="COURT")return "CANCHA";if(o.place_type==="DELIVERY")return "DELIVERY";return o.order_source||"QR"}
 function statusText(s){return {RECEIVED:"Recibido",PREPARING:"Preparando",READY:"Listo",DELIVERED:"Entregado",CANCELLED:"Cancelado"}[s]||s}
 function renderOrdersBoard(){
  const filtered=state.origin==="ALL"?state.orders:state.orders.filter(o=>originLabel(o)===state.origin);
@@ -73,8 +89,17 @@ const selected=()=>[...$("#optGroups").querySelectorAll("input:checked")].map(i=
 $("#optAdd").onclick=()=>{state.cart.push({product_id:state.current.id,qty:1,option_ids:selected()});$("#optionDialog").close();renderTicket()};
 function unit(i){const p=state.products.find(x=>x.id===i.product_id);return Number(p?.price||0)+(i.option_ids||[]).reduce((a,id)=>a+Number(state.options.find(o=>o.id===id)?.price_delta||0),0)}
 function renderTicket(){const el=$("#ticketItems");el.innerHTML=state.cart.map((i,n)=>{const p=state.products.find(x=>x.id===i.product_id),opts=(i.option_ids||[]).map(id=>state.options.find(o=>o.id===id)?.name).filter(Boolean).join(", ");return '<div class="line"><div><b>'+(p?.name||"")+'</b><small>'+opts+'</small><small>'+money(unit(i))+'</small></div><div class="qty"><button data-less="'+n+'">−</button><strong>'+i.qty+'</strong><button data-more="'+n+'">+</button></div></div>'}).join("");$("#ticketTotal").textContent=money(state.cart.reduce((a,i)=>a+unit(i)*i.qty,0));el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{state.cart[+b.dataset.more].qty++;renderTicket()});el.querySelectorAll("[data-less]").forEach(b=>b.onclick=()=>{const n=+b.dataset.less;if(--state.cart[n].qty<=0)state.cart.splice(n,1);renderTicket()})}
-$("#placeSelect").onchange=()=>$("#ticketPlace").textContent=$("#placeSelect").selectedOptions[0]?.textContent||"Pedido";$("#search").oninput=renderProducts;
-$("#sendSale").onclick=async()=>{if(!state.cart.length)return toast("Agrega productos");const payload={station,customer_name:$("#customerName").value.trim(),payment_method:$("#paymentMethod").value,payment_status:$("#paymentStatus").value,items:state.cart};const {error}=await sb.rpc("pos_place_order",{p_place:$("#placeSelect").value,p_payload:payload});if(error)return toast(error.message);state.cart=[];$("#customerName").value="";renderTicket();await refreshOrders();toast("Venta directa registrada")};
+$("#placeSelect").onchange=updateDirectContext;$("#customerSelect").onchange=updateDirectContext;$("#search").oninput=renderProducts;
+$("#newCustomerBtn").onclick=()=>{$("#customerForm").reset();$("#customerDialog").showModal()};
+$("#customerForm").onsubmit=async e=>{e.preventDefault();const name=$("#newCustomerName").value.trim(),phone=$("#newCustomerPhone").value.trim(),notes=$("#newCustomerNotes").value.trim();if(!name)return toast("Escribe el nombre del cliente");const {data,error}=await sb.rpc("create_pos_customer_public",{p_name:name,p_phone:phone||null,p_notes:notes||null});if(error)return toast(error.message);state.customers.push(data);state.customers.sort((a,b)=>a.name.localeCompare(b.name,"es"));renderCustomerSelect(data.id);updateDirectContext();$("#customerDialog").close();toast("Cliente creado")};
+$("#sendSale").onclick=async()=>{
+ if(!state.cart.length)return toast("Agrega productos");
+ const customer=state.customers.find(c=>c.id===$("#customerSelect").value);
+ const payload={station,customer_id:customer?.id||null,customer_name:customer?.name||"Consumidor final",payment_method:$("#paymentMethod").value,payment_status:$("#paymentStatus").value,note:$("#saleNote").value.trim(),items:state.cart};
+ const {data,error}=await sb.rpc("pos_place_order",{p_place:$("#placeSelect").value||null,p_payload:payload});
+ if(error)return toast(error.message);
+ state.cart=[];$("#saleNote").value="";$("#customerSelect").value="";$("#placeSelect").value="";updateDirectContext();renderTicket();await refreshOrders();toast("Venta directa registrada");
+};
 
 function startRealtime(){if(state.realtime)return;state.realtime=true;setInterval(async()=>{const old=state.orders[0]?.id;const {data,error}=await sb.rpc("get_pos_orders_public",{p_station:station});if(error)return;state.orders=Array.isArray(data)?data:[];renderOrdersBoard();if(old&&state.orders[0]?.id&&state.orders[0].id!==old){toast("🔔 Nuevo pedido recibido");try{new Audio("data:audio/wav;base64,UklGRl9vT19telephonering").play()}catch{}}},3500)}
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
