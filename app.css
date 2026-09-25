@@ -1990,3 +1990,34 @@ body[data-place-type="TABLE"] #sendFeedback{
   color:#171006!important;
   box-shadow:0 12px 28px rgba(255,177,31,.18);
 }
+
+/* MINUTO 90 · entrega en cancha */
+body[data-place-type="COURT"] .court-delivery-fields{
+  display:grid;gap:12px;margin:16px 0 6px;padding:16px;
+  border:1px solid rgba(185,255,79,.20);border-radius:18px;
+  background:linear-gradient(145deg,rgba(15,25,34,.96),rgba(7,13,19,.96));
+}
+body[data-place-type="COURT"] .court-delivery-head{display:flex;gap:10px;align-items:center}
+body[data-place-type="COURT"] .court-delivery-head>span{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#b9ff4f,#75d832);color:#071006;font-size:1.15rem
+}
+body[data-place-type="COURT"] .court-delivery-head b,
+body[data-place-type="COURT"] .court-delivery-head small{display:block}
+body[data-place-type="COURT"] .court-delivery-head small{color:#8796a6;margin-top:2px}
+body[data-place-type="COURT"] .court-delivery-fields label{display:grid;gap:6px;color:#eaf1f7;font-weight:800}
+body[data-place-type="COURT"] .court-delivery-fields input,
+body[data-place-type="COURT"] .court-delivery-fields select{
+  width:100%;padding:12px 13px;border:1px solid rgba(255,255,255,.12);
+  border-radius:13px;background:#0b1219;color:#fff;font:inherit;outline:none
+}
+body[data-place-type="COURT"] .court-delivery-fields input:focus,
+body[data-place-type="COURT"] .court-delivery-fields select:focus{border-color:#78a7ff;box-shadow:0 0 0 3px rgba(83,145,255,.08)}
+body[data-place-type="COURT"] .court-cash-fields{display:grid;gap:10px;padding-top:2px}
+body[data-place-type="COURT"] .court-change-preview{
+  padding:10px 12px;border-radius:12px;background:rgba(185,255,79,.10);
+  border:1px solid rgba(185,255,79,.20);color:#b9ff4f;font-weight:900
+}
+@media(max-width:620px){
+  body[data-place-type="COURT"] .court-delivery-fields{padding:13px;margin-top:12px}
+}
