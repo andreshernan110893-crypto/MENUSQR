@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20260924-minute90-v15">
+<link rel="stylesheet" href="/app.css?v=20260925-tracking-v16">
 </head>
 <body>
 <section id="experienceIntro" class="experience-intro">
@@ -24,6 +24,24 @@
   </div>
 </header>
 <main>
+  <section id="orderTracker" class="order-tracker hidden" aria-live="polite">
+    <div class="tracker-head">
+      <div><small>SEGUIMIENTO EN VIVO</small><h2 id="trackerTitle">Tu pedido</h2></div>
+      <span id="trackerStatusBadge" class="tracker-status">RECIBIDO</span>
+    </div>
+    <div class="tracker-steps">
+      <div class="tracker-step" data-track-step="RECEIVED"><span>1</span><b>Recibido</b><small>Ya lo tenemos</small></div>
+      <div class="tracker-line"></div>
+      <div class="tracker-step" data-track-step="PREPARING"><span>2</span><b>Preparando</b><small>Está en cocina/bar</small></div>
+      <div class="tracker-line"></div>
+      <div class="tracker-step" data-track-step="READY"><span>3</span><b>Listo</b><small>Sale a entrega</small></div>
+      <div class="tracker-line"></div>
+      <div class="tracker-step" data-track-step="DELIVERED"><span>4</span><b>Entregado</b><small>¡Que lo disfrutes!</small></div>
+    </div>
+    <div id="trackerStations" class="tracker-stations"></div>
+    <div id="trackerItems" class="tracker-items"></div>
+    <div class="tracker-foot"><span id="trackerPayment"></span><b id="trackerTotal">L 0.00</b></div>
+  </section>
   <section id="courtMatchHub" class="court-match-hub hidden"><div class="court-scoreboard"><div class="court-brand-lockup"><small>MINUTO 90</small><strong id="courtHubPlace">CANCHA</strong><span>LA BANDEJA + BEER STATION</span></div><div class="court-score-center"><span class="live-dot"></span><b id="courtPhase">PRIMER TIEMPO</b><em id="courtClock">00:00</em></div><button id="courtComboShortcut" type="button">ARMA TU EQUIPO</button></div><div class="court-ticker"><div><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span><span>⚽ ARMA TU EQUIPO</span><span>⏱ TIEMPO EXTRA</span><span>🥅 VAMOS A PENALES</span><span>⚡ PROMOS DEL PARTIDO</span><span>🔥 ANTOJITOS</span><span>🥤 BEBIDAS FRÍAS</span></div></div></section>
   <section class="cinema-hero"><div id="heroAmbient" class="hero-ambient"></div><div id="heroDots" class="hero-dots"></div></section>
   <section id="promoSection" class="home-section"><div class="section-head"><div><small>AHORA</small><h2>Promociones y recomendados</h2></div></div><div id="promoGrid" class="promo-grid"></div></section>
@@ -59,6 +77,6 @@
 <button id="aiFab" class="ai-fab" aria-label="Asistente del menú"><span>✦</span><b>Te ayudo</b></button><dialog id="aiDialog" class="ai-dialog"><button class="close" data-close>×</button><div class="ai-chat"><div class="ai-chat-head"><small>ASISTENTE DEL MENÚ</small><h2>¿Qué se te antoja?</h2><p>Pregúntame por comida, bebidas, combos o qué combina mejor con tu pedido.</p></div><div id="aiMessagesFull" class="ai-messages"><div class="ai-msg assistant">Hola 👋 Puedo ayudarte a elegir algo del menú.</div></div><form id="aiFormFull" class="ai-form"><input id="aiInputFull" maxlength="300" autocomplete="off" placeholder="Ej. Quiero una pizza y algo frío"><button type="submit">Enviar</button></form></div></dialog><div id="toast"></div>
 <div id="goalCelebration" class="goal-celebration hidden" aria-hidden="true"><div class="goal-celebration-card"><img id="goalCelebrationImage" alt=""><div><small id="goalCelebrationKicker">PEDIDO EN JUEGO</small><h2 id="goalCelebrationTitle">¡GOOOL!</h2><p id="goalCelebrationText">Tu pedido fue enviado.</p></div></div></div><button id="backToTop" hidden></button>
 <script src="/supabase.js"></script>
-<script type="module" src="/app.js?v=20260924-minute90-v15"></script>
+<script type="module" src="/app.js?v=20260925-tracking-v16"></script>
 </body>
 </html>

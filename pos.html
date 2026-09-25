@@ -1,14 +1,43 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090a0d"><title>POS · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css"></head>
+<meta name="theme-color" content="#090a0d"><title>Receptor de pedidos · La Bandeja + Beer Station</title><link rel="stylesheet" href="/pos.css?v=20260925-receptor-v2"></head>
 <body>
 <section id="posApp">
-<header><div><small id="posKicker">POS · PEDIDOS EN VIVO</small><strong id="posTitle">La Bandeja</strong></div><div class="station-pill" id="stationPill">LB</div><span class="pos-online">OPERATIVO</span></header>
-<main>
-<section class="catalog"><div class="bar"><select id="placeSelect"></select><input id="search" placeholder="Buscar producto"><button id="refresh">Actualizar</button></div><nav id="cats"></nav><div id="productGrid" class="product-grid"></div></section>
-<aside class="ticket"><div class="ticket-head"><small>PEDIDO MANUAL</small><h2 id="ticketPlace">Nuevo pedido</h2></div><input id="customerName" placeholder="Cliente / referencia"><div id="ticketItems"></div><div class="payment"><select id="paymentMethod"><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option><option value="CREDIT">Crédito</option></select><select id="paymentStatus"><option value="PENDING">Pendiente</option><option value="PAID">Pagado</option><option value="CREDIT">Crédito</option></select></div><div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Enviar pedido</button></aside>
-</main>
-<section class="orders-panel"><div class="orders-head"><div><small>ÓRDENES ENTRANTES</small><h2 id="ordersTitle">Pedidos La Bandeja</h2></div><span class="live-badge">EN VIVO</span></div><div id="orders"></div></section>
+<header class="pos-top"><div><small>RECEPTOR DE PEDIDOS · EN VIVO</small><strong id="posTitle">La Bandeja</strong></div><div class="top-actions"><span class="station-pill" id="stationPill">LB</span><span class="pos-online">OPERATIVO</span><button id="toggleManual">+ Venta directa</button></div></header>
+
+<section class="receiver">
+  <div class="receiver-head">
+    <div><small>OPERACIÓN</small><h1 id="ordersTitle">Pedidos La Bandeja</h1><p>Recibe, prepara, entrega y cobra. La venta directa queda como función secundaria.</p></div>
+    <div class="receiver-stats">
+      <div><span>Recibidos</span><b id="countReceived">0</b></div>
+      <div><span>Preparando</span><b id="countPreparing">0</b></div>
+      <div><span>Listos</span><b id="countReady">0</b></div>
+    </div>
+  </div>
+  <div class="order-toolbar">
+    <div id="originFilters" class="origin-filters">
+      <button data-origin="ALL" class="active">Todos</button><button data-origin="MESA">Mesas</button><button data-origin="CANCHA">Canchas</button><button data-origin="POS">Venta directa</button>
+    </div>
+    <button id="refresh">Actualizar</button>
+  </div>
+  <div class="order-board">
+    <section class="order-column received"><div class="column-head"><span>●</span><b>RECIBIDOS</b><em id="badgeReceived">0</em></div><div id="ordersReceived" class="order-stack"></div></section>
+    <section class="order-column preparing"><div class="column-head"><span>●</span><b>PREPARANDO</b><em id="badgePreparing">0</em></div><div id="ordersPreparing" class="order-stack"></div></section>
+    <section class="order-column ready"><div class="column-head"><span>●</span><b>LISTOS</b><em id="badgeReady">0</em></div><div id="ordersReady" class="order-stack"></div></section>
+    <section class="order-column delivered"><div class="column-head"><span>●</span><b>ENTREGADOS</b><em id="badgeDelivered">0</em></div><div id="ordersDelivered" class="order-stack"></div></section>
+  </div>
 </section>
+
+<section id="manualSale" class="manual-sale hidden">
+  <div class="manual-head"><div><small>FUNCIÓN SECUNDARIA</small><h2>Venta directa / facturación</h2></div><button id="closeManual">Cerrar</button></div>
+  <main>
+    <section class="catalog"><div class="bar"><select id="placeSelect"></select><input id="search" placeholder="Buscar producto"></div><nav id="cats"></nav><div id="productGrid" class="product-grid"></div></section>
+    <aside class="ticket"><div class="ticket-head"><small>PEDIDO MANUAL</small><h2 id="ticketPlace">Nuevo pedido</h2></div><input id="customerName" placeholder="Cliente / referencia"><div id="ticketItems"></div><div class="payment"><select id="paymentMethod"><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option><option value="CREDIT">Crédito</option></select><select id="paymentStatus"><option value="PENDING">Pendiente</option><option value="PAID">Pagado</option><option value="CREDIT">Crédito</option></select></div><div class="total"><span>Total</span><b id="ticketTotal">L 0.00</b></div><button id="sendSale" class="send">Registrar venta directa</button></aside>
+  </main>
+</section>
+</section>
+
 <dialog id="optionDialog"><button class="close" data-close>×</button><div class="option-card"><small>PERSONALIZAR</small><h2 id="optName"></h2><div id="optGroups"></div><button id="optAdd" class="send">Agregar</button></div></dialog>
-<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js"></script></body></html>
+
+<dialog id="billDialog"><button class="close" data-close>×</button><div class="option-card"><small>COBRO / FACTURACIÓN</small><h2 id="billTitle">Pedido</h2><p id="billMeta"></p><label>Medio de pago<select id="billMethod"><option value="EFECTIVO">Efectivo</option><option value="TARJETA">Tarjeta</option><option value="TRANSFERENCIA">Transferencia</option><option value="CREDIT">Crédito</option></select></label><label>Estado<select id="billStatus"><option value="PAID">Pagado</option><option value="PENDING">Pendiente</option><option value="CREDIT">Crédito</option></select></label><button id="billConfirm" class="send">Confirmar y generar comprobante</button></div></dialog>
+<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/pos.js?v=20260925-receptor-v2"></script></body></html>
