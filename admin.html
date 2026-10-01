@@ -1,23 +1,16 @@
 <!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin · La Bandeja + Beer Station</title>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin CRM · La Bandeja + Beer Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/admin.css?v=20260925-cxc-v1">
-</head>
-<body>
-<section id="adminView">
-<header class="admin-top"><div><small>ADMIN</small><strong>La Bandeja + Beer Station</strong></div><nav id="tabs">
-<button data-tab="products" class="active">Productos</button><button data-tab="combos">Combos</button><button data-tab="categories">Categorías</button><button data-tab="banners">Banners</button><button data-tab="promotions">Promociones</button><button data-tab="extras">Extras</button><button data-tab="branding">Logos</button><button data-tab="places">Ubicaciones</button><button data-tab="orders">Pedidos</button><button data-tab="receivables">Cuentas por cobrar</button><button data-tab="feedback">Feedback</button></nav></header>
-<main>
-<div class="toolbar"><div><span id="sectionEyebrow">CATÁLOGO</span><h1 id="sectionTitle">Productos</h1></div><div id="toolbarActions"></div></div>
-<section id="content"></section>
-</main>
-</section>
+<link rel="stylesheet" href="/admin.css?v=20261001-crm-v1"></head>
+<body><section id="adminView" class="crm-shell">
+<aside class="crm-sidebar"><div class="crm-brand"><small>ADMIN CRM</small><strong>La Bandeja<br>+ Beer Station</strong><span>Gestión integral</span></div>
+<nav id="tabs" class="crm-nav">
+<button data-tab="dashboard" class="active">Dashboard</button><button data-tab="sales">Ventas</button><button data-tab="purchases">Compras</button><button data-tab="expenses">Gastos</button><button data-tab="inventory">Inventario</button>
+<button data-tab="receivables">Cuentas por cobrar</button><button data-tab="payables">Cuentas por pagar</button><button data-tab="employees">Empleados</button><button data-tab="customers">Clientes</button><button data-tab="suppliers">Proveedores</button><button data-tab="reports">Reportes</button><button data-tab="config">CONFIG</button>
+</nav><div class="crm-side-foot"><span>HYDRA ENTERPRISE</span><small>Administración central</small></div></aside>
+<section class="crm-work"><header class="crm-topbar"><div><small id="sectionEyebrow">GERENCIA</small><h1 id="sectionTitle">Dashboard</h1></div><div id="toolbarActions"></div></header>
+<main><section id="content"></section></main></section></section>
 <dialog id="editDialog"><button class="close" data-close>×</button><form id="editForm" class="form-card"></form></dialog>
-<div id="toast"></div>
-<script src="/supabase.js"></script>
-<script type="module" src="/admin.js?v=20260925-cxc-v1"></script>
-</body></html>
+<div id="toast"></div><script src="/supabase.js"></script><script type="module" src="/admin.js?v=20261001-crm-v1"></script></body></html>
