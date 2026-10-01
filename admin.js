@@ -212,11 +212,12 @@ function stockItem(id){return state.ingredientStock.find(x=>x.item_id===id)||{qt
 function convertQty(q,from,to){const a=unitObj(from),b=unitObj(to);if(!a.code||!b.code||a.dimension!==b.dimension)return null;return Number(q)*Number(a.factor_to_reference)/Number(b.factor_to_reference)}
 function recipeMetrics(r){const lines=state.recipeItems.filter(x=>x.recipe_id===r.id);let raw=0;lines.forEach(x=>{const i=state.inventoryItems.find(z=>z.id===x.item_id);raw+=Number(x.qty_base||0)*(1+Number(x.waste_pct||0)/100)*Number(i?.current_cost||0)});const total=raw*(1+Number(r.overhead_pct||0)/100),unit=Number(r.yield_qty||1)>0?total/Number(r.yield_qty):0,p=state.products.find(x=>x.id===r.product_id),margin=Number(p?.price||0)>0?((Number(p.price)-unit)/Number(p.price))*100:0;return{raw,total,unit,margin,price:Number(p?.price||0)}}
 function renderProduction(){
- state.prodView=state.prodView||"recipes";
- toolbar("Producción y Costos","RESTAURANTE",'<button id="newIngredient">+ Insumo</button><button id="newRecipe">+ Receta</button>');
- const views=[["recipes","Recetas"],["ingredients","Insumos"],["waste","Mermas"],["costs","Variación de costos"],["batches","Producción"]];
+ state.prodView=state.prodView||"overview";
+ toolbar("Producción","RESTAURANTE",'<button id="newIngredient">+ Insumo</button><button id="newRecipe">+ Receta</button>');
+ const views=[["overview","Resumen"],["ingredients","Insumos"],["recipes","Recetas"],["waste","Mermas"],["costs","Variación de costos"],["batches","Producción"]];
  const tabs='<div class="prod-tabs">'+views.map(v=>'<button data-prod-view="'+v[0]+'" class="'+(state.prodView===v[0]?"active":"")+'">'+v[1]+'</button>').join("")+'</div>';
  let body="";
+ if(state.prodView==="overview") body=renderProductionOverview();
  if(state.prodView==="ingredients") body=renderIngredientView();
  if(state.prodView==="recipes") body=renderRecipeView();
  if(state.prodView==="waste") body=renderWasteView();
@@ -224,9 +225,39 @@ function renderProduction(){
  if(state.prodView==="batches") body=renderBatchView();
  $("#content").innerHTML=tabs+body;
  $("#content").querySelectorAll("[data-prod-view]").forEach(b=>b.onclick=()=>{state.prodView=b.dataset.prodView;renderProduction()});
- $("#newIngredient").onclick=()=>editIngredient();
- $("#newRecipe").onclick=()=>editRecipe();
+ $("#content").querySelectorAll("[data-prod-action]").forEach(b=>b.onclick=()=>{
+   const a=b.dataset.prodAction;
+   if(a==="ingredient")editIngredient();
+   if(a==="recipe")editRecipe();
+   if(a==="purchase"){state.tab="purchases";$("#tabs").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x.dataset.tab==="purchases"));renderPurchases()}
+   if(a==="waste")registerWaste();
+   if(a==="batch")produceRecipe();
+ });
+ if($("#newIngredient"))$("#newIngredient").onclick=()=>editIngredient();
+ if($("#newRecipe"))$("#newRecipe").onclick=()=>editRecipe();
  bindProductionActions();
+}
+function renderProductionOverview(){
+ const stockValue=state.ingredientStock.reduce((a,x)=>{const i=state.inventoryItems.find(z=>z.id===x.item_id);return a+Number(x.qty_base||0)*Number(i?.current_cost||0)},0);
+ const low=state.inventoryItems.filter(i=>Number(stockItem(i.id).qty_base)<=Number(stockItem(i.id).min_qty_base));
+ const waste=state.wasteRecords.reduce((a,x)=>a+Number(x.total_cost||0),0);
+ const changed=state.costHistory.filter(x=>x.variation_pct!=null).slice(0,5);
+ let html='<section class="prod-hero"><div><small>COCINA · COSTEO · INVENTARIO</small><h2>Producción del restaurante</h2><p>Define insumos y presentaciones, compra en cualquier unidad, calcula recetas, controla mermas y registra producción real.</p></div>';
+ html+='<div class="prod-hero-number"><span>Inventario de insumos</span><b>'+L(stockValue)+'</b><small>'+state.inventoryItems.length+' insumos registrados</small></div></section>';
+ html+='<section class="prod-summary">'+crmCard("Insumos",String(state.inventoryItems.length),"Catálogo de materia prima")+crmCard("Recetas",String(state.recipes.length),"Productos con costeo")+crmCard("Mermas",L(waste),state.wasteRecords.length+" registros")+'</section>';
+ html+='<section class="production-launch-grid">';
+ html+='<button data-prod-action="ingredient"><span>01</span><b>Crear insumo</b><small>Pollo, aceite, queso, cerveza, salsas, empaques...</small></button>';
+ html+='<button data-prod-action="purchase"><span>02</span><b>Comprar insumos</b><small>Compra por caja, bolsa, botella, libra, galón o cualquier presentación.</small></button>';
+ html+='<button data-prod-action="recipe"><span>03</span><b>Crear receta</b><small>Relaciona los productos vendidos con sus ingredientes y cantidades.</small></button>';
+ html+='<button data-prod-action="batch"><span>04</span><b>Registrar producción</b><small>Descarga ingredientes y calcula el costo del lote producido.</small></button>';
+ html+='<button data-prod-action="waste"><span>05</span><b>Registrar merma</b><small>Dañado, vencido, derrame, error de preparación o merma natural.</small></button>';
+ html+='<button data-prod-view="costs"><span>06</span><b>Ver variación de costos</b><small>Compara costo anterior, costo nuevo y porcentaje de cambio.</small></button></section>';
+ html+='<section class="exec-grid prod-overview-grid"><article class="exec-panel"><div class="exec-panel-head"><div><small>FLUJO RECOMENDADO</small><h3>Cómo trabaja KRAKEN</h3></div></div>';
+ html+='<div class="prod-flow"><div><b>1. Insumo</b><span>Unidad base</span></div><i>→</i><div><b>2. Presentación</b><span>Conversión</span></div><i>→</i><div><b>3. Compra</b><span>Costo real</span></div><i>→</i><div><b>4. Receta</b><span>Margen</span></div><i>→</i><div><b>5. Producción</b><span>Descargo</span></div></div></article>';
+ html+='<article class="exec-panel"><div class="exec-panel-head"><div><small>ALERTAS</small><h3>Inventario y costos</h3></div></div><div class="alert-stack">';
+ html+=low.slice(0,4).map(i=>'<div><span>'+safe(i.name)+'</span><b>'+qtyText(stockItem(i.id).qty_base,i.base_unit)+'</b><small>mín. '+qtyText(stockItem(i.id).min_qty_base,i.base_unit)+'</small></div>').join("")||'<div class="empty-admin">Aún no hay alertas. Crea tus primeros insumos.</div>';
+ html+='</div><div class="cost-mini">'+changed.map(h=>{const i=state.inventoryItems.find(x=>x.id===h.item_id);return '<div><span>'+safe(i?.name||"")+'</span><b class="'+(Number(h.variation_pct)>0?"up":"down")+'">'+(Number(h.variation_pct)>0?"+":"")+Number(h.variation_pct).toFixed(1)+'%</b></div>'}).join("")+'</div></article></section>';
+ return html;
 }
 function renderIngredientView(){
  const total=state.ingredientStock.reduce((a,x)=>{const i=state.inventoryItems.find(z=>z.id===x.item_id);return a+Number(x.qty_base||0)*Number(i?.current_cost||0)},0);
