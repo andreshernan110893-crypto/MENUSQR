@@ -128,9 +128,61 @@ function renderFeedback(){
 const L=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 function crmCard(label,value,sub=""){return '<article class="crm-kpi"><span>'+label+'</span><b>'+value+'</b><small>'+sub+'</small></article>'}
 function renderDashboard(){
- const sales=state.orders.filter(o=>o.sale_recorded_at&&o.status!=="CANCELLED"),salesTotal=sales.reduce((a,o)=>a+Number(o.total||0),0),exp=state.expenses.reduce((a,x)=>a+Number(x.amount||0),0),cxc=state.receivables.filter(x=>x.status==="OPEN").reduce((a,x)=>a+Number(x.balance||0),0),cxp=state.payables.filter(x=>x.status==="OPEN").reduce((a,x)=>a+Number(x.balance||0),0);
- toolbar("Dashboard","GERENCIA");
- $("#content").innerHTML='<div class="crm-kpis">'+crmCard("Ventas registradas",L(salesTotal),sales.length+" operaciones")+crmCard("Gastos",L(exp),state.expenses.length+" registros")+crmCard("Cuentas por cobrar",L(cxc),state.receivables.filter(x=>x.status==="OPEN").length+" abiertas")+crmCard("Cuentas por pagar",L(cxp),state.payables.filter(x=>x.status==="OPEN").length+" abiertas")+'</div><div class="crm-panels"><article class="crm-panel"><h2>Resumen operativo</h2><div class="metric-list"><div><span>Productos activos</span><b>'+state.products.filter(x=>x.active).length+'</b></div><div><span>Clientes</span><b>'+state.customers.length+'</b></div><div><span>Proveedores</span><b>'+state.suppliers.length+'</b></div><div><span>Empleados activos</span><b>'+state.employees.filter(x=>x.active).length+'</b></div></div></article><article class="crm-panel"><h2>Inventario crítico</h2><div class="metric-list">'+state.inventory.filter(x=>Number(x.qty)<=Number(x.min_stock)).slice(0,8).map(x=>'<div><span>'+safe(state.products.find(p=>p.id===x.product_id)?.name||x.product_id)+'</span><b>'+Number(x.qty).toFixed(2)+'</b></div>').join("")+'</div></article></div>';
+ const valid=state.orders.filter(o=>o.sale_recorded_at&&o.status!=="CANCELLED");
+ const total=valid.reduce((a,o)=>a+Number(o.total||0),0);
+ const lb=valid.filter(o=>o.station==="LB").reduce((a,o)=>a+Number(o.total||0),0);
+ const bs=valid.filter(o=>o.station==="BS").reduce((a,o)=>a+Number(o.total||0),0);
+ const exp=state.expenses.reduce((a,x)=>a+Number(x.amount||0),0);
+ const cxcOpen=state.receivables.filter(x=>x.status==="OPEN"),cxpOpen=state.payables.filter(x=>x.status==="OPEN");
+ const cxc=cxcOpen.reduce((a,x)=>a+Number(x.balance||0),0),cxp=cxpOpen.reduce((a,x)=>a+Number(x.balance||0),0);
+ const invValue=state.inventory.reduce((a,x)=>a+Number(x.qty||0)*Number(x.unit_cost||0),0);
+ const low=state.inventory.filter(x=>Number(x.qty)<=Number(x.min_stock));
+ const avg=valid.length?total/valid.length:0;
+ const recent=valid.slice().sort((a,b)=>new Date(b.sale_recorded_at)-new Date(a.sale_recorded_at)).slice(0,6);
+ const itemMap=new Map();
+ valid.forEach(o=>(o.order_items||[]).forEach(i=>{const k=i.product_name||"Producto";const v=itemMap.get(k)||{qty:0,amount:0};v.qty+=Number(i.qty||0);v.amount+=Number(i.line_total||0);itemMap.set(k,v)}));
+ const top=[...itemMap.entries()].sort((a,b)=>b[1].amount-a[1].amount).slice(0,5),topMax=Math.max(1,...top.map(x=>x[1].amount));
+ const today=new Date(),days=[];for(let n=6;n>=0;n--){const d=new Date(today);d.setDate(today.getDate()-n);const key=d.toLocaleDateString("en-CA");const val=valid.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===key).reduce((a,o)=>a+Number(o.total||0),0);days.push({label:d.toLocaleDateString("es-HN",{weekday:"short"}),value:val})}
+ const maxDay=Math.max(1,...days.map(x=>x.value));
+ toolbar("Dashboard Ejecutivo","GERENCIA",'<button id="refreshExecutive">Actualizar</button>');
+ $("#content").innerHTML=`
+ <section class="exec-hero">
+   <div class="exec-hero-copy"><small>RESUMEN GERENCIAL</small><h2>Control ejecutivo de toda la operación.</h2><p>Ventas, liquidez, cartera, inventario y obligaciones de La Bandeja + Beer Station en una sola vista.</p>
+   <div class="exec-hero-actions"><button data-go="sales">Ver ventas</button><button data-go="reports">Abrir reportes</button><button data-go="inventory">Revisar inventario</button></div></div>
+   <div class="exec-total"><span>VENTAS REGISTRADAS</span><strong>${L(total)}</strong><small>${valid.length} operaciones · Ticket promedio ${L(avg)}</small><div class="brand-split"><div><b>La Bandeja</b><span>${L(lb)}</span></div><div><b>Beer Station</b><span>${L(bs)}</span></div></div></div>
+ </section>
+ <section class="exec-kpis">
+   ${crmCard("Resultado operativo",L(total-exp),"Ventas menos gastos registrados")}
+   ${crmCard("Cuentas por cobrar",L(cxc),cxcOpen.length+" pendientes")}
+   ${crmCard("Cuentas por pagar",L(cxp),cxpOpen.length+" pendientes")}
+   ${crmCard("Inventario valorizado",L(invValue),low.length+" productos en alerta")}
+ </section>
+ <section class="exec-grid">
+   <article class="exec-panel exec-chart"><div class="exec-panel-head"><div><small>ÚLTIMOS 7 DÍAS</small><h3>Movimiento de ventas</h3></div><b>${L(days.reduce((a,x)=>a+x.value,0))}</b></div>
+     <div class="bars">${days.map(x=>`<div class="bar-day"><div class="bar-value">${x.value?L(x.value):""}</div><div class="bar-track"><i style="height:${Math.max(x.value?8:2,(x.value/maxDay)*100)}%"></i></div><span>${safe(x.label)}</span></div>`).join("")}</div>
+   </article>
+   <article class="exec-panel"><div class="exec-panel-head"><div><small>RENDIMIENTO</small><h3>Productos con mayor venta</h3></div></div>
+     <div class="rank-list">${top.length?top.map(([name,v],i)=>`<div class="rank-row"><span class="rank-no">${i+1}</span><div><b>${safe(name)}</b><small>${Number(v.qty).toFixed(0)} unidades</small><i><em style="width:${(v.amount/topMax)*100}%"></em></i></div><strong>${L(v.amount)}</strong></div>`).join(""):'<div class="empty-admin">Sin ventas suficientes.</div>'}</div>
+   </article>
+   <article class="exec-panel"><div class="exec-panel-head"><div><small>LIQUIDEZ</small><h3>Cartera y obligaciones</h3></div></div>
+     <div class="finance-duo"><div><span>Por cobrar</span><b>${L(cxc)}</b><small>${cxcOpen.length} cuentas abiertas</small></div><div><span>Por pagar</span><b>${L(cxp)}</b><small>${cxpOpen.length} obligaciones</small></div></div>
+     <button class="panel-link" data-go="receivables">Administrar cuentas por cobrar</button><button class="panel-link" data-go="payables">Administrar cuentas por pagar</button>
+   </article>
+   <article class="exec-panel"><div class="exec-panel-head"><div><small>INVENTARIO</small><h3>Alertas de existencia</h3></div><span class="alert-count">${low.length}</span></div>
+     <div class="alert-stack">${low.slice(0,6).map(x=>{const p=state.products.find(p=>p.id===x.product_id);return `<div><span>${safe(p?.name||x.product_id)}</span><b>${Number(x.qty||0).toFixed(2)}</b><small>mín. ${Number(x.min_stock||0).toFixed(2)}</small></div>`}).join("")||'<div class="empty-admin">Sin alertas de inventario.</div>'}</div>
+     <button class="panel-link" data-go="inventory">Abrir inventario</button>
+   </article>
+ </section>
+ <section class="exec-bottom">
+   <article class="exec-panel recent-panel"><div class="exec-panel-head"><div><small>ACTIVIDAD</small><h3>Ventas recientes</h3></div><button data-go="sales">Ver todas</button></div>
+     <div class="recent-list">${recent.map(o=>`<div class="recent-sale"><div><b>${safe(o.customer_name||o.diners?.display_name||"Consumidor final")}</b><small>${safe(o.table_sessions?.places?.name||o.table_sessions?.place_code||"POS")} · ${new Date(o.sale_recorded_at).toLocaleString("es-HN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</small></div><span>${safe(o.sale_type||"CONTADO")}</span><strong>${L(o.total)}</strong></div>`).join("")||'<div class="empty-admin">Sin ventas registradas.</div>'}</div>
+   </article>
+   <article class="exec-panel quick-panel"><div class="exec-panel-head"><div><small>ACCESOS RÁPIDOS</small><h3>Gestión diaria</h3></div></div>
+     <div class="quick-grid"><button data-go="purchases"><b>Compras</b><small>Registrar abastecimiento</small></button><button data-go="expenses"><b>Gastos</b><small>Registrar egreso</small></button><button data-go="customers"><b>Clientes</b><small>Administrar cartera</small></button><button data-go="suppliers"><b>Proveedores</b><small>Gestión comercial</small></button><button data-go="employees"><b>Empleados</b><small>Gestión de personal</small></button><button data-go="config"><b>Config</b><small>Catálogo y sistema</small></button></div>
+   </article>
+ </section>`;
+ $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const tab=b.dataset.go;state.tab=tab;$("#tabs").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));render();window.scrollTo({top:0,behavior:"smooth"})});
+ $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
 }
 function renderSales(){toolbar("Ventas","COMERCIAL");const rows=state.orders.filter(o=>o.sale_recorded_at||o.payment_status==="PAID"||o.sale_type==="CREDITO");$("#content").innerHTML='<div class="crm-kpis">'+crmCard("Total",L(rows.reduce((a,x)=>a+Number(x.total||0),0)),rows.length+" ventas")+crmCard("Contado",L(rows.filter(x=>x.sale_type!=="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+crmCard("Crédito",L(rows.filter(x=>x.sale_type==="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+'</div><div class="crm-table"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Origen</th><th>Tipo</th><th>Pago</th><th>Total</th></tr></thead><tbody>'+rows.map(o=>'<tr><td>'+new Date(o.sale_recorded_at||o.created_at).toLocaleString("es-HN")+'</td><td>'+safe(o.customer_name||o.diners?.display_name||"Consumidor final")+'</td><td>'+safe(o.table_sessions?.places?.name||o.table_sessions?.place_code||"")+'</td><td>'+safe(o.sale_type||"CONTADO")+'</td><td>'+safe(o.payment_method||"—")+'</td><td><b>'+L(o.total)+'</b></td></tr>').join("")+'</tbody></table></div>'}
 function renderCustomers(){toolbar("Clientes","CRM",'<button id="newCustomer">+ Nuevo cliente</button>');$("#content").innerHTML='<div class="crm-table"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th></th></tr></thead><tbody>'+state.customers.map(x=>'<tr><td><b>'+safe(x.name)+'</b></td><td>'+safe(x.phone||"—")+'</td><td>'+safe(x.email||"—")+'</td><td>'+safe(x.address||"—")+'</td><td><button data-edit-customer="'+x.id+'">Editar</button></td></tr>').join("")+'</tbody></table></div>';$("#newCustomer").onclick=()=>editCustomer();$("#content").querySelectorAll("[data-edit-customer]").forEach(b=>b.onclick=()=>editCustomer(b.dataset.editCustomer))}
