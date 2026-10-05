@@ -234,7 +234,6 @@ function renderDashboard(){
            <linearGradient id="areaBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e9cff" stop-opacity=".36"/><stop offset="1" stop-color="#0e9cff" stop-opacity="0"/></linearGradient>
            <filter id="lineGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
          </defs>
-         <g class="chart-grid">${[45,85,125,165,205].map(y=>`<line x1="45" y1="${y}" x2="655" y2="${y}"/>`).join("")}${coords.map(p=>`<line x1="${p.x}" y1="40" x2="${p.x}" y2="220"/>`).join("")}</g>
          <path class="chart-area" d="${area}"/>
          <path class="chart-line" d="${path}" filter="url(#lineGlow)"/>
          ${coords.map(p=>`<circle class="chart-dot" cx="${p.x}" cy="${p.y}" r="4"/>`).join("")}
