@@ -1217,7 +1217,7 @@ html{scrollbar-width:thin;scrollbar-color:#0c5c91 #02070b}::-webkit-scrollbar{wi
   min-height:350px!important;
   background:
     linear-gradient(90deg,rgba(1,7,12,.97) 0%,rgba(2,10,18,.86) 31%,rgba(2,10,18,.48) 51%,rgba(2,7,13,.08) 72%,rgba(1,4,8,.1) 100%),
-    url('/assets/new/kraken-hero-art.webp') right center/auto 100% no-repeat,
+    url('/assets/new/kraken-hero-clean.jpg') right 42%/auto 112% no-repeat,
     radial-gradient(circle at 72% 42%,rgba(0,119,255,.18),transparent 38%),
     #02070c!important;
   border:1px solid rgba(14,132,205,.52)!important;
@@ -1225,8 +1225,8 @@ html{scrollbar-width:thin;scrollbar-color:#0c5c91 #02070b}::-webkit-scrollbar{wi
   box-shadow:inset 0 0 80px rgba(0,0,0,.35),0 18px 55px rgba(0,0,0,.3)!important
 }
 .exact-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,11,19,.05),rgba(0,0,0,.18));pointer-events:none}
-.exact-hero:after{background:radial-gradient(circle at 73% 42%,rgba(0,173,255,.08),transparent 34%),linear-gradient(180deg,transparent 60%,rgba(0,80,160,.08))!important}
-.exact-hero-shade{background:linear-gradient(90deg,rgba(2,7,12,.98) 0%,rgba(2,7,12,.79) 38%,rgba(2,7,12,.2) 62%,transparent 78%)!important}
+.exact-hero:after{background:radial-gradient(circle at 74% 34%,rgba(0,173,255,.11),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.02) 0%,transparent 55%,rgba(0,25,45,.24) 100%)!important}
+.exact-hero-shade{background:linear-gradient(90deg,rgba(2,7,12,.98) 0%,rgba(2,7,12,.88) 32%,rgba(2,7,12,.48) 49%,rgba(2,7,12,.12) 63%,transparent 76%)!important}
 .exact-kraken-title{display:none!important}
 .exact-copy{width:min(650px,56%)!important;padding:54px 30px 40px 40px!important}
 .exact-actions button{background:rgba(4,18,30,.56)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
