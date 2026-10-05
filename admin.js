@@ -193,74 +193,82 @@ function renderDashboard(){
  const active=state.orders.filter(o=>["RECEIVED","PREPARING","READY"].includes(o.status));
  const cxcOpen=state.receivables.filter(x=>x.status==="OPEN"),cxpOpen=state.payables.filter(x=>x.status==="OPEN");
  const cxc=cxcOpen.reduce((a,x)=>a+Number(x.balance||0),0),cxp=cxpOpen.reduce((a,x)=>a+Number(x.balance||0),0);
- const lb=today.filter(o=>o.station==="LB").reduce((a,o)=>a+Number(o.total||0),0);
- const bs=today.filter(o=>o.station==="BS").reduce((a,o)=>a+Number(o.total||0),0);
  const dayPoints=[];for(let n=6;n>=0;n--){const d=new Date(now);d.setDate(now.getDate()-n);const k=d.toLocaleDateString("en-CA");const v=valid.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===k).reduce((a,o)=>a+Number(o.total||0),0);dayPoints.push({label:d.toLocaleDateString("es-HN",{weekday:"short"}),value:v})}
  const maxDay=Math.max(1,...dayPoints.map(x=>x.value));
- const topMap=new Map();today.forEach(o=>(o.order_items||[]).forEach(i=>{const k=i.product_name||"Producto",v=topMap.get(k)||{qty:0,amount:0};v.qty+=Number(i.qty||0);v.amount+=Number(i.line_total||0);topMap.set(k,v)}));
- const top=[...topMap.entries()].sort((a,b)=>b[1].amount-a[1].amount).slice(0,5);
+ const coords=dayPoints.map((x,i)=>({x:45+i*(610/Math.max(1,dayPoints.length-1)),y:205-(x.value/maxDay)*155,...x}));
+ const path=coords.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
+ const area=path+" L "+coords[coords.length-1].x.toFixed(1)+" 220 L "+coords[0].x.toFixed(1)+" 220 Z";
  const recent=valid.slice().sort((a,b)=>new Date(b.sale_recorded_at)-new Date(a.sale_recorded_at)).slice(0,5);
+ const orderActive=active.length;
  toolbar("Dashboard","OPERACIÓN",'<button id="refreshExecutive">Actualizar</button>');
  $("#content").innerHTML=`
- <section class="pulse-hero spotlight-card">
-   <div class="pulse-copy">
-     <div class="pulse-badge"><span></span> Sistema operativo</div>
+ <section class="exact-hero">
+   <div class="exact-hero-shade"></div>
+   <div class="exact-copy">
+     <div class="exact-status"><i></i> Sistema operativo</div>
      <h2>Todo lo importante,<br><em>en una sola vista.</em></h2>
      <p>Operación, ventas y control financiero en tiempo real.</p>
-     <div class="pulse-actions">
-       <button data-go="sales">Ver ventas</button>
-       <button data-go="orders">Pedidos activos</button>
-       <button data-go="reports">Abrir reportes</button>
+     <div class="exact-actions">
+       <button data-go="sales" class="primary">▣ <span>Ver ventas</span><b>→</b></button>
+       <button data-go="orders">▤ <span>Pedidos activos</span></button>
+       <button data-go="reports">▥ <span>Abrir reportes</span></button>
      </div>
    </div>
-   <div class="pulse-number">
-     <span>VENTAS DE HOY</span>
-     <strong>${L(total)}</strong>
-     <small>${today.length} operaciones · ticket ${L(avg)}</small>
-     <div class="location-mini">
-       <div><span>La Bandeja</span><b>${L(lb)}</b></div>
-       <div><span>Beer Station</span><b>${L(bs)}</b></div>
+   <div class="exact-kraken-title"><strong>KRAKEN</strong><span>CONTROL TOTAL<br>DE TU OPERACIÓN</span></div>
+ </section>
+
+ <section class="exact-kpis">
+   <button data-go="sales" class="exact-kpi cyan">
+     <div class="kpi-icon">▣</div><div><span>VENTAS DE HOY</span><b>${L(total)}</b><small>${today.length} operaciones · ticket ${L(avg)}</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
+   </button>
+   <button data-go="orders" class="exact-kpi blue">
+     <div class="kpi-icon">◇</div><div><span>PEDIDOS ACTIVOS</span><b>${orderActive}</b><small>Pendientes de proceso</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
+   </button>
+   <button data-go="receivables" class="exact-kpi cyan">
+     <div class="kpi-icon">◉</div><div><span>CUENTAS POR COBRAR</span><b>${L(cxc)}</b><small>${cxcOpen.length} clientes</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
+   </button>
+   <button data-go="payables" class="exact-kpi blue">
+     <div class="kpi-icon">▣</div><div><span>CUENTAS POR PAGAR</span><b>${L(cxp)}</b><small>${cxpOpen.length} proveedores</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
+   </button>
+ </section>
+
+ <section class="exact-main-grid">
+   <article class="exact-panel exact-sales-panel">
+     <div class="exact-panel-head">
+       <div><span>▥</span><div><b>VENTAS</b><small>Comportamiento de ventas en el tiempo</small></div></div>
+       <div class="period-tabs"><button class="active">Hoy</button><button>7 días</button><button>30 días</button><button>12 meses</button></div>
      </div>
-   </div>
- </section>
- <section class="metric-strip">
-   <button data-go="sales"><span>Últimos 7 días</span><b>${L(weekTotal)}</b><small>${week.length} ventas</small></button>
-   <button data-go="orders"><span>Pedidos activos</span><b>${active.length}</b><small>en operación</small></button>
-   <button data-go="receivables"><span>Por cobrar</span><b>${L(cxc)}</b><small>${cxcOpen.length} cuentas</small></button>
-   <button data-go="payables"><span>Por pagar</span><b>${L(cxp)}</b><small>${cxpOpen.length} cuentas</small></button>
- </section>
- <section class="command-grid">
-   <article class="command-card chart-command spotlight-card">
-     <div class="card-head"><div><small>VENTAS</small><h3>Tendencia semanal</h3></div><span>${L(weekTotal)}</span></div>
-     <div class="modern-chart">${dayPoints.map(x=>`<div><b>${x.value?L(x.value):""}</b><i><em style="height:${Math.max(x.value?8:2,(x.value/maxDay)*100)}%"></em></i><span>${safe(x.label)}</span></div>`).join("")}</div>
-   </article>
-   <article class="command-card live-command">
-     <div class="card-head"><div><small>EN VIVO</small><h3>Flujo de pedidos</h3></div><span class="online-label">LIVE</span></div>
-     <div class="order-pulse">
-       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="RECEIVED").length}</b><span>Recibidos</span></button>
-       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="PREPARING").length}</b><span>Preparando</span></button>
-       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="READY").length}</b><span>Listos</span></button>
-       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="DELIVERED").length}</b><span>Entregados</span></button>
+     <div class="line-chart-wrap">
+       <svg viewBox="0 0 700 245" preserveAspectRatio="none" aria-label="Ventas últimos 7 días">
+         <defs>
+           <linearGradient id="areaBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e9cff" stop-opacity=".36"/><stop offset="1" stop-color="#0e9cff" stop-opacity="0"/></linearGradient>
+           <filter id="lineGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+         </defs>
+         <g class="chart-grid">${[45,85,125,165,205].map(y=>`<line x1="45" y1="${y}" x2="655" y2="${y}"/>`).join("")}${coords.map(p=>`<line x1="${p.x}" y1="40" x2="${p.x}" y2="220"/>`).join("")}</g>
+         <path class="chart-area" d="${area}"/>
+         <path class="chart-line" d="${path}" filter="url(#lineGlow)"/>
+         ${coords.map(p=>`<circle class="chart-dot" cx="${p.x}" cy="${p.y}" r="4"/>`).join("")}
+         ${coords.map((p,i)=>`<text x="${p.x}" y="238" text-anchor="middle">${safe(dayPoints[i].label)}</text>`).join("")}
+       </svg>
      </div>
    </article>
-   <article class="command-card top-command">
-     <div class="card-head"><div><small>RENDIMIENTO</small><h3>Top productos</h3></div><button data-go="sales">Ver ventas</button></div>
-     <div class="clean-rank">${top.length?top.map(([name,v],i)=>`<div><span>${i+1}</span><b>${safe(name)}</b><small>${Number(v.qty).toFixed(0)} uds</small><strong>${L(v.amount)}</strong></div>`).join(""):'<div class="quiet-state">Sin ventas suficientes hoy.</div>'}</div>
-   </article>
-   <article class="command-card recent-command">
-     <div class="card-head"><div><small>ACTIVIDAD</small><h3>Movimientos recientes</h3></div></div>
-     <div class="clean-feed">${recent.length?recent.map(o=>`<button data-go="sales"><div><b>${safe(o.customer_name||o.diners?.display_name||"Consumidor final")}</b><small>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</small></div><span>${safe(o.station==="BS"?"Beer Station":"La Bandeja")}</span><strong>${L(o.total)}</strong></button>`).join(""):'<div class="quiet-state">Sin movimientos recientes.</div>'}</div>
+
+   <article class="exact-panel exact-activity">
+     <div class="exact-panel-head"><div><span>◷</span><div><b>ACTIVIDAD RECIENTE</b></div></div><button data-go="sales" class="see-all">Ver todo →</button></div>
+     <div class="activity-timeline">
+       ${recent.length?recent.map((o,i)=>`<button data-go="sales"><i class="timeline-dot t${i}"></i><div class="activity-icon">${i===0?"▣":i===1?"◇":i===2?"◉":"◎"}</div><div class="activity-copy"><b>${safe(o.customer_name||o.diners?.display_name||"Nueva venta registrada")}</b><small>${safe(o.station==="BS"?"Beer Station":"La Bandeja")} · ${L(o.total)}</small></div><time>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit"})}</time></button>`).join(""):'<div class="quiet-state">Sin actividad reciente.</div>'}
+     </div>
    </article>
  </section>
- <section class="quick-dock">
-   <button data-go="purchases"><span>+</span><div><b>Nueva compra</b><small>Registrar abastecimiento</small></div></button>
-   <button data-go="expenses"><span>+</span><div><b>Nuevo gasto</b><small>Registrar egreso</small></div></button>
-   <button data-go="production"><span>↗</span><div><b>Producción</b><small>Costos y recetas</small></div></button>
-   <button data-go="catalog"><span>⌘</span><div><b>Catálogo</b><small>Productos y maestros</small></div></button>
+
+ <section class="exact-shortcuts">
+   <button data-go="inventory" class="green"><span>◇</span><div><b>Inventario</b><small>Gestiona tus productos</small></div><i>→</i></button>
+   <button data-go="production" class="blue"><span>▥</span><div><b>Producción</b><small>Órdenes y procesos</small></div><i>→</i></button>
+   <button data-go="employees" class="purple"><span>◎</span><div><b>Empleados</b><small>Administra tu equipo</small></div><i>→</i></button>
+   <button data-go="reports" class="gold"><span>▥</span><div><b>Reportes</b><small>Análisis y estadísticas</small></div><i>→</i></button>
  </section>`;
  $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.go));
  $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
- enableSpotlightCards();
 }
 function enableSpotlightCards(){
  document.querySelectorAll(".spotlight-card").forEach(card=>{
