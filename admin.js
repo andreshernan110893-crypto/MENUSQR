@@ -18,7 +18,40 @@ async function loadAll(){const [b,c,p,pch,hs,pr,ppr,g,o,l,pl,ord,calls,fb,ar,cu,
  sb.from("payable_payments").select("*").order("created_at",{ascending:false}),sb.from("inventory_stock").select("*"),sb.from("inventory_movements").select("*").order("created_at",{ascending:false}).limit(200),
  sb.from("measure_units").select("*").order("dimension").order("factor_to_reference"),sb.from("inventory_items").select("*").order("name"),sb.from("item_presentations").select("*").order("name"),sb.from("inventory_item_stock").select("*"),sb.from("recipes").select("*"),sb.from("recipe_items").select("*").order("sort_order"),sb.from("item_cost_history").select("*").order("recorded_at",{ascending:false}).limit(300),sb.from("waste_records").select("*").order("created_at",{ascending:false}).limit(200),sb.from("production_batches").select("*").order("created_at",{ascending:false}).limit(100)
 ]);Object.assign(state,{brands:b.data||[],categories:c.data||[],products:p.data||[],productChannels:pch.data||[],heroSlides:hs.data||[],promotions:pr.data||[],promoLinks:ppr.data||[],groups:g.data||[],options:o.data||[],links:l.data||[],places:pl.data||[],orders:ord.data||[],calls:calls.data||[],feedback:fb.data||[],receivables:Array.isArray(ar.data)?ar.data:[],customers:cu.data||[],suppliers:su.data||[],employees:em.data||[],purchases:pu.data||[],purchaseItems:pi.data||[],expenses:ex.data||[],payables:pa.data||[],payablePayments:pp.data||[],inventory:inv.data||[],inventoryMovements:im.data||[],measureUnits:mu.data||[],inventoryItems:ii.data||[],presentations:ipr.data||[],ingredientStock:ist.data||[],recipes:rc.data||[],recipeItems:ri.data||[],costHistory:ch.data||[],wasteRecords:wr.data||[],productionBatches:pb.data||[]})}
-$("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{state.tab=b.dataset.tab;$("#tabs").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x===b));render()});
+function syncNavigation(){
+ const nav=$("#tabs");if(!nav)return;
+ nav.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.tab));
+ nav.querySelectorAll(".nav-group").forEach(g=>{
+   const name=g.dataset.group;
+   const active=name===state.tab||(name==="config"&&["combos","banners","promotions","extras","branding","places","orders","feedback"].includes(state.tab));
+   g.classList.toggle("active-group",active);
+   if(active)g.classList.add("open");
+ });
+ nav.querySelectorAll("[data-nav-tab]").forEach(b=>{
+   let active=b.dataset.navTab===state.tab;
+   if(active&&b.dataset.purchaseView)active=state.purchaseView===b.dataset.purchaseView;
+   if(active&&b.dataset.prodView)active=state.prodView===b.dataset.prodView;
+   if(active&&b.dataset.catalogView)active=state.catalogView===b.dataset.catalogView;
+   b.classList.toggle("active",active);
+ });
+}
+function navigateAdmin(tab,opts={}){
+ state.tab=tab;
+ if(opts.purchaseView)state.purchaseView=opts.purchaseView;
+ if(opts.prodView)state.prodView=opts.prodView;
+ if(opts.catalogView)state.catalogView=opts.catalogView;
+ syncNavigation();
+ render();
+ if(window.innerWidth<=860){$("#sidebar")?.classList.remove("mobile-open");$("#sidebarBackdrop")?.classList.remove("show")}
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.tab));
+$("#tabs").querySelectorAll("[data-nav-tab]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.navTab,{purchaseView:b.dataset.purchaseView,prodView:b.dataset.prodView,catalogView:b.dataset.catalogView}));
+$("#tabs").querySelectorAll("[data-group-toggle]").forEach(b=>b.onclick=()=>{const g=b.closest(".nav-group");g.classList.toggle("open")});
+$("#sidebarCollapse")?.addEventListener("click",()=>document.body.classList.toggle("sidebar-collapsed"));
+$("#mobileMenu")?.addEventListener("click",()=>{$("#sidebar")?.classList.add("mobile-open");$("#sidebarBackdrop")?.classList.add("show")});
+$("#sidebarBackdrop")?.addEventListener("click",()=>{$("#sidebar")?.classList.remove("mobile-open");$("#sidebarBackdrop")?.classList.remove("show")});
+syncNavigation();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 
 function toolbar(title,eyebrow="ADMINISTRACIÓN",button=""){ $("#sectionTitle").textContent=title;$("#sectionEyebrow").textContent=eyebrow;$("#toolbarActions").innerHTML=button}
@@ -182,7 +215,7 @@ function renderDashboard(){
      <div class="quick-grid"><button data-go="purchases"><b>Compras</b><small>Registrar abastecimiento</small></button><button data-go="expenses"><b>Gastos</b><small>Registrar egreso</small></button><button data-go="customers"><b>Clientes</b><small>Administrar cartera</small></button><button data-go="suppliers"><b>Proveedores</b><small>Gestión comercial</small></button><button data-go="employees"><b>Empleados</b><small>Gestión de personal</small></button><button data-go="config"><b>Config</b><small>Catálogo y sistema</small></button></div>
    </article>
  </section>`;
- $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const tab=b.dataset.go;state.tab=tab;$("#tabs").querySelectorAll("button").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));render();window.scrollTo({top:0,behavior:"smooth"})});
+ $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const tab=b.dataset.go;navigateAdmin(tab)});
  $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
 }
 function renderSales(){toolbar("Ventas","COMERCIAL");const rows=state.orders.filter(o=>o.sale_recorded_at||o.payment_status==="PAID"||o.sale_type==="CREDITO");$("#content").innerHTML='<div class="crm-kpis">'+crmCard("Total",L(rows.reduce((a,x)=>a+Number(x.total||0),0)),rows.length+" ventas")+crmCard("Contado",L(rows.filter(x=>x.sale_type!=="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+crmCard("Crédito",L(rows.filter(x=>x.sale_type==="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+'</div><div class="crm-table"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Origen</th><th>Tipo</th><th>Pago</th><th>Total</th></tr></thead><tbody>'+rows.map(o=>'<tr><td>'+new Date(o.sale_recorded_at||o.created_at).toLocaleString("es-HN")+'</td><td>'+safe(o.customer_name||o.diners?.display_name||"Consumidor final")+'</td><td>'+safe(o.table_sessions?.places?.name||o.table_sessions?.place_code||"")+'</td><td>'+safe(o.sale_type||"CONTADO")+'</td><td>'+safe(o.payment_method||"—")+'</td><td><b>'+L(o.total)+'</b></td></tr>').join("")+'</tbody></table></div>'}
