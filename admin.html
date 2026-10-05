@@ -1,69 +1,69 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KRAKEN · La Bandeja + Beer Station</title>
+<title>KRAKEN Â· La Bandeja + Beer Station</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/admin.css?v=20261004-sidebar-v1">
+<link rel="stylesheet" href="/admin.css?v=20261004-ghost-v1">
 </head>
 <body>
 <section id="adminView" class="kraken-app">
   <aside id="sidebar" class="kraken-sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark">K</div>
-      <div class="brand-copy"><small>HYDRA ENTERPRISE</small><strong>KRAKEN</strong><span>La Bandeja + Beer Station</span></div>
-      <button id="sidebarCollapse" class="sidebar-collapse" type="button" aria-label="Colapsar menú">‹</button>
+      <div class="brand-copy"><small>HYDRA ENTERPRISE</small><strong>KRAKEN</strong><span>Ubicaciones · La Bandeja / Beer Station</span></div>
+      <button id="sidebarCollapse" class="sidebar-collapse" type="button" aria-label="Colapsar menÃº">â€¹</button>
     </div>
 
     <nav id="tabs" class="side-nav">
-      <button class="nav-item active" data-tab="dashboard"><span class="nav-icon">◆</span><span>Dashboard</span></button>
-      <button class="nav-item" data-tab="sales"><span class="nav-icon">↗</span><span>Ventas</span></button>
+      <button class="nav-item active" data-tab="dashboard"><span class="nav-icon">â—†</span><span>Dashboard</span></button>
+      <button class="nav-item" data-tab="sales"><span class="nav-icon">â†—</span><span>Ventas</span></button>
 
       <div class="nav-group" data-group="purchases">
-        <button class="nav-group-head" data-group-toggle="purchases"><span class="nav-icon">▣</span><span>Compras</span><i>⌄</i></button>
+        <button class="nav-group-head" data-group-toggle="purchases"><span class="nav-icon">â–£</span><span>Compras</span><i>âŒ„</i></button>
         <div class="nav-submenu">
           <button data-nav-tab="purchases" data-purchase-view="normal">Compra normal</button>
           <button data-nav-tab="purchases" data-purchase-view="products">Con productos</button>
         </div>
       </div>
 
-      <button class="nav-item" data-tab="expenses"><span class="nav-icon">−</span><span>Gastos</span></button>
-      <button class="nav-item" data-tab="inventory"><span class="nav-icon">▦</span><span>Inventario</span></button>
+      <button class="nav-item" data-tab="expenses"><span class="nav-icon">âˆ’</span><span>Gastos</span></button>
+      <button class="nav-item" data-tab="inventory"><span class="nav-icon">â–¦</span><span>Inventario</span></button>
 
       <div class="nav-group" data-group="production">
-        <button class="nav-group-head" data-group-toggle="production"><span class="nav-icon">◈</span><span>Producción</span><i>⌄</i></button>
+        <button class="nav-group-head" data-group-toggle="production"><span class="nav-icon">â—ˆ</span><span>ProducciÃ³n</span><i>âŒ„</i></button>
         <div class="nav-submenu">
           <button data-nav-tab="production" data-prod-view="overview">Resumen</button>
           <button data-nav-tab="production" data-prod-view="ingredients">Insumos</button>
           <button data-nav-tab="production" data-prod-view="presentations">Presentaciones</button>
           <button data-nav-tab="production" data-prod-view="recipes">Recetas</button>
-          <button data-nav-tab="production" data-prod-view="batches">Producción</button>
+          <button data-nav-tab="production" data-prod-view="batches">ProducciÃ³n</button>
           <button data-nav-tab="production" data-prod-view="waste">Mermas</button>
-          <button data-nav-tab="production" data-prod-view="costs">Variación de costos</button>
+          <button data-nav-tab="production" data-prod-view="costs">VariaciÃ³n de costos</button>
         </div>
       </div>
 
       <button class="nav-item" data-tab="receivables"><span class="nav-icon">$</span><span>Cuentas por cobrar</span></button>
-      <button class="nav-item" data-tab="payables"><span class="nav-icon">¤</span><span>Cuentas por pagar</span></button>
-      <button class="nav-item" data-tab="employees"><span class="nav-icon">◎</span><span>Empleados</span></button>
+      <button class="nav-item" data-tab="payables"><span class="nav-icon">Â¤</span><span>Cuentas por pagar</span></button>
+      <button class="nav-item" data-tab="employees"><span class="nav-icon">â—Ž</span><span>Empleados</span></button>
 
       <div class="nav-group" data-group="catalog">
-        <button class="nav-group-head" data-group-toggle="catalog"><span class="nav-icon">▤</span><span>Catálogo</span><i>⌄</i></button>
+        <button class="nav-group-head" data-group-toggle="catalog"><span class="nav-icon">â–¤</span><span>CatÃ¡logo</span><i>âŒ„</i></button>
         <div class="nav-submenu">
           <button data-nav-tab="catalog" data-catalog-view="products">Productos</button>
           <button data-nav-tab="catalog" data-catalog-view="customers">Clientes</button>
           <button data-nav-tab="catalog" data-catalog-view="suppliers">Proveedores</button>
-          <button data-nav-tab="catalog" data-catalog-view="categories">Categorías</button>
+          <button data-nav-tab="catalog" data-catalog-view="categories">CategorÃ­as</button>
         </div>
       </div>
 
-      <button class="nav-item" data-tab="reports"><span class="nav-icon">◫</span><span>Reportes</span></button>
+      <button class="nav-item" data-tab="reports"><span class="nav-icon">â—«</span><span>Reportes</span></button>
 
       <div class="nav-group" data-group="config">
-        <button class="nav-group-head" data-group-toggle="config"><span class="nav-icon">⚙</span><span>Config</span><i>⌄</i></button>
+        <button class="nav-group-head" data-group-toggle="config"><span class="nav-icon">âš™</span><span>Config</span><i>âŒ„</i></button>
         <div class="nav-submenu">
           <button data-nav-tab="combos">Combos</button>
           <button data-nav-tab="banners">Banners</button>
@@ -79,7 +79,7 @@
 
     <div class="sidebar-foot">
       <span class="status-dot"></span>
-      <div><b>Operación en vivo</b><small>Sistema conectado</small></div>
+      <div><b>OperaciÃ³n en vivo</b><small>Sistema conectado</small></div>
     </div>
   </aside>
 
@@ -87,13 +87,13 @@
 
   <section class="kraken-workspace">
     <header class="kraken-topbar">
-      <button id="mobileMenu" class="mobile-menu" type="button">☰</button>
+      <button id="mobileMenu" class="mobile-menu" type="button">â˜°</button>
       <div class="topbar-context">
         <small id="sectionEyebrow">GERENCIA</small>
         <h1 id="sectionTitle">Dashboard Ejecutivo</h1>
       </div>
       <div class="topbar-center">
-        <span class="business-pill"><i></i> La Bandeja + Beer Station</span>
+        <span class="business-pill"><i></i> Ubicaciones · La Bandeja / Beer Station</span>
       </div>
       <div id="toolbarActions" class="topbar-actions"></div>
     </header>
@@ -104,9 +104,9 @@
   </section>
 </section>
 
-<dialog id="editDialog"><button class="close" data-close>×</button><form id="editForm" class="form-card"></form></dialog>
+<dialog id="editDialog"><button class="close" data-close>Ã—</button><form id="editForm" class="form-card"></form></dialog>
 <div id="toast"></div>
 <script src="/supabase.js"></script>
-<script type="module" src="/admin.js?v=20261004-sidebar-v1"></script>
+<script type="module" src="/admin.js?v=20261004-ghost-v1"></script>
 </body>
 </html>
