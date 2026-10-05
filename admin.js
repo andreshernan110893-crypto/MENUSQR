@@ -182,6 +182,21 @@ function renderDashboard(){
  toolbar("KRAKEN","CENTRO DE MANDO",'<button id="refreshExecutive" class="ghost-refresh">↻ Actualizar</button>');
  $("#content").innerHTML=`
  <section class="kraken-command">
+   <div class="storm-layer" aria-hidden="true">
+     <div class="storm-cloud cloud-one"></div>
+     <div class="storm-cloud cloud-two"></div>
+     <div class="lightning flash-one"></div>
+     <div class="lightning flash-two"></div>
+     <div class="ghost-ship">
+       <div class="ship-mast"></div>
+       <div class="ship-sail sail-left"></div>
+       <div class="ship-sail sail-right"></div>
+       <div class="ship-hull"></div>
+     </div>
+     <div class="sea sea-back"></div>
+     <div class="sea sea-mid"></div>
+     <div class="sea sea-front"></div>
+   </div>
    <div class="ghost-fog fog-a"></div><div class="ghost-fog fog-b"></div>
    <div class="kraken-crest"><span>☠</span></div>
    <div class="command-copy"><small>BITÁCORA DEL CAPITÁN</small><h2>El mar está bajo control.</h2><div class="command-chips"><button data-go="sales">Ventas</button><button data-go="production">Producción</button><button data-go="inventory">Bodega</button><button data-go="reports">Reportes</button></div></div>

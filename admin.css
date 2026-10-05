@@ -265,3 +265,38 @@ body.sidebar-collapsed .nav-submenu{max-height:0!important;opacity:0!important}
 @media(max-width:1180px){.captain-kpis{grid-template-columns:repeat(3,1fr)}.kraken-board{grid-template-columns:1fr 1fr}}
 @media(max-width:860px){.kraken-command{grid-template-columns:1fr;padding:20px}.kraken-crest{display:none}.captain-kpis{grid-template-columns:1fr 1fr}.kraken-board,.kraken-lower{grid-template-columns:1fr}.treasure-card{min-height:190px}.command-copy{padding-top:0}.sea-chart{height:180px}}
 @media(max-width:560px){.captain-kpis{grid-template-columns:1fr}.location-split,.location-cards{grid-template-columns:1fr}.status-wheel{grid-template-columns:1fr 1fr}.loot-list>div{grid-template-columns:28px minmax(0,1fr) auto}.loot-list small{display:none}.signal-list button{grid-template-columns:minmax(0,1fr) auto}.signal-list>button>span{display:none}}
+
+/* KRAKEN STORM / GHOST SHIP V2 */
+.kraken-command{isolation:isolate}
+.kraken-command>*:not(.storm-layer){position:relative;z-index:3}
+.storm-layer{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:
+ radial-gradient(circle at 76% 17%,rgba(195,210,213,.06),transparent 26%),
+ linear-gradient(180deg,rgba(13,25,33,.48),rgba(4,10,14,.18) 45%,rgba(2,7,10,.68) 100%)}
+.storm-layer:before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(104deg,transparent 0 15px,rgba(180,215,222,.06) 16px,transparent 17px 33px);transform:translateX(-6%);animation:rainSweep 1.6s linear infinite;opacity:.42}
+@keyframes rainSweep{from{transform:translate(-7%,-3%)}to{transform:translate(2%,4%)}}
+.storm-cloud{position:absolute;border-radius:50%;filter:blur(24px);opacity:.46;background:#50636a;box-shadow:80px 5px 0 20px #394c54,160px -4px 0 8px #263942,-55px 8px 0 14px #40535a}
+.cloud-one{width:180px;height:50px;top:12px;left:6%;animation:cloudDrift 13s ease-in-out infinite alternate}
+.cloud-two{width:220px;height:60px;top:46px;right:7%;opacity:.34;animation:cloudDrift 17s ease-in-out infinite alternate-reverse}
+@keyframes cloudDrift{from{transform:translateX(-22px)}to{transform:translateX(34px)}}
+.lightning{position:absolute;width:2px;height:95px;top:8px;background:linear-gradient(#d9f5ff,rgba(174,218,236,.55),transparent);clip-path:polygon(40% 0,100% 0,63% 40%,100% 40%,0 100%,35% 52%,0 52%);opacity:0;filter:drop-shadow(0 0 8px rgba(177,224,255,.65))}
+.flash-one{left:29%;animation:stormFlash 8s infinite}
+.flash-two{right:24%;height:74px;animation:stormFlash 11s 3.5s infinite}
+@keyframes stormFlash{0%,87%,100%{opacity:0}88%{opacity:.85}89%{opacity:.18}90%{opacity:.7}91%{opacity:0}}
+.ghost-ship{position:absolute;right:11%;bottom:64px;width:220px;height:122px;opacity:.22;filter:drop-shadow(0 8px 12px rgba(0,0,0,.6));animation:shipRock 5.6s ease-in-out infinite;transform-origin:50% 100%}
+.ship-hull{position:absolute;left:17px;bottom:2px;width:186px;height:38px;background:linear-gradient(180deg,#1a2427,#060a0c);clip-path:polygon(0 0,100% 0,84% 84%,28% 100%,8% 66%);border-top:2px solid rgba(188,162,99,.18)}
+.ship-hull:after{content:"";position:absolute;left:38px;right:28px;top:10px;height:5px;background:repeating-linear-gradient(90deg,rgba(194,165,98,.3) 0 14px,transparent 14px 23px)}
+.ship-mast{position:absolute;left:111px;bottom:35px;width:4px;height:88px;background:#2a2620;box-shadow:0 0 0 1px rgba(204,177,109,.08)}
+.ship-mast:before{content:"";position:absolute;width:116px;height:3px;background:#302a22;left:-57px;top:20px}
+.ship-sail{position:absolute;background:linear-gradient(145deg,rgba(74,82,80,.9),rgba(17,25,27,.95));filter:drop-shadow(0 0 3px rgba(0,0,0,.7))}
+.sail-left{width:73px;height:65px;left:39px;bottom:48px;clip-path:polygon(100% 0,100% 100%,0 70%)}
+.sail-right{width:76px;height:60px;left:116px;bottom:51px;clip-path:polygon(0 0,100% 73%,0 100%)}
+@keyframes shipRock{0%,100%{transform:translateY(1px) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1.2deg)}}
+.sea{position:absolute;left:-8%;width:116%;border-radius:50% 50% 0 0/100% 100% 0 0;transform-origin:50% 100%}
+.sea-back{height:64px;bottom:26px;background:rgba(39,85,89,.33);animation:seaMoveA 5s ease-in-out infinite alternate}
+.sea-mid{height:54px;bottom:2px;background:rgba(18,60,65,.48);animation:seaMoveB 3.8s ease-in-out infinite alternate-reverse}
+.sea-front{height:35px;bottom:-11px;background:#071216;box-shadow:0 -7px 18px rgba(54,110,112,.12);animation:seaMoveA 3.2s ease-in-out infinite alternate}
+@keyframes seaMoveA{from{transform:translateX(-1.5%) scaleY(.92)}to{transform:translateX(1.5%) scaleY(1.08)}}
+@keyframes seaMoveB{from{transform:translateX(2%) scaleY(1.02)}to{transform:translateX(-2%) scaleY(.9)}}
+.kraken-command:hover .ghost-ship{opacity:.3}
+@media(prefers-reduced-motion:reduce){.storm-layer:before,.storm-cloud,.lightning,.ghost-ship,.sea{animation:none!important}}
+@media(max-width:860px){.ghost-ship{right:3%;bottom:72px;transform:scale(.8);transform-origin:100% 100%;opacity:.17}.storm-layer:before{opacity:.25}}
