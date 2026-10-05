@@ -3,109 +3,97 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>KRAKEN · Operations Center</title>
+<title>KRAKEN · Control Total</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/admin.css?v=20261005-command-v1">
+<link rel="stylesheet" href="/admin.css?v=20261005-kraken-wow-v1">
 </head>
-<body class="command-ui">
-<section id="adminView" class="command-app">
-  <header class="command-header">
-    <div class="command-brand">
-      <div class="command-logo">K</div>
-      <div>
-        <strong>KRAKEN</strong>
-        <small>Operations Center</small>
+<body class="kraken-wow">
+<section id="adminView" class="wow-app">
+  <aside class="wow-sidebar">
+    <div class="wow-brand">
+      <div class="wow-emblem">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1"><stop stop-color="#2db6ff"/><stop offset="1" stop-color="#0059ff"/></linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <path d="M60 10 78 30 70 51 91 38 100 54 82 69 104 73 96 92 72 82 60 108 48 82 24 92 16 73 38 69 20 54 29 38 50 51 42 30Z" fill="#0a1220" stroke="url(#g1)" stroke-width="4" filter="url(#glow)"/>
+          <path d="M42 54 60 38 78 54 70 72 60 84 50 72Z" fill="#101b2c" stroke="#22a8ff" stroke-width="3"/>
+          <circle cx="52" cy="59" r="4" fill="#2cc8ff" filter="url(#glow)"/><circle cx="68" cy="59" r="4" fill="#2cc8ff" filter="url(#glow)"/>
+        </svg>
       </div>
+      <div><strong>KRAKEN</strong><small>CONTROL TOTAL</small></div>
     </div>
 
-    <div class="command-location">
-      <span class="live-dot"></span>
-      <b>La Bandeja</b>
-      <span class="location-divider">/</span>
-      <b>Beer Station</b>
-    </div>
-
-    <div class="command-tools">
-      <button id="globalSearchBtn" type="button" class="icon-action" title="Buscar">⌕</button>
-      <div id="toolbarActions" class="topbar-actions"></div>
-      <button id="mobileMenu" class="icon-action mobile-only" type="button">☰</button>
-    </div>
-  </header>
-
-  <nav id="tabs" class="command-nav">
-    <button class="nav-item active" data-tab="dashboard"><span>Dashboard</span></button>
-    <button class="nav-item" data-tab="sales"><span>Ventas</span></button>
-
-    <div class="nav-group" data-group="purchases">
-      <button class="nav-group-head" data-group-toggle="purchases"><span>Compras</span><i>⌄</i></button>
-      <div class="nav-submenu">
-        <button data-nav-tab="purchases" data-purchase-view="normal">Compra normal</button>
-        <button data-nav-tab="purchases" data-purchase-view="products">Con productos</button>
+    <nav id="tabs" class="wow-nav">
+      <button class="nav-item active" data-tab="dashboard"><span class="nav-symbol">⌂</span><span>Dashboard</span></button>
+      <button class="nav-item" data-tab="sales"><span class="nav-symbol">◒</span><span>Ventas</span></button>
+      <div class="nav-group" data-group="purchases">
+        <button class="nav-group-head" data-group-toggle="purchases"><span class="nav-symbol">▱</span><span>Compras</span><i>›</i></button>
+        <div class="nav-submenu">
+          <button data-nav-tab="purchases" data-purchase-view="normal">Compra normal</button>
+          <button data-nav-tab="purchases" data-purchase-view="products">Con productos</button>
+        </div>
       </div>
-    </div>
-
-    <button class="nav-item" data-tab="expenses"><span>Gastos</span></button>
-    <button class="nav-item" data-tab="inventory"><span>Inventario</span></button>
-
-    <div class="nav-group" data-group="production">
-      <button class="nav-group-head" data-group-toggle="production"><span>Producción</span><i>⌄</i></button>
-      <div class="nav-submenu">
-        <button data-nav-tab="production" data-prod-view="overview">Resumen</button>
-        <button data-nav-tab="production" data-prod-view="ingredients">Insumos</button>
-        <button data-nav-tab="production" data-prod-view="presentations">Presentaciones</button>
-        <button data-nav-tab="production" data-prod-view="recipes">Recetas</button>
-        <button data-nav-tab="production" data-prod-view="batches">Producción</button>
-        <button data-nav-tab="production" data-prod-view="waste">Mermas</button>
-        <button data-nav-tab="production" data-prod-view="costs">Variación de costos</button>
+      <button class="nav-item" data-tab="expenses"><span class="nav-symbol">▤</span><span>Gastos</span></button>
+      <button class="nav-item" data-tab="inventory"><span class="nav-symbol">◇</span><span>Inventario</span></button>
+      <div class="nav-group" data-group="production">
+        <button class="nav-group-head" data-group-toggle="production"><span class="nav-symbol">▥</span><span>Producción</span><i>›</i></button>
+        <div class="nav-submenu">
+          <button data-nav-tab="production" data-prod-view="overview">Resumen</button>
+          <button data-nav-tab="production" data-prod-view="ingredients">Insumos</button>
+          <button data-nav-tab="production" data-prod-view="presentations">Presentaciones</button>
+          <button data-nav-tab="production" data-prod-view="recipes">Recetas</button>
+          <button data-nav-tab="production" data-prod-view="batches">Producción</button>
+          <button data-nav-tab="production" data-prod-view="waste">Mermas</button>
+          <button data-nav-tab="production" data-prod-view="costs">Variación de costos</button>
+        </div>
       </div>
-    </div>
-
-    <button class="nav-item" data-tab="receivables"><span>CxC</span></button>
-    <button class="nav-item" data-tab="payables"><span>CxP</span></button>
-    <button class="nav-item" data-tab="employees"><span>Empleados</span></button>
-
-    <div class="nav-group" data-group="catalog">
-      <button class="nav-group-head" data-group-toggle="catalog"><span>Catálogo</span><i>⌄</i></button>
-      <div class="nav-submenu">
-        <button data-nav-tab="catalog" data-catalog-view="products">Productos</button>
-        <button data-nav-tab="catalog" data-catalog-view="customers">Clientes</button>
-        <button data-nav-tab="catalog" data-catalog-view="suppliers">Proveedores</button>
-        <button data-nav-tab="catalog" data-catalog-view="categories">Categorías</button>
+      <button class="nav-item" data-tab="receivables"><span class="nav-symbol">⇄</span><span>CxC</span></button>
+      <button class="nav-item" data-tab="payables"><span class="nav-symbol">⇆</span><span>CxP</span></button>
+      <button class="nav-item" data-tab="employees"><span class="nav-symbol">◎</span><span>Empleados</span></button>
+      <div class="nav-group" data-group="catalog">
+        <button class="nav-group-head" data-group-toggle="catalog"><span class="nav-symbol">▦</span><span>Catálogo</span><i>›</i></button>
+        <div class="nav-submenu">
+          <button data-nav-tab="catalog" data-catalog-view="products">Productos</button>
+          <button data-nav-tab="catalog" data-catalog-view="customers">Clientes</button>
+          <button data-nav-tab="catalog" data-catalog-view="suppliers">Proveedores</button>
+          <button data-nav-tab="catalog" data-catalog-view="categories">Categorías</button>
+        </div>
       </div>
-    </div>
-
-    <button class="nav-item" data-tab="reports"><span>Reportes</span></button>
-
-    <div class="nav-group" data-group="config">
-      <button class="nav-group-head" data-group-toggle="config"><span>Config</span><i>⌄</i></button>
-      <div class="nav-submenu submenu-right">
-        <button data-nav-tab="combos">Combos</button>
-        <button data-nav-tab="banners">Banners</button>
-        <button data-nav-tab="promotions">Promociones</button>
-        <button data-nav-tab="extras">Extras y opciones</button>
-        <button data-nav-tab="branding">Logos y marcas</button>
-        <button data-nav-tab="places">Ubicaciones</button>
-        <button data-nav-tab="orders">Pedidos operativos</button>
-        <button data-nav-tab="feedback">Feedback</button>
+      <button class="nav-item" data-tab="reports"><span class="nav-symbol">▥</span><span>Reportes</span></button>
+      <div class="nav-group" data-group="config">
+        <button class="nav-group-head" data-group-toggle="config"><span class="nav-symbol">⚙</span><span>Configuración</span><i>›</i></button>
+        <div class="nav-submenu">
+          <button data-nav-tab="combos">Combos</button><button data-nav-tab="banners">Banners</button><button data-nav-tab="promotions">Promociones</button>
+          <button data-nav-tab="extras">Extras</button><button data-nav-tab="branding">Marcas</button><button data-nav-tab="places">Ubicaciones</button>
+          <button data-nav-tab="orders">Pedidos</button><button data-nav-tab="feedback">Feedback</button>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <main class="command-main">
-    <div class="command-page-head">
-      <div>
-        <small id="sectionEyebrow">GERENCIA</small>
-        <h1 id="sectionTitle">Dashboard Ejecutivo</h1>
+    <div class="wow-sidefoot"><span></span><div><b>Sistema operativo</b><small>Conectado</small></div></div>
+  </aside>
+
+  <section class="wow-workspace">
+    <header class="wow-topbar">
+      <button id="mobileMenu" class="mobile-menu">☰</button>
+      <div class="wow-search">
+        <button id="globalSearchBtn" type="button">⌕</button><span>Buscar en el sistema...</span><kbd>Ctrl + K</kbd>
       </div>
-      <div class="page-status">
-        <span class="live-dot"></span>
-        <span>Operación en vivo</span>
+      <div class="wow-user"><div class="user-orb">AH</div><div><b>Andres Hernandez</b><small>Administrador</small></div><span>⌄</span></div>
+      <div id="toolbarActions" class="wow-actions"></div>
+    </header>
+
+    <main class="wow-main">
+      <div class="wow-page-head">
+        <div><small id="sectionEyebrow">OPERACIÓN</small><h1 id="sectionTitle">Dashboard Ejecutivo</h1></div>
       </div>
-    </div>
-    <section id="content"></section>
-  </main>
+      <section id="content"></section>
+    </main>
+  </section>
 </section>
 
 <div id="searchPalette" class="search-palette" hidden>
@@ -119,6 +107,6 @@
 <dialog id="editDialog"><button class="close" data-close>&times;</button><form id="editForm" class="form-card"></form></dialog>
 <div id="toast"></div>
 <script src="/supabase.js"></script>
-<script type="module" src="/admin.js?v=20261005-command-v1"></script>
+<script type="module" src="/admin.js?v=20261005-kraken-wow-v1"></script>
 </body>
 </html>
