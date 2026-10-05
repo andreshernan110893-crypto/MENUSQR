@@ -1794,3 +1794,264 @@ html,body,.kraken-wow{background:#020406!important}
 .kraken-wow ::-webkit-scrollbar-thumb:hover{
   background:linear-gradient(180deg,#1b3d5c,#102a42)!important;
 }
+
+/* KRAKEN professional black theme v12 */
+:root{
+  --k-bg:#000000;
+  --k-bg-soft:#050607;
+  --k-panel:#07090b;
+  --k-panel-2:#0a0d10;
+  --k-border:#20262d;
+  --k-border-soft:#171c21;
+  --k-text:#f2f4f6;
+  --k-muted:#8d98a3;
+  --k-muted-2:#67727d;
+  --k-accent:#1c3145;
+  --k-accent-2:#29455f;
+  --k-glow:rgba(38,67,94,.16);
+}
+
+html,body,.kraken-wow{
+  background:#000!important;
+  color:var(--k-text)!important;
+}
+
+.kraken-wow{
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,.72)),
+    linear-gradient(90deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.72) 28%,rgba(0,0,0,.40) 55%,rgba(0,0,0,.58) 100%),
+    url('/assets/new/kraken-hero-clean.jpg') center top/cover fixed no-repeat!important;
+}
+
+.kraken-wow .wow-app:before{
+  background:
+    radial-gradient(circle at 64% 18%,rgba(43,69,91,.035),transparent 30%),
+    linear-gradient(90deg,rgba(0,0,0,.38),transparent 44%,rgba(0,0,0,.14))!important;
+}
+
+.kraken-wow .wow-sidebar{
+  background:linear-gradient(180deg,rgba(0,0,0,.97),rgba(4,5,6,.94))!important;
+  border-right:1px solid #181d22!important;
+  box-shadow:16px 0 40px rgba(0,0,0,.34)!important;
+  backdrop-filter:blur(16px) saturate(82%)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(82%)!important;
+}
+
+.kraken-wow .wow-brand-image{
+  background:linear-gradient(180deg,rgba(0,0,0,.88),rgba(4,5,6,.72))!important;
+  border-bottom:1px solid #171b20!important;
+}
+
+.kraken-wow .wow-brand-image img{
+  opacity:.78!important;
+  filter:grayscale(.18) brightness(.82) contrast(1.02) drop-shadow(0 0 8px rgba(37,61,82,.10))!important;
+}
+
+.kraken-wow .brand-system{
+  color:#747e88!important;
+  opacity:.72!important;
+}
+
+.kraken-wow .wow-topbar{
+  background:rgba(0,0,0,.84)!important;
+  border-bottom:1px solid #191e23!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(14px) saturate(84%)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(84%)!important;
+}
+
+.kraken-wow .wow-main,
+.kraken-wow #content{
+  background:transparent!important;
+}
+
+.kraken-wow .nav-item,
+.kraken-wow .nav-group-head{
+  color:#a0a8b0!important;
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+
+.kraken-wow .nav-item:hover,
+.kraken-wow .nav-group-head:hover{
+  color:#e9edf1!important;
+  background:#0a0d10!important;
+  box-shadow:inset 0 0 0 1px #1d2329!important;
+}
+
+.kraken-wow .nav-item.active{
+  color:#fff!important;
+  background:linear-gradient(90deg,#0d1115,#07090b)!important;
+  border:1px solid #242b32!important;
+  box-shadow:
+    inset 3px 0 0 #31485c,
+    0 8px 18px rgba(0,0,0,.22)!important;
+}
+
+.kraken-wow .nav-symbol{
+  background:#090c0f!important;
+  border:1px solid #252c33!important;
+  color:#8493a0!important;
+  box-shadow:none!important;
+}
+
+.kraken-wow .nav-item.active .nav-symbol{
+  color:#a9bac7!important;
+  border-color:#33414d!important;
+  background:#0c1116!important;
+}
+
+.kraken-wow .wow-sidefoot{
+  background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.72))!important;
+  border-top:1px solid #181d22!important;
+}
+
+.exact-kpi,
+.exact-panel,
+.exact-shortcuts button,
+.finance-mini{
+  background:linear-gradient(145deg,rgba(8,10,12,.92),rgba(3,4,5,.90))!important;
+  border:1px solid #22282f!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.015),
+    0 10px 24px rgba(0,0,0,.28)!important;
+  backdrop-filter:blur(12px) saturate(78%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(78%)!important;
+}
+
+.exact-kpi:hover,
+.exact-panel:hover,
+.exact-shortcuts button:hover,
+.finance-mini:hover{
+  border-color:#303841!important;
+  background:linear-gradient(145deg,rgba(12,15,18,.95),rgba(4,5,7,.92))!important;
+  box-shadow:
+    0 0 18px rgba(36,58,78,.10),
+    0 14px 30px rgba(0,0,0,.32)!important;
+  transform:translateY(-1px);
+}
+
+.exact-kpi h3,
+.exact-kpi b,
+.exact-panel b,
+.finance-mini-copy b,
+.exact-shortcuts b{
+  color:#f3f5f7!important;
+}
+
+.exact-kpi small,
+.exact-panel small,
+.finance-mini-copy small,
+.exact-shortcuts small,
+.finance-mini-copy span{
+  color:#7d8791!important;
+}
+
+.exact-panel-head,
+.exact-panel-head b{
+  color:#e9edf1!important;
+}
+
+.exact-panel-head span,
+.see-all,
+.exact-shortcuts .activity-shortcut>span{
+  color:#788b9b!important;
+}
+
+.period-tabs button{
+  background:#07090b!important;
+  border-color:#23292f!important;
+  color:#7f8993!important;
+  box-shadow:none!important;
+}
+
+.period-tabs button.active{
+  background:#12171c!important;
+  border-color:#39434d!important;
+  color:#dce3e9!important;
+  box-shadow:inset 0 0 12px rgba(55,75,93,.08)!important;
+}
+
+.finance-expenses,
+.finance-purchases{
+  background:linear-gradient(145deg,rgba(9,10,12,.92),rgba(3,4,5,.90))!important;
+  border-color:#252b31!important;
+}
+
+.finance-expenses .finance-mini-icon,
+.finance-purchases .finance-mini-icon,
+.exact-shortcuts .activity-shortcut>span{
+  background:#0b0f13!important;
+  border-color:#2a3239!important;
+  color:#8999a6!important;
+}
+
+.exact-shortcuts .green,
+.exact-shortcuts .blue,
+.exact-shortcuts .purple,
+.exact-shortcuts .gold{
+  border-color:#23292f!important;
+}
+
+.exact-shortcuts .green>span,
+.exact-shortcuts .blue>span,
+.exact-shortcuts .purple>span,
+.exact-shortcuts .gold>span{
+  background:#0a0d10!important;
+  border:1px solid #252c33!important;
+  color:#8997a3!important;
+}
+
+.exact-shortcuts .green>i,
+.exact-shortcuts .blue>i,
+.exact-shortcuts .purple>i,
+.exact-shortcuts .gold>i{
+  color:#748491!important;
+}
+
+.dashboard-kraken-window:after{
+  background:linear-gradient(90deg,transparent,rgba(73,84,94,.15),transparent)!important;
+}
+
+.exact-main-grid .chart-wrap,
+.exact-main-grid .sales-chart,
+.exact-main-grid svg{
+  filter:saturate(.35) brightness(.82) contrast(1.02)!important;
+}
+
+.kraken-wow input,
+.kraken-wow select,
+.kraken-wow textarea,
+.kraken-wow button{
+  accent-color:#334b5f!important;
+}
+
+.kraken-wow input,
+.kraken-wow select,
+.kraken-wow textarea{
+  background:#080a0c!important;
+  border-color:#242b31!important;
+  color:#edf1f4!important;
+}
+
+.kraken-wow input:focus,
+.kraken-wow select:focus,
+.kraken-wow textarea:focus{
+  border-color:#3a4752!important;
+  box-shadow:0 0 0 2px rgba(51,71,89,.10)!important;
+}
+
+.kraken-wow ::-webkit-scrollbar-track{
+  background:#040506!important;
+}
+
+.kraken-wow ::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#1a2026,#101419)!important;
+  border:1px solid #252c32!important;
+  box-shadow:none!important;
+}
+
+.kraken-wow ::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#252c33,#151a20)!important;
+}
