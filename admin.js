@@ -49,8 +49,28 @@ $("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>navigateAdmin
 $("#tabs").querySelectorAll("[data-nav-tab]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.navTab,{purchaseView:b.dataset.purchaseView,prodView:b.dataset.prodView,catalogView:b.dataset.catalogView}));
 $("#tabs").querySelectorAll("[data-group-toggle]").forEach(b=>b.onclick=()=>{const g=b.closest(".nav-group");g.classList.toggle("open")});
 $("#sidebarCollapse")?.addEventListener("click",()=>document.body.classList.toggle("sidebar-collapsed"));
-$("#mobileMenu")?.addEventListener("click",()=>{$("#sidebar")?.classList.add("mobile-open");$("#sidebarBackdrop")?.classList.add("show")});
-$("#sidebarBackdrop")?.addEventListener("click",()=>{$("#sidebar")?.classList.remove("mobile-open");$("#sidebarBackdrop")?.classList.remove("show")});
+$("#mobileMenu")?.addEventListener("click",()=>$("#tabs")?.classList.toggle("mobile-open"));
+function openSearch(){
+ const p=$("#searchPalette"),i=$("#globalSearchInput");if(!p)return;p.hidden=false;document.body.classList.add("search-open");setTimeout(()=>i?.focus(),30);renderGlobalSearch("");
+}
+function closeSearch(){const p=$("#searchPalette");if(!p)return;p.hidden=true;document.body.classList.remove("search-open")}
+function renderGlobalSearch(q){
+ const box=$("#searchResults");if(!box)return;
+ const term=String(q||"").trim().toLowerCase();
+ const modules=[["dashboard","Dashboard"],["sales","Ventas"],["purchases","Compras"],["expenses","Gastos"],["inventory","Inventario"],["production","Producción"],["receivables","Cuentas por cobrar"],["payables","Cuentas por pagar"],["employees","Empleados"],["catalog","Catálogo"],["reports","Reportes"],["places","Ubicaciones"]];
+ let rows=modules.filter(x=>!term||x[1].toLowerCase().includes(term)).slice(0,5).map(x=>({kind:"Módulo",title:x[1],sub:"Abrir módulo",tab:x[0]}));
+ if(term){
+  rows.push(...state.products.filter(x=>String(x.name||"").toLowerCase().includes(term)).slice(0,5).map(x=>({kind:"Producto",title:x.name,sub:"Catálogo de productos",tab:"catalog",catalogView:"products"})));
+  rows.push(...state.customers.filter(x=>String(x.name||"").toLowerCase().includes(term)).slice(0,4).map(x=>({kind:"Cliente",title:x.name,sub:x.phone||"Cliente",tab:"catalog",catalogView:"customers"})));
+ }
+ box.innerHTML=rows.length?rows.map((x,i)=>'<button data-search-index="'+i+'"><span>'+safe(x.kind)+'</span><b>'+safe(x.title)+'</b><small>'+safe(x.sub)+'</small></button>').join(""):'<div class="search-empty">Sin resultados</div>';
+ box.querySelectorAll("[data-search-index]").forEach(b=>b.onclick=()=>{const x=rows[Number(b.dataset.searchIndex)];closeSearch();navigateAdmin(x.tab,{catalogView:x.catalogView})});
+}
+$("#globalSearchBtn")?.addEventListener("click",openSearch);
+$("#closeSearch")?.addEventListener("click",closeSearch);
+$("#globalSearchInput")?.addEventListener("input",e=>renderGlobalSearch(e.target.value));
+$("#searchPalette")?.addEventListener("click",e=>{if(e.target.id==="searchPalette")closeSearch()});
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();openSearch()}if(e.key==="Escape")closeSearch()});
 syncNavigation();
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>b.closest("dialog").close());
 
@@ -162,67 +182,90 @@ function renderFeedback(){
 const L=n=>"L "+Number(n||0).toLocaleString("es-HN",{minimumFractionDigits:2,maximumFractionDigits:2});
 function crmCard(label,value,sub=""){return '<article class="crm-kpi"><span>'+label+'</span><b>'+value+'</b><small>'+sub+'</small></article>'}
 function renderDashboard(){
- const all=state.orders.filter(o=>o.sale_recorded_at&&o.status!=="CANCELLED");
+ const valid=state.orders.filter(o=>o.sale_recorded_at&&o.status!=="CANCELLED");
  const now=new Date(),todayKey=now.toLocaleDateString("en-CA");
- const startWeek=new Date(now);startWeek.setDate(now.getDate()-6);startWeek.setHours(0,0,0,0);
- const today=all.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===todayKey);
- const week=all.filter(o=>new Date(o.sale_recorded_at)>=startWeek);
+ const today=valid.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===todayKey);
+ const total=today.reduce((a,o)=>a+Number(o.total||0),0);
+ const avg=today.length?total/today.length:0;
+ const weekStart=new Date(now);weekStart.setDate(now.getDate()-6);weekStart.setHours(0,0,0,0);
+ const week=valid.filter(o=>new Date(o.sale_recorded_at)>=weekStart);
+ const weekTotal=week.reduce((a,o)=>a+Number(o.total||0),0);
  const active=state.orders.filter(o=>["RECEIVED","PREPARING","READY"].includes(o.status));
- const totalToday=today.reduce((a,o)=>a+Number(o.total||0),0),totalWeek=week.reduce((a,o)=>a+Number(o.total||0),0),avg=today.length?totalToday/today.length:0;
- const lb=today.filter(o=>o.station==="LB").reduce((a,o)=>a+Number(o.total||0),0),bs=today.filter(o=>o.station==="BS").reduce((a,o)=>a+Number(o.total||0),0);
  const cxcOpen=state.receivables.filter(x=>x.status==="OPEN"),cxpOpen=state.payables.filter(x=>x.status==="OPEN");
  const cxc=cxcOpen.reduce((a,x)=>a+Number(x.balance||0),0),cxp=cxpOpen.reduce((a,x)=>a+Number(x.balance||0),0);
- const low=state.ingredientStock.filter(x=>{const i=state.inventoryItems.find(z=>z.id===x.item_id);return i&&Number(x.qty_base)<=Number(x.min_qty_base||0)});
- const wasteToday=state.wasteRecords.filter(x=>String(x.waste_date)===todayKey).reduce((a,x)=>a+Number(x.total_cost||0),0);
- const recent=all.slice().sort((a,b)=>new Date(b.sale_recorded_at)-new Date(a.sale_recorded_at)).slice(0,5);
- const dayPoints=[];for(let n=6;n>=0;n--){const d=new Date(now);d.setDate(now.getDate()-n);const k=d.toLocaleDateString("en-CA"),v=all.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===k).reduce((a,o)=>a+Number(o.total||0),0);dayPoints.push({label:d.toLocaleDateString("es-HN",{weekday:"short"}),value:v})}
+ const lb=today.filter(o=>o.station==="LB").reduce((a,o)=>a+Number(o.total||0),0);
+ const bs=today.filter(o=>o.station==="BS").reduce((a,o)=>a+Number(o.total||0),0);
+ const dayPoints=[];for(let n=6;n>=0;n--){const d=new Date(now);d.setDate(now.getDate()-n);const k=d.toLocaleDateString("en-CA");const v=valid.filter(o=>new Date(o.sale_recorded_at).toLocaleDateString("en-CA")===k).reduce((a,o)=>a+Number(o.total||0),0);dayPoints.push({label:d.toLocaleDateString("es-HN",{weekday:"short"}),value:v})}
  const maxDay=Math.max(1,...dayPoints.map(x=>x.value));
- const itemMap=new Map();today.forEach(o=>(o.order_items||[]).forEach(i=>{const k=i.product_name||"Producto",v=itemMap.get(k)||{qty:0,amount:0};v.qty+=Number(i.qty||0);v.amount+=Number(i.line_total||0);itemMap.set(k,v)}));
- const top=[...itemMap.entries()].sort((a,b)=>b[1].amount-a[1].amount).slice(0,4);
- toolbar("KRAKEN","CENTRO DE MANDO",'<button id="refreshExecutive" class="ghost-refresh">↻ Actualizar</button>');
+ const topMap=new Map();today.forEach(o=>(o.order_items||[]).forEach(i=>{const k=i.product_name||"Producto",v=topMap.get(k)||{qty:0,amount:0};v.qty+=Number(i.qty||0);v.amount+=Number(i.line_total||0);topMap.set(k,v)}));
+ const top=[...topMap.entries()].sort((a,b)=>b[1].amount-a[1].amount).slice(0,5);
+ const recent=valid.slice().sort((a,b)=>new Date(b.sale_recorded_at)-new Date(a.sale_recorded_at)).slice(0,5);
+ toolbar("Dashboard","OPERACIÓN",'<button id="refreshExecutive">Actualizar</button>');
  $("#content").innerHTML=`
- <section class="kraken-command">
-   <div class="storm-layer" aria-hidden="true">
-     <div class="storm-cloud cloud-one"></div>
-     <div class="storm-cloud cloud-two"></div>
-     <div class="lightning flash-one"></div>
-     <div class="lightning flash-two"></div>
-     <div class="ghost-ship">
-       <div class="ship-mast"></div>
-       <div class="ship-sail sail-left"></div>
-       <div class="ship-sail sail-right"></div>
-       <div class="ship-hull"></div>
+ <section class="pulse-hero spotlight-card">
+   <div class="pulse-copy">
+     <div class="pulse-badge"><span></span> Sistema operativo</div>
+     <h2>Todo lo importante,<br><em>en una sola vista.</em></h2>
+     <p>Operación, ventas y control financiero en tiempo real.</p>
+     <div class="pulse-actions">
+       <button data-go="sales">Ver ventas</button>
+       <button data-go="orders">Pedidos activos</button>
+       <button data-go="reports">Abrir reportes</button>
      </div>
-     <div class="sea sea-back"></div>
-     <div class="sea sea-mid"></div>
-     <div class="sea sea-front"></div>
    </div>
-   <div class="ghost-fog fog-a"></div><div class="ghost-fog fog-b"></div>
-   <div class="kraken-crest"><span>☠</span></div>
-   <div class="command-copy"><small>RESUMEN EJECUTIVO</small><h2>Control total de la operación.</h2><div class="command-chips"><button data-go="sales">Ventas</button><button data-go="production">Producción</button><button data-go="inventory">Bodega</button><button data-go="reports">Reportes</button></div></div>
-   <div class="treasure-card"><span>VENTAS DEL DÍA</span><strong>${L(totalToday)}</strong><small>${today.length} ventas · ticket ${L(avg)}</small><div class="location-split"><button data-location="LB"><b>La Bandeja</b><span>${L(lb)}</span></button><button data-location="BS"><b>Beer Station</b><span>${L(bs)}</span></button></div></div>
+   <div class="pulse-number">
+     <span>VENTAS DE HOY</span>
+     <strong>${L(total)}</strong>
+     <small>${today.length} operaciones · ticket ${L(avg)}</small>
+     <div class="location-mini">
+       <div><span>La Bandeja</span><b>${L(lb)}</b></div>
+       <div><span>Beer Station</span><b>${L(bs)}</b></div>
+     </div>
+   </div>
  </section>
- <section class="captain-kpis">
-   <button class="captain-kpi" data-go="sales"><span>VENTAS 7 DÍAS</span><b>${L(totalWeek)}</b><small>${week.length} operaciones</small></button>
-   <button class="captain-kpi" data-go="orders"><span>PEDIDOS ACTIVOS</span><b>${active.length}</b><small>en proceso</small></button>
-   <button class="captain-kpi warning" data-go="receivables"><span>POR COBRAR</span><b>${L(cxc)}</b><small>${cxcOpen.length} cuentas</small></button>
-   <button class="captain-kpi warning" data-go="payables"><span>POR PAGAR</span><b>${L(cxp)}</b><small>${cxpOpen.length} cuentas</small></button>
-   <button class="captain-kpi danger" data-go="production"><span>MERMA HOY</span><b>${L(wasteToday)}</b><small>${low.length} alertas de stock</small></button>
+ <section class="metric-strip">
+   <button data-go="sales"><span>Últimos 7 días</span><b>${L(weekTotal)}</b><small>${week.length} ventas</small></button>
+   <button data-go="orders"><span>Pedidos activos</span><b>${active.length}</b><small>en operación</small></button>
+   <button data-go="receivables"><span>Por cobrar</span><b>${L(cxc)}</b><small>${cxcOpen.length} cuentas</small></button>
+   <button data-go="payables"><span>Por pagar</span><b>${L(cxp)}</b><small>${cxpOpen.length} cuentas</small></button>
  </section>
- <section class="kraken-board">
-   <article class="deck-panel chart-panel"><div class="deck-head"><div><small>TENDENCIA DE VENTAS</small><h3>Últimos 7 días</h3></div><span>${L(totalWeek)}</span></div><div class="sea-chart">${dayPoints.map(x=>`<div class="sea-day"><span>${safe(x.label)}</span><div class="sea-column"><i style="height:${Math.max(5,(x.value/maxDay)*100)}%"></i></div><b>${x.value?L(x.value):"—"}</b></div>`).join("")}</div></article>
-   <article class="deck-panel live-deck"><div class="deck-head"><div><small>OPERACIÓN EN VIVO</small><h3>Pedidos</h3></div><span class="signal-live">● EN VIVO</span></div><div class="status-wheel"><button data-order-filter="RECEIVED"><b>${state.orders.filter(o=>o.status==="RECEIVED").length}</b><span>Recibidos</span></button><button data-order-filter="PREPARING"><b>${state.orders.filter(o=>o.status==="PREPARING").length}</b><span>Preparando</span></button><button data-order-filter="READY"><b>${state.orders.filter(o=>o.status==="READY").length}</b><span>Listos</span></button><button data-order-filter="DELIVERED"><b>${state.orders.filter(o=>o.status==="DELIVERED").length}</b><span>Entregados</span></button></div><button class="deck-action" data-go="orders">Abrir pedidos</button></article>
-   <article class="deck-panel compass-panel"><div class="deck-head"><div><small>UBICACIONES</small><h3>Ubicaciones</h3></div></div><div class="compass-core"><span>N</span><i></i><b>K</b></div><div class="location-cards"><button data-location="LB"><b>La Bandeja</b><span>${L(lb)}</span><small>hoy</small></button><button data-location="BS"><b>Beer Station</b><span>${L(bs)}</span><small>hoy</small></button></div><button class="deck-action" data-go="places">Administrar ubicaciones</button></article>
-   <article class="deck-panel danger-log"><div class="deck-head"><div><small>ALERTAS</small><h3>Alertas</h3></div><span class="danger-count">${low.length+cxcOpen.length+cxpOpen.length}</span></div><div class="captain-log">${low.slice(0,3).map(x=>{const i=state.inventoryItems.find(z=>z.id===x.item_id);return `<button data-go="production"><span>Stock bajo</span><b>${safe(i?.name||"Insumo")}</b></button>`}).join("")}${cxcOpen.length?`<button data-go="receivables"><span>Cartera</span><b>${cxcOpen.length} CxC abiertas</b></button>`:""}${cxpOpen.length?`<button data-go="payables"><span>Obligaciones</span><b>${cxpOpen.length} CxP abiertas</b></button>`:""}${!low.length&&!cxcOpen.length&&!cxpOpen.length?'<div class="calm-seas">Sin alertas críticas.</div>':""}</div></article>
+ <section class="command-grid">
+   <article class="command-card chart-command spotlight-card">
+     <div class="card-head"><div><small>VENTAS</small><h3>Tendencia semanal</h3></div><span>${L(weekTotal)}</span></div>
+     <div class="modern-chart">${dayPoints.map(x=>`<div><b>${x.value?L(x.value):""}</b><i><em style="height:${Math.max(x.value?8:2,(x.value/maxDay)*100)}%"></em></i><span>${safe(x.label)}</span></div>`).join("")}</div>
+   </article>
+   <article class="command-card live-command">
+     <div class="card-head"><div><small>EN VIVO</small><h3>Flujo de pedidos</h3></div><span class="online-label">LIVE</span></div>
+     <div class="order-pulse">
+       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="RECEIVED").length}</b><span>Recibidos</span></button>
+       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="PREPARING").length}</b><span>Preparando</span></button>
+       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="READY").length}</b><span>Listos</span></button>
+       <button data-go="orders"><b>${state.orders.filter(o=>o.status==="DELIVERED").length}</b><span>Entregados</span></button>
+     </div>
+   </article>
+   <article class="command-card top-command">
+     <div class="card-head"><div><small>RENDIMIENTO</small><h3>Top productos</h3></div><button data-go="sales">Ver ventas</button></div>
+     <div class="clean-rank">${top.length?top.map(([name,v],i)=>`<div><span>${i+1}</span><b>${safe(name)}</b><small>${Number(v.qty).toFixed(0)} uds</small><strong>${L(v.amount)}</strong></div>`).join(""):'<div class="quiet-state">Sin ventas suficientes hoy.</div>'}</div>
+   </article>
+   <article class="command-card recent-command">
+     <div class="card-head"><div><small>ACTIVIDAD</small><h3>Movimientos recientes</h3></div></div>
+     <div class="clean-feed">${recent.length?recent.map(o=>`<button data-go="sales"><div><b>${safe(o.customer_name||o.diners?.display_name||"Consumidor final")}</b><small>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</small></div><span>${safe(o.station==="BS"?"Beer Station":"La Bandeja")}</span><strong>${L(o.total)}</strong></button>`).join(""):'<div class="quiet-state">Sin movimientos recientes.</div>'}</div>
+   </article>
  </section>
- <section class="kraken-lower">
-   <article class="deck-panel"><div class="deck-head"><div><small>PRODUCTOS DESTACADOS</small><h3>Productos destacados</h3></div></div><div class="loot-list">${top.length?top.map(([name,v],i)=>`<div><span>${String(i+1).padStart(2,"0")}</span><b>${safe(name)}</b><small>${Number(v.qty).toFixed(0)} uds</small><strong>${L(v.amount)}</strong></div>`).join(""):'<div class="calm-seas">Aún no hay ventas suficientes hoy.</div>'}</div></article>
-   <article class="deck-panel"><div class="deck-head"><div><small>ACTIVIDAD RECIENTE</small><h3>Actividad reciente</h3></div></div><div class="signal-list">${recent.map(o=>`<button data-go="sales"><div><b>${safe(o.customer_name||o.diners?.display_name||"Consumidor final")}</b><small>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"short"})}</small></div><span>${safe(o.station==="BS"?"Beer Station":"La Bandeja")}</span><strong>${L(o.total)}</strong></button>`).join("")||'<div class="calm-seas">Sin actividad reciente.</div>'}</div></article>
+ <section class="quick-dock">
+   <button data-go="purchases"><span>+</span><div><b>Nueva compra</b><small>Registrar abastecimiento</small></div></button>
+   <button data-go="expenses"><span>+</span><div><b>Nuevo gasto</b><small>Registrar egreso</small></div></button>
+   <button data-go="production"><span>↗</span><div><b>Producción</b><small>Costos y recetas</small></div></button>
+   <button data-go="catalog"><span>⌘</span><div><b>Catálogo</b><small>Productos y maestros</small></div></button>
  </section>`;
  $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.go));
- $("#content").querySelectorAll("[data-location]").forEach(b=>b.onclick=()=>{const loc=b.dataset.location;toast((loc==="LB"?"La Bandeja":"Beer Station")+" · "+(loc==="LB"?L(lb):L(bs))+" hoy")});
- $("#content").querySelectorAll("[data-order-filter]").forEach(b=>b.onclick=()=>{navigateAdmin("orders");setTimeout(()=>toast("Filtro "+b.dataset.orderFilter.toLowerCase()),80)});
  $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
+ enableSpotlightCards();
+}
+function enableSpotlightCards(){
+ document.querySelectorAll(".spotlight-card").forEach(card=>{
+  card.onpointermove=e=>{const r=card.getBoundingClientRect();card.style.setProperty("--mx",(e.clientX-r.left)+"px");card.style.setProperty("--my",(e.clientY-r.top)+"px")};
+ });
 }
 function renderSales(){toolbar("Ventas","COMERCIAL");const rows=state.orders.filter(o=>o.sale_recorded_at||o.payment_status==="PAID"||o.sale_type==="CREDITO");$("#content").innerHTML='<div class="crm-kpis">'+crmCard("Total",L(rows.reduce((a,x)=>a+Number(x.total||0),0)),rows.length+" ventas")+crmCard("Contado",L(rows.filter(x=>x.sale_type!=="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+crmCard("Crédito",L(rows.filter(x=>x.sale_type==="CREDITO").reduce((a,x)=>a+Number(x.total||0),0)))+'</div><div class="crm-table"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Origen</th><th>Tipo</th><th>Pago</th><th>Total</th></tr></thead><tbody>'+rows.map(o=>'<tr><td>'+new Date(o.sale_recorded_at||o.created_at).toLocaleString("es-HN")+'</td><td>'+safe(o.customer_name||o.diners?.display_name||"Consumidor final")+'</td><td>'+safe(o.table_sessions?.places?.name||o.table_sessions?.place_code||"")+'</td><td>'+safe(o.sale_type||"CONTADO")+'</td><td>'+safe(o.payment_method||"—")+'</td><td><b>'+L(o.total)+'</b></td></tr>').join("")+'</tbody></table></div>'}
 function renderCustomers(){toolbar("Clientes","CRM",'<button id="newCustomer">+ Nuevo cliente</button>');$("#content").innerHTML='<div class="crm-table"><table><thead><tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th></th></tr></thead><tbody>'+state.customers.map(x=>'<tr><td><b>'+safe(x.name)+'</b></td><td>'+safe(x.phone||"—")+'</td><td>'+safe(x.email||"—")+'</td><td>'+safe(x.address||"—")+'</td><td><button data-edit-customer="'+x.id+'">Editar</button></td></tr>').join("")+'</tbody></table></div>';$("#newCustomer").onclick=()=>editCustomer();$("#content").querySelectorAll("[data-edit-customer]").forEach(b=>b.onclick=()=>editCustomer(b.dataset.editCustomer))}
