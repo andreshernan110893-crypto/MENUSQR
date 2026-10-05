@@ -1259,3 +1259,194 @@ html{scrollbar-width:thin;scrollbar-color:#0c5c91 #02070b}::-webkit-scrollbar{wi
   .exact-hero-shade{background:linear-gradient(180deg,rgba(2,7,12,.9),rgba(2,7,12,.6) 65%,rgba(2,7,12,.3))!important}
   .exact-copy{width:100%!important;padding:38px 20px 46px!important}
 }
+
+/* KRAKEN fullscreen composition v7 */
+html,body{min-height:100%;background:#02060b!important}
+.kraken-wow{
+  min-height:100vh;
+  background:
+    linear-gradient(90deg,rgba(1,6,11,.82) 0%,rgba(2,8,14,.48) 31%,rgba(2,8,14,.12) 56%,rgba(1,5,9,.18) 100%),
+    linear-gradient(180deg,rgba(0,5,10,.08) 0%,rgba(0,5,10,.12) 62%,rgba(0,5,10,.42) 100%),
+    url('/assets/new/kraken-hero-clean.jpg') center top/cover fixed no-repeat!important;
+  color:#eef7ff;
+}
+.kraken-wow .wow-app{
+  min-height:100vh!important;
+  background:transparent!important;
+  position:relative;
+}
+.kraken-wow .wow-app:before{
+  content:"";
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(circle at 63% 18%,rgba(0,146,255,.08),transparent 28%),
+    linear-gradient(90deg,rgba(0,0,0,.28),transparent 42%,rgba(0,0,0,.08));
+}
+.kraken-wow .wow-sidebar,
+.kraken-wow .wow-workspace{position:relative;z-index:1}
+
+.kraken-wow .wow-sidebar{
+  background:linear-gradient(180deg,rgba(1,8,14,.78),rgba(1,7,12,.62))!important;
+  backdrop-filter:blur(14px) saturate(118%);
+  -webkit-backdrop-filter:blur(14px) saturate(118%);
+  border-right:1px solid rgba(16,136,210,.34)!important;
+  box-shadow:18px 0 50px rgba(0,0,0,.20)!important;
+}
+.kraken-wow .wow-brand-image{
+  min-height:150px!important;
+  padding:12px 8px 10px!important;
+  background:transparent!important;
+  border-bottom:1px solid rgba(22,130,198,.28);
+  display:flex!important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+}
+.kraken-wow .wow-brand-image img{
+  width:150px!important;height:150px!important;
+  object-fit:contain!important;
+  filter:drop-shadow(0 0 18px rgba(0,148,255,.23))!important;
+  mix-blend-mode:screen;
+}
+.kraken-wow .brand-system{
+  display:block;
+  margin-top:-12px;
+  color:#8fc8ea;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:1.6px;
+  text-align:center;
+  opacity:.86;
+}
+
+.kraken-wow .wow-workspace{
+  background:transparent!important;
+}
+.kraken-wow .wow-topbar{
+  background:rgba(1,8,14,.52)!important;
+  backdrop-filter:blur(16px) saturate(118%);
+  -webkit-backdrop-filter:blur(16px) saturate(118%);
+  border-bottom:1px solid rgba(20,133,207,.32)!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+.kraken-wow .wow-main{
+  background:transparent!important;
+  padding-bottom:46px!important;
+}
+.kraken-wow .wow-main:has(.exact-hero){
+  padding-top:0!important;
+}
+.kraken-wow .wow-main:has(.exact-hero) #content{
+  padding-top:0!important;
+  background:transparent!important;
+}
+
+.exact-hero{
+  position:relative!important;
+  min-height:330px!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+.exact-hero:before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  background:
+    linear-gradient(90deg,rgba(1,7,12,.82) 0%,rgba(1,7,12,.64) 30%,rgba(1,7,12,.16) 56%,transparent 74%)!important;
+  pointer-events:none!important;
+}
+.exact-hero:after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  background:linear-gradient(180deg,transparent 68%,rgba(2,8,14,.16))!important;
+  pointer-events:none!important;
+}
+.exact-hero-shade{display:none!important}
+.exact-copy{
+  position:relative!important;
+  z-index:2!important;
+  width:min(650px,52%)!important;
+  padding:56px 28px 40px 30px!important;
+}
+.exact-copy h2{
+  text-shadow:0 4px 24px rgba(0,0,0,.58)!important;
+}
+.exact-copy p{
+  color:#c0d5e3!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.65);
+}
+.exact-actions button{
+  background:rgba(4,17,28,.44)!important;
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-color:rgba(44,158,229,.44)!important;
+}
+.exact-actions button:first-child{
+  background:linear-gradient(180deg,rgba(28,171,255,.96),rgba(7,105,233,.96))!important;
+  box-shadow:0 0 24px rgba(0,145,255,.28)!important;
+}
+
+.exact-kpis,
+.exact-main-grid,
+.exact-shortcuts{
+  position:relative;
+  z-index:2;
+}
+.exact-kpi{
+  background:linear-gradient(145deg,rgba(3,16,27,.62),rgba(2,9,16,.45))!important;
+  backdrop-filter:blur(14px) saturate(118%);
+  -webkit-backdrop-filter:blur(14px) saturate(118%);
+  border:1px solid rgba(15,139,216,.58)!important;
+  box-shadow:inset 0 0 24px rgba(0,132,255,.04),0 12px 28px rgba(0,0,0,.14)!important;
+}
+.exact-kpi:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(145deg,rgba(6,24,40,.69),rgba(2,10,18,.50))!important;
+  box-shadow:0 0 28px rgba(0,147,255,.14)!important;
+}
+.exact-panel{
+  background:linear-gradient(145deg,rgba(3,15,25,.64),rgba(2,8,14,.47))!important;
+  backdrop-filter:blur(15px) saturate(118%);
+  -webkit-backdrop-filter:blur(15px) saturate(118%);
+  border:1px solid rgba(13,132,205,.50)!important;
+  box-shadow:inset 0 0 28px rgba(0,116,255,.03),0 14px 30px rgba(0,0,0,.14)!important;
+}
+.exact-shortcuts button{
+  background:linear-gradient(145deg,rgba(4,18,30,.60),rgba(2,9,16,.46))!important;
+  backdrop-filter:blur(13px) saturate(118%);
+  -webkit-backdrop-filter:blur(13px) saturate(118%);
+}
+.kraken-wow .nav-item,
+.kraken-wow .nav-group-head{
+  background:rgba(2,12,20,.18)!important;
+}
+.kraken-wow .nav-item:hover,
+.kraken-wow .nav-group-head:hover{
+  background:rgba(0,125,214,.12)!important;
+}
+.kraken-wow .nav-item.active{
+  background:linear-gradient(90deg,rgba(0,136,230,.24),rgba(0,92,160,.08))!important;
+}
+.kraken-wow .wow-sidefoot{
+  background:linear-gradient(180deg,rgba(1,8,14,.14),rgba(1,8,14,.56))!important;
+  backdrop-filter:blur(10px);
+}
+.kraken-wow ::-webkit-scrollbar{width:8px;height:8px}
+.kraken-wow ::-webkit-scrollbar-track{background:rgba(0,9,17,.45)}
+.kraken-wow ::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#0d5d98,#0b3d66);
+  border-radius:99px;
+  box-shadow:0 0 10px rgba(0,136,255,.18);
+}
+
+@media(max-width:900px){
+  .kraken-wow{background-position:60% top!important;background-attachment:scroll!important}
+  .exact-copy{width:100%!important;padding:38px 18px 36px!important}
+  .exact-hero{min-height:390px!important}
+  .exact-hero:before{background:linear-gradient(180deg,rgba(1,7,12,.88),rgba(1,7,12,.48) 64%,rgba(1,7,12,.28))!important}
+}
