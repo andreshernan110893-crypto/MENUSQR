@@ -80,3 +80,13 @@ body{margin:0;background:#07090d;color:#f6f7f9;font-family:Inter,Arial,sans-seri
 .purchase-draft-table button{border:1px solid #303a46;background:#171e27;color:#fff;border-radius:8px;padding:6px 8px}
 @media(max-width:980px){.purchase-header-grid,.purchase-line-grid{grid-template-columns:repeat(2,1fr)}.purchase-conversion-panel{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:680px){.purchase-view-head,.purchase-form-title{grid-template-columns:1fr;display:grid;align-items:start}.purchase-total-box{text-align:left;min-width:0}.purchase-header-grid,.purchase-line-grid{grid-template-columns:1fr}.purchase-header-grid .wide{grid-column:auto}.purchase-conversion-panel{grid-template-columns:1fr 1fr}.purchase-savebar{flex-wrap:wrap;bottom:4px}.purchase-savebar>div{width:100%;margin-right:0}}
+/* PRODUCT PURCHASE INVOICE V4 */
+.purchase-line-grid-v2{grid-template-columns:repeat(6,minmax(0,1fr))}
+.invoice-balance{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;border:1px solid #3a2f24;background:rgba(180,120,40,.06);border-radius:14px}
+.invoice-balance.ok{border-color:rgba(90,210,125,.32);background:rgba(90,210,125,.06)}
+.invoice-balance>div{padding:10px 12px;border-radius:10px;background:#0a0f15}
+.invoice-balance span,.invoice-balance b{display:block}.invoice-balance span{color:#86919e;font-size:.65rem}.invoice-balance b{font-size:.95rem;margin-top:3px}
+.purchase-conversion-panel{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1180px){.purchase-line-grid-v2{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.purchase-line-grid-v2{grid-template-columns:1fr 1fr}.invoice-balance{grid-template-columns:1fr}}
+@media(max-width:520px){.purchase-line-grid-v2{grid-template-columns:1fr}.purchase-conversion-panel{grid-template-columns:1fr}}

@@ -334,23 +334,39 @@ function renderNormalPurchaseWorkspace(){
  '<div class="crm-table"><table><thead><tr><th>Fecha</th><th>Proveedor</th><th>Factura</th><th>Negocio</th><th>Pago</th><th>Total</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+safe(x.purchase_date)+'</td><td>'+safe(state.suppliers.find(s=>s.id===x.supplier_id)?.name||"—")+'</td><td>'+safe(x.invoice_number||"—")+'</td><td>'+safe(x.station)+'</td><td>'+safe(x.payment_type)+'</td><td><b>'+L(x.total)+'</b></td></tr>').join("")+'</tbody></table></div>';
  $("#newGeneralPurchase").onclick=()=>editPurchaseGeneral();
 }
+function ensurePurchaseDraftHeader(){
+ if(!state.purchaseDraftHeader)state.purchaseDraftHeader={supplier_id:"",station:"LB",invoice_number:"",invoice_total:"",purchase_date:new Date().toISOString().slice(0,10),payment_type:"CONTADO",notes:""};
+ return state.purchaseDraftHeader;
+}
+function capturePurchaseDraftHeader(){
+ const h=ensurePurchaseDraftHeader();
+ if($("#ppSupplier"))h.supplier_id=$("#ppSupplier").value;
+ if($("#ppStation"))h.station=$("#ppStation").value;
+ if($("#ppInvoice"))h.invoice_number=$("#ppInvoice").value;
+ if($("#ppInvoiceTotal"))h.invoice_total=$("#ppInvoiceTotal").value;
+ if($("#ppDate"))h.purchase_date=$("#ppDate").value;
+ if($("#ppPayment"))h.payment_type=$("#ppPayment").value;
+ if($("#ppNotes"))h.notes=$("#ppNotes").value;
+ return h;
+}
 function renderProductPurchaseWorkspace(){
- const lines=state.purchaseDraftLines||[];
- const total=lines.reduce((a,x)=>a+Number(x.line_total||0),0);
+ const lines=state.purchaseDraftLines||[],h=ensurePurchaseDraftHeader();
+ const detailTotal=lines.reduce((a,x)=>a+Number(x.line_total||0),0),invoiceTotal=Number(h.invoice_total||0),difference=invoiceTotal-detailTotal;
  $("#purchaseWorkspace").innerHTML='<section class="product-purchase-shell">'+
- '<div class="purchase-form-title"><div><small>COMPRA CON PRODUCTOS</small><h2>Nueva compra de productos / insumos</h2><p>Selecciona la presentación comprada. KRAKEN convierte automáticamente a la unidad base, calcula el costo real y registra la variación.</p></div><div class="purchase-total-box"><span>Total compra</span><b id="draftPurchaseTotal">'+L(total)+'</b><small>'+lines.length+' líneas</small></div></div>'+
- '<div class="purchase-header-grid"><label>Proveedor<select id="ppSupplier"><option value="">Sin proveedor</option>'+state.suppliers.map(x=>'<option value="'+x.id+'">'+safe(x.name)+'</option>').join("")+'</select></label><label>Negocio<select id="ppStation"><option value="LB">La Bandeja</option><option value="BS">Beer Station</option></select></label><label>Factura / documento<input id="ppInvoice" placeholder="Número de factura"></label><label>Fecha<input id="ppDate" type="date" value="'+new Date().toISOString().slice(0,10)+'"></label><label>Forma de compra<select id="ppPayment"><option value="CONTADO">Contado</option><option value="CREDITO">Crédito</option></select></label><label class="wide">Notas<input id="ppNotes" placeholder="Observaciones opcionales"></label></div>'+
- '<div class="purchase-product-builder"><div class="builder-title"><div><small>AGREGAR PRODUCTO</small><h3>Conversión y costeo</h3></div><button type="button" id="ppNewPresentation">+ Presentación</button></div>'+
- '<div class="purchase-line-grid"><label>Producto / insumo<select id="ppItem">'+state.inventoryItems.map(i=>'<option value="'+i.id+'">'+safe(i.name)+' · '+safe(unitObj(i.base_unit).symbol)+'</option>').join("")+'</select></label><label>Presentación<select id="ppPresentation"></select></label><label>Cantidad de presentaciones<input id="ppQty" type="number" min=".0001" step=".0001" value="1"></label><label>Precio por presentación<input id="ppUnitPrice" type="number" min="0" step=".01" placeholder="L 0.00"></label></div>'+
- '<div id="ppConversion" class="purchase-conversion-panel"></div><button type="button" id="ppAddLine" class="purchase-add-line">+ Agregar a la compra</button></div>'+
- '<div class="purchase-lines-panel"><div class="purchase-lines-head"><h3>Detalle de compra</h3><span>'+lines.length+' productos</span></div>'+renderPurchaseDraftLines(lines)+'</div>'+
- '<div class="purchase-savebar"><div><span>Total</span><b>'+L(total)+'</b></div><button id="ppClear" type="button">Limpiar</button><button id="ppSave" type="button" class="primary">Registrar compra</button></div></section>'+
+ '<div class="purchase-form-title"><div><small>COMPRA CON PRODUCTOS</small><h2>Factura de compra</h2><p>Registra la factura y agrega todos sus productos. KRAKEN convierte cada presentación a la unidad base y actualiza costos e inventario.</p></div><div class="purchase-total-box"><span>Total factura</span><b id="draftPurchaseTotal">'+L(invoiceTotal)+'</b><small>Detalle '+L(detailTotal)+'</small></div></div>'+
+ '<div class="purchase-header-grid"><label>Proveedor<select id="ppSupplier"><option value="">Seleccionar proveedor</option>'+state.suppliers.map(x=>'<option value="'+x.id+'" '+(h.supplier_id===x.id?"selected":"")+'>'+safe(x.name)+'</option>').join("")+'</select></label><label>Número de factura<input id="ppInvoice" value="'+safe(h.invoice_number||"")+'" placeholder="Ej. 000-001-01-00012345"></label><label>Total factura<input id="ppInvoiceTotal" type="number" min="0" step=".01" value="'+safe(h.invoice_total||"")+'" placeholder="L 0.00"></label><label>Fecha<input id="ppDate" type="date" value="'+safe(h.purchase_date||new Date().toISOString().slice(0,10))+'"></label><label>Negocio<select id="ppStation"><option value="LB" '+(h.station==="LB"?"selected":"")+'>La Bandeja</option><option value="BS" '+(h.station==="BS"?"selected":"")+'>Beer Station</option></select></label><label>Forma de compra<select id="ppPayment"><option value="CONTADO" '+(h.payment_type==="CONTADO"?"selected":"")+'>Contado</option><option value="CREDITO" '+(h.payment_type==="CREDITO"?"selected":"")+'>Crédito</option></select></label><label class="wide">Notas<input id="ppNotes" value="'+safe(h.notes||"")+'" placeholder="Observaciones opcionales"></label></div>'+
+ '<div class="purchase-product-builder"><div class="builder-title"><div><small>AGREGAR PRODUCTO</small><h3>Producto y conversión</h3></div><button type="button" id="ppNewPresentation">+ Nueva presentación</button></div>'+
+ '<div class="purchase-line-grid purchase-line-grid-v2"><label>Producto<select id="ppItem"><option value="">Seleccionar producto</option>'+state.inventoryItems.map(i=>'<option value="'+i.id+'">'+safe(i.name)+'</option>').join("")+'</select></label><label>Presentación<select id="ppPresentation"></select></label><label>Cantidad<input id="ppQty" type="number" min=".0001" step=".0001" value="1"></label><label>Contenido por presentación<input id="ppContentQty" type="number" min=".0001" step=".0001" placeholder="Ej. 750"></label><label>Unidad de medida<select id="ppMeasureUnit"></select></label><label>Total producto<input id="ppLineTotal" type="number" min="0" step=".01" placeholder="L 0.00"></label></div>'+
+ '<div id="ppConversion" class="purchase-conversion-panel"></div><button type="button" id="ppAddLine" class="purchase-add-line">+ Agregar producto</button></div>'+
+ '<div class="purchase-lines-panel"><div class="purchase-lines-head"><h3>Productos de la factura</h3><span>'+lines.length+' productos</span></div>'+renderPurchaseDraftLines(lines)+'</div>'+
+ '<div class="invoice-balance '+(Math.abs(difference)<=0.01&&invoiceTotal>0?"ok":"")+'"><div><span>Total factura</span><b>'+L(invoiceTotal)+'</b></div><div><span>Suma productos</span><b>'+L(detailTotal)+'</b></div><div><span>Diferencia</span><b>'+L(difference)+'</b></div></div>'+
+ '<div class="purchase-savebar"><div><span>Total factura</span><b>'+L(invoiceTotal)+'</b></div><button id="ppClear" type="button">Limpiar factura</button><button id="ppSave" type="button" class="primary">Agregar factura</button></div></section>'+
  renderRecentProductPurchases();
  bindProductPurchaseForm();
 }
 function renderPurchaseDraftLines(lines){
  if(!lines.length)return '<div class="empty-purchase-lines">Agrega el primer producto para construir la compra.</div>';
- return '<div class="crm-table purchase-draft-table"><table><thead><tr><th>Producto</th><th>Presentación</th><th>Cant.</th><th>Equivalencia base</th><th>Costo base</th><th>Variación</th><th>Total</th><th></th></tr></thead><tbody>'+lines.map((x,idx)=>{const v=x.old_cost>0?((x.unit_cost_base-x.old_cost)/x.old_cost)*100:null;return '<tr><td><b>'+safe(x.item_name)+'</b></td><td>'+safe(x.presentation_name)+'</td><td>'+Number(x.qty).toLocaleString("es-HN",{maximumFractionDigits:4})+'</td><td>'+qtyText(x.base_qty,x.base_unit)+'</td><td>'+L(x.unit_cost_base)+' / '+safe(unitObj(x.base_unit).symbol)+'</td><td><span class="cost-var '+(v>0?"up":v<0?"down":"")+'">'+(v===null?"Nuevo":(v>0?"+":"")+v.toFixed(1)+"%")+'</span></td><td><b>'+L(x.line_total)+'</b></td><td><button data-remove-draft="'+idx+'">Quitar</button></td></tr>'}).join("")+'</tbody></table></div>';
+ return '<div class="crm-table purchase-draft-table"><table><thead><tr><th>Producto</th><th>Presentación</th><th>Cant.</th><th>Medida</th><th>Conversión</th><th>Costo base</th><th>Variación</th><th>Total</th><th></th></tr></thead><tbody>'+lines.map((x,idx)=>{const v=x.old_cost>0?((x.unit_cost_base-x.old_cost)/x.old_cost)*100:null;return '<tr><td><b>'+safe(x.item_name)+'</b></td><td>'+safe(x.presentation_name)+'</td><td>'+Number(x.qty).toLocaleString("es-HN",{maximumFractionDigits:4})+'</td><td>'+Number(x.content_qty||0).toLocaleString("es-HN",{maximumFractionDigits:4})+' '+safe(unitObj(x.measure_unit).symbol)+'</td><td>'+qtyText(x.base_qty,x.base_unit)+'</td><td>'+L(x.unit_cost_base)+' / '+safe(unitObj(x.base_unit).symbol)+'</td><td><span class="cost-var '+(v>0?"up":v<0?"down":"")+'">'+(v===null?"Nuevo":(v>0?"+":"")+v.toFixed(1)+"%")+'</span></td><td><b>'+L(x.line_total)+'</b></td><td><button data-remove-draft="'+idx+'">Quitar</button></td></tr>'}).join("")+'</tbody></table></div>';
 }
 function renderRecentProductPurchases(){
  const rows=state.purchases.filter(x=>x.purchase_kind==="PRODUCTS").slice(0,10);
@@ -358,42 +374,70 @@ function renderRecentProductPurchases(){
  return '<section class="recent-product-purchases"><div class="purchase-lines-head"><h3>Compras recientes con productos</h3><span>'+rows.length+' recientes</span></div><div class="crm-table"><table><thead><tr><th>Fecha</th><th>Proveedor</th><th>Factura</th><th>Pago</th><th>Productos</th><th>Total</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+safe(x.purchase_date)+'</td><td>'+safe(state.suppliers.find(s=>s.id===x.supplier_id)?.name||"—")+'</td><td>'+safe(x.invoice_number||"—")+'</td><td>'+safe(x.payment_type)+'</td><td>'+state.purchaseItems.filter(i=>i.purchase_id===x.id).length+'</td><td><b>'+L(x.total)+'</b></td></tr>').join("")+'</tbody></table></div></section>';
 }
 function bindProductPurchaseForm(){
- const itemEl=$("#ppItem"),presEl=$("#ppPresentation"),qtyEl=$("#ppQty"),priceEl=$("#ppUnitPrice"),conv=$("#ppConversion");
+ const itemEl=$("#ppItem"),presEl=$("#ppPresentation"),qtyEl=$("#ppQty"),contentEl=$("#ppContentQty"),unitEl=$("#ppMeasureUnit"),lineEl=$("#ppLineTotal"),conv=$("#ppConversion");
+ const saveHeader=()=>capturePurchaseDraftHeader();
+ ["ppSupplier","ppStation","ppInvoice","ppInvoiceTotal","ppDate","ppPayment","ppNotes"].forEach(id=>{const el=$("#"+id);if(el)el.onchange=saveHeader});
+ const refreshUnits=()=>{
+   const item=state.inventoryItems.find(x=>x.id===itemEl.value);
+   if(!item){unitEl.innerHTML="";return}
+   const dim=unitObj(item.base_unit).dimension;
+   unitEl.innerHTML=state.measureUnits.filter(u=>u.dimension===dim&&u.active!==false).map(u=>'<option value="'+u.code+'">'+safe(u.name)+' ('+safe(u.symbol)+')</option>').join("");
+ };
  const refreshPresentations=()=>{
-   const iid=itemEl.value,ps=state.presentations.filter(x=>x.item_id===iid&&x.active!==false);
-   presEl.innerHTML=ps.map(p=>'<option value="'+p.id+'">'+safe(p.name)+' · '+Number(p.measure_qty)+' '+safe(unitObj(p.measure_unit).symbol)+'</option>').join("");
+   const iid=itemEl.value,item=state.inventoryItems.find(x=>x.id===iid),ps=state.presentations.filter(x=>x.item_id===iid&&x.active!==false);
+   presEl.innerHTML='<option value="">Seleccionar presentación</option>'+ps.map(p=>'<option value="'+p.id+'">'+safe(p.name)+'</option>').join("");
+   refreshUnits();
+   if(item)unitEl.value=item.base_unit;
+   contentEl.value="";
+   preview();
+ };
+ const loadPresentation=()=>{
+   const pr=state.presentations.find(x=>x.id===presEl.value);
+   if(pr){contentEl.value=Number(pr.measure_qty||0)||"";refreshUnits();unitEl.value=pr.measure_unit||unitEl.value}
    preview();
  };
  const preview=()=>{
-   const item=state.inventoryItems.find(x=>x.id===itemEl.value),pr=state.presentations.find(x=>x.id===presEl.value),qty=Number(qtyEl.value||0),unitPrice=Number(priceEl.value||0);
-   if(!item){conv.innerHTML='<span>Crea primero un insumo en Producción.</span>';return}
-   if(!pr){conv.innerHTML='<div class="conversion-empty"><b>Este insumo no tiene presentación de compra.</b><span>Crea una presentación para poder convertirlo correctamente.</span></div>';return}
-   const baseQty=qty*Number(pr.base_qty||0),lineTotal=qty*unitPrice,newCost=baseQty>0?lineTotal/baseQty:0,old=Number(item.current_cost||0),variation=old>0?((newCost-old)/old)*100:null;
-   conv.innerHTML='<div><span>Compras</span><b>'+Number(qty).toLocaleString("es-HN",{maximumFractionDigits:4})+' × '+safe(pr.name)+'</b></div><div><span>Equivale a</span><b>'+qtyText(baseQty,item.base_unit)+'</b></div><div><span>Costo anterior</span><b>'+L(old)+' / '+safe(unitObj(item.base_unit).symbol)+'</b></div><div><span>Nuevo costo base</span><b>'+L(newCost)+' / '+safe(unitObj(item.base_unit).symbol)+'</b></div><div><span>Variación</span><b class="'+(variation>0?"up":variation<0?"down":"")+'">'+(variation===null?"Primer costo":(variation>0?"+":"")+variation.toFixed(2)+"%")+'</b></div><div><span>Total línea</span><b>'+L(lineTotal)+'</b></div>';
+   const item=state.inventoryItems.find(x=>x.id===itemEl.value),pr=state.presentations.find(x=>x.id===presEl.value),qty=Number(qtyEl.value||0),content=Number(contentEl.value||0),lineTotal=Number(lineEl.value||0),measure=unitEl.value;
+   if(!item){conv.innerHTML='<span>Selecciona un producto.</span>';return}
+   if(!pr){conv.innerHTML='<div class="conversion-empty"><b>Selecciona una presentación.</b><span>Si no existe, créala desde “Nueva presentación”.</span></div>';return}
+   const oneBase=convertQty(content,measure,item.base_unit);
+   if(oneBase==null){conv.innerHTML='<div class="conversion-empty"><b>Unidad incompatible.</b><span>Selecciona una unidad de la misma dimensión que '+safe(unitObj(item.base_unit).name)+'.</span></div>';return}
+   const baseQty=qty*oneBase,newCost=baseQty>0?lineTotal/baseQty:0,old=Number(item.current_cost||0),variation=old>0?((newCost-old)/old)*100:null,unitPerPresentation=qty>0?lineTotal/qty:0;
+   conv.innerHTML='<div><span>Presentaciones</span><b>'+Number(qty).toLocaleString("es-HN",{maximumFractionDigits:4})+' × '+safe(pr.name)+'</b></div><div><span>Contenido</span><b>'+Number(content).toLocaleString("es-HN",{maximumFractionDigits:4})+' '+safe(unitObj(measure).symbol)+'</b></div><div><span>Conversión total</span><b>'+qtyText(baseQty,item.base_unit)+'</b></div><div><span>Costo / presentación</span><b>'+L(unitPerPresentation)+'</b></div><div><span>Costo anterior</span><b>'+L(old)+' / '+safe(unitObj(item.base_unit).symbol)+'</b></div><div><span>Nuevo costo base</span><b>'+L(newCost)+' / '+safe(unitObj(item.base_unit).symbol)+'</b></div><div><span>Variación</span><b class="'+(variation>0?"up":variation<0?"down":"")+'">'+(variation===null?"Primer costo":(variation>0?"+":"")+variation.toFixed(2)+"%")+'</b></div><div><span>Total producto</span><b>'+L(lineTotal)+'</b></div>';
  };
- if(itemEl){itemEl.onchange=refreshPresentations;presEl.onchange=preview;qtyEl.oninput=preview;priceEl.oninput=preview;refreshPresentations()}
- $("#ppNewPresentation").onclick=()=>{const iid=itemEl.value;if(!iid)return toast("Selecciona un insumo");managePresentations(iid)};
+ itemEl.onchange=refreshPresentations;presEl.onchange=loadPresentation;qtyEl.oninput=preview;contentEl.oninput=preview;unitEl.onchange=preview;lineEl.oninput=preview;
+ $("#ppInvoiceTotal").oninput=()=>{saveHeader();const total=Number($("#ppInvoiceTotal").value||0);$("#draftPurchaseTotal").textContent=L(total)};
+ $("#ppNewPresentation").onclick=()=>{const iid=itemEl.value;if(!iid)return toast("Selecciona un producto");capturePurchaseDraftHeader();managePresentations(iid)};
  $("#ppAddLine").onclick=()=>{
-   const item=state.inventoryItems.find(x=>x.id===itemEl.value),pr=state.presentations.find(x=>x.id===presEl.value),qty=Number(qtyEl.value||0),unitPrice=Number(priceEl.value||0);
-   if(!item)return toast("Crea o selecciona un producto / insumo");
-   if(!pr)return toast("Selecciona o crea una presentación");
+   capturePurchaseDraftHeader();
+   const item=state.inventoryItems.find(x=>x.id===itemEl.value),pr=state.presentations.find(x=>x.id===presEl.value),qty=Number(qtyEl.value||0),content=Number(contentEl.value||0),lineTotal=Number(lineEl.value||0),measure=unitEl.value;
+   if(!item)return toast("Selecciona un producto");
+   if(!pr)return toast("Selecciona una presentación");
    if(qty<=0)return toast("Ingresa una cantidad válida");
-   if(unitPrice<0)return toast("Precio inválido");
-   const baseQty=qty*Number(pr.base_qty||0),lineTotal=qty*unitPrice,unitCostBase=baseQty>0?lineTotal/baseQty:0;
-   state.purchaseDraftLines.push({item_id:item.id,item_name:item.name,base_unit:item.base_unit,presentation_id:pr.id,presentation_name:pr.name,qty,unit_price:unitPrice,line_total:lineTotal,base_qty:baseQty,unit_cost_base:unitCostBase,old_cost:Number(item.current_cost||0)});
+   if(content<=0)return toast("Ingresa el contenido de la presentación");
+   if(lineTotal<0)return toast("Total del producto inválido");
+   const oneBase=convertQty(content,measure,item.base_unit);if(oneBase==null)return toast("Unidad de medida incompatible");
+   const baseQty=qty*oneBase,unitCostBase=baseQty>0?lineTotal/baseQty:0;
+   state.purchaseDraftLines.push({item_id:item.id,item_name:item.name,base_unit:item.base_unit,presentation_id:pr.id,presentation_name:pr.name,qty,content_qty:content,measure_unit:measure,line_total:lineTotal,base_qty:baseQty,unit_cost_base:unitCostBase,old_cost:Number(item.current_cost||0)});
    renderProductPurchaseWorkspace();
  };
- $("#purchaseWorkspace").querySelectorAll("[data-remove-draft]").forEach(b=>b.onclick=()=>{state.purchaseDraftLines.splice(Number(b.dataset.removeDraft),1);renderProductPurchaseWorkspace()});
- $("#ppClear").onclick=()=>{state.purchaseDraftLines=[];renderProductPurchaseWorkspace()};
+ $("#purchaseWorkspace").querySelectorAll("[data-remove-draft]").forEach(b=>b.onclick=()=>{capturePurchaseDraftHeader();state.purchaseDraftLines.splice(Number(b.dataset.removeDraft),1);renderProductPurchaseWorkspace()});
+ $("#ppClear").onclick=()=>{state.purchaseDraftLines=[];state.purchaseDraftHeader=null;renderProductPurchaseWorkspace()};
  $("#ppSave").onclick=saveProductPurchase;
 }
 async function saveProductPurchase(){
- const lines=state.purchaseDraftLines||[];if(!lines.length)return toast("Agrega al menos un producto");
- const payload={supplier_id:$("#ppSupplier").value||null,station:$("#ppStation").value,invoice_number:$("#ppInvoice").value.trim(),purchase_date:$("#ppDate").value,payment_type:$("#ppPayment").value,notes:$("#ppNotes").value.trim(),items:lines.map(x=>({item_id:x.item_id,presentation_id:x.presentation_id,qty:x.qty,line_total:x.line_total}))};
- const btn=$("#ppSave");btn.disabled=true;btn.textContent="Registrando...";
+ const lines=state.purchaseDraftLines||[],h=capturePurchaseDraftHeader();
+ if(!h.supplier_id)return toast("Selecciona un proveedor");
+ if(!String(h.invoice_number||"").trim())return toast("Ingresa el número de factura");
+ const invoiceTotal=Number(h.invoice_total||0);if(invoiceTotal<=0)return toast("Ingresa el total de la factura");
+ if(!lines.length)return toast("Agrega al menos un producto");
+ const detailTotal=lines.reduce((a,x)=>a+Number(x.line_total||0),0);
+ if(Math.abs(detailTotal-invoiceTotal)>0.01)return toast("La suma de productos "+L(detailTotal)+" no coincide con el total factura "+L(invoiceTotal));
+ const payload={supplier_id:h.supplier_id,station:h.station,invoice_number:String(h.invoice_number).trim(),invoice_total:invoiceTotal,purchase_date:h.purchase_date,payment_type:h.payment_type,notes:String(h.notes||"").trim(),items:lines.map(x=>({item_id:x.item_id,presentation_id:x.presentation_id,qty:x.qty,content_qty:x.content_qty,measure_unit:x.measure_unit,line_total:x.line_total}))};
+ const btn=$("#ppSave");btn.disabled=true;btn.textContent="Agregando factura...";
  const{data,error}=await sb.rpc("restaurant_create_product_purchase_public",{p_payload:payload});
- if(error){btn.disabled=false;btn.textContent="Registrar compra";return toast(error.message)}
- state.purchaseDraftLines=[];await loadAll();renderProductPurchaseWorkspace();toast("Compra registrada · "+L(data?.total||0));
+ if(error){btn.disabled=false;btn.textContent="Agregar factura";return toast(error.message)}
+ state.purchaseDraftLines=[];state.purchaseDraftHeader=null;await loadAll();renderProductPurchaseWorkspace();toast("Factura agregada · "+L(data?.total||0));
 }
 function purchaseHeaderForm(title,kind){
  const f=$("#editForm");
