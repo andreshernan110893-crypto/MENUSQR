@@ -1,1 +1,19 @@
-²ø1šYì
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 190">
+<defs>
+ <linearGradient id="b" x1="0" x2="1"><stop stop-color="#31c9ff"/><stop offset="1" stop-color="#0567e8"/></linearGradient>
+ <linearGradient id="m" x1="0" x2="1"><stop stop-color="#758395"/><stop offset=".45" stop-color="#111923"/><stop offset="1" stop-color="#38485a"/></linearGradient>
+ <filter id="g"><feGaussianBlur stdDeviation="3" result="x"/><feMerge><feMergeNode in="x"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="360" height="190" fill="transparent"/>
+<g transform="translate(102 5)">
+ <path d="M78 0 121 38 112 89 94 123 78 145 61 123 44 89 35 38Z" fill="url(#m)" stroke="#7890a8" stroke-width="2"/>
+ <path d="M35 40 3 17 18 88 60 103M121 40 153 17 138 88 96 103" fill="url(#m)" stroke="#5f7183" stroke-width="2"/>
+ <path d="M46 62 78 42 110 62 99 93 78 111 57 93Z" fill="#0b131d" stroke="#18a7ff" stroke-width="3"/>
+ <path d="M45 61 63 52 58 77 45 74Z" fill="#2ac8ff" filter="url(#g)"/>
+ <path d="M111 61 93 52 98 77 111 74Z" fill="#2ac8ff" filter="url(#g)"/>
+ <path d="M18 102 C-18 119 -8 145 24 138 C44 134 48 119 36 109" fill="none" stroke="url(#b)" stroke-width="10" stroke-linecap="round" filter="url(#g)"/>
+ <path d="M138 102 C174 119 164 145 132 138 C112 134 108 119 120 109" fill="none" stroke="url(#b)" stroke-width="10" stroke-linecap="round" filter="url(#g)"/>
+</g>
+<text x="180" y="166" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" font-weight="800" letter-spacing="7" fill="#e7edf3">KRAKEN</text>
+<text x="180" y="185" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="4" fill="#1aa8ff">CONTROL TOTAL</text>
+</svg>
