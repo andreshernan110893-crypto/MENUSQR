@@ -1594,3 +1594,203 @@ html,body{min-height:100%;background:#02060b!important}
   box-shadow:0 0 26px rgba(0,150,255,.14)!important;
   transform:translateY(-2px);
 }
+
+/* KRAKEN restrained dark palette v11 */
+:root{
+  --k-black:#020406;
+  --k-black-2:#05080c;
+  --k-panel:#080d12;
+  --k-panel-2:#0b1118;
+  --k-gray:#1a232d;
+  --k-line:rgba(60,82,104,.42);
+  --k-text:#e7edf4;
+  --k-muted:#7f8f9f;
+  --k-navy:#0d2237;
+  --k-navy-2:#12314d;
+  --k-glow:rgba(38,92,138,.22);
+}
+html,body,.kraken-wow{background:#020406!important}
+.kraken-wow{
+  color:var(--k-text)!important;
+  background:
+    linear-gradient(90deg,rgba(1,3,5,.92) 0%,rgba(2,5,8,.78) 28%,rgba(3,8,13,.38) 56%,rgba(1,4,7,.48) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.20),rgba(0,0,0,.45)),
+    url('/assets/new/kraken-hero-clean.jpg') center top/cover fixed no-repeat!important;
+}
+.kraken-wow .wow-app:before{
+  background:
+    radial-gradient(circle at 64% 18%,rgba(28,62,94,.07),transparent 30%),
+    linear-gradient(90deg,rgba(0,0,0,.30),transparent 42%,rgba(0,0,0,.14))!important;
+}
+.kraken-wow .wow-sidebar{
+  background:linear-gradient(180deg,rgba(2,5,8,.96),rgba(4,8,12,.92))!important;
+  border-right:1px solid rgba(53,70,88,.55)!important;
+  box-shadow:14px 0 34px rgba(0,0,0,.28)!important;
+}
+.kraken-wow .wow-topbar{
+  background:rgba(3,7,11,.80)!important;
+  border-bottom:1px solid rgba(52,70,89,.45)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.18)!important;
+}
+.kraken-wow .wow-brand-image{
+  background:linear-gradient(180deg,rgba(3,7,11,.82),rgba(4,9,14,.52))!important;
+  border-bottom:1px solid rgba(53,70,88,.42)!important;
+}
+.kraken-wow .wow-brand-image img{
+  filter:drop-shadow(0 0 10px rgba(32,76,112,.16))!important;
+  opacity:.86!important;
+}
+.kraken-wow .brand-system{color:#7d8e9f!important;opacity:.78!important}
+
+.kraken-wow .nav-item,
+.kraken-wow .nav-group-head{
+  color:#9ba9b7!important;
+  background:rgba(8,13,18,.34)!important;
+  border-color:transparent!important;
+}
+.kraken-wow .nav-item:hover,
+.kraken-wow .nav-group-head:hover{
+  color:#dce6ef!important;
+  background:rgba(15,24,33,.70)!important;
+  box-shadow:inset 0 0 0 1px rgba(59,78,97,.22)!important;
+}
+.kraken-wow .nav-item.active{
+  color:#f3f7fa!important;
+  background:linear-gradient(90deg,rgba(12,27,40,.90),rgba(7,15,22,.82))!important;
+  border:1px solid rgba(40,72,101,.78)!important;
+  box-shadow:
+    inset 3px 0 0 #244f73,
+    0 0 18px rgba(24,60,92,.16)!important;
+}
+.kraken-wow .nav-symbol{
+  background:#0b1219!important;
+  border:1px solid rgba(49,67,84,.65)!important;
+  color:#7fa8c6!important;
+  box-shadow:none!important;
+}
+.kraken-wow .nav-item.active .nav-symbol{
+  color:#9fc5df!important;
+  border-color:#294d6a!important;
+  background:#0d1822!important;
+}
+.kraken-wow .wow-sidefoot{
+  background:linear-gradient(180deg,rgba(3,8,12,.28),rgba(2,5,8,.84))!important;
+  border-top:1px solid rgba(50,68,85,.42)!important;
+}
+.kraken-wow .wow-sidefoot>span{
+  box-shadow:0 0 10px rgba(37,93,65,.22)!important;
+}
+
+.exact-kpi,
+.exact-panel,
+.exact-shortcuts button,
+.finance-mini{
+  background:linear-gradient(145deg,rgba(8,13,19,.88),rgba(4,8,12,.82))!important;
+  border:1px solid rgba(48,66,83,.58)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.015),
+    0 10px 24px rgba(0,0,0,.22)!important;
+  backdrop-filter:blur(12px) saturate(92%)!important;
+  -webkit-backdrop-filter:blur(12px) saturate(92%)!important;
+}
+.exact-kpi:hover,
+.exact-panel:hover,
+.exact-shortcuts button:hover,
+.finance-mini:hover{
+  border-color:rgba(61,88,112,.70)!important;
+  box-shadow:
+    0 0 22px rgba(24,57,87,.14),
+    0 12px 28px rgba(0,0,0,.24)!important;
+  transform:translateY(-1px);
+}
+.exact-kpi:before,
+.exact-panel:before,
+.exact-shortcuts button:before{
+  opacity:.25!important;
+}
+.exact-kpi h3,
+.exact-kpi b,
+.exact-panel b,
+.finance-mini-copy b,
+.exact-shortcuts b{color:#eef3f7!important}
+.exact-kpi small,
+.exact-panel small,
+.finance-mini-copy small,
+.exact-shortcuts small{color:#7f8f9f!important}
+
+.exact-main-grid .chart-wrap,
+.exact-main-grid .sales-chart,
+.exact-main-grid svg{
+  filter:saturate(.62) brightness(.88)!important;
+}
+.exact-panel-head span,
+.see-all,
+.period-tabs button.active,
+.exact-shortcuts .activity-shortcut>span{
+  color:#6f9abb!important;
+}
+.period-tabs button{
+  background:#080d12!important;
+  border-color:rgba(48,66,83,.55)!important;
+  color:#7f8f9f!important;
+}
+.period-tabs button.active{
+  background:#102033!important;
+  border-color:#284964!important;
+  box-shadow:0 0 14px rgba(31,74,110,.16)!important;
+}
+.dashboard-kraken-window:after{
+  background:linear-gradient(90deg,transparent,rgba(52,83,110,.22),transparent)!important;
+}
+
+.finance-expenses{
+  background:linear-gradient(145deg,rgba(20,14,16,.90),rgba(6,9,12,.84))!important;
+  border-color:rgba(85,62,63,.58)!important;
+}
+.finance-expenses .finance-mini-icon{
+  background:#181014!important;
+  border-color:#5f3b3f!important;
+  color:#b38386!important;
+}
+.finance-purchases .finance-mini-icon,
+.exact-shortcuts .activity-shortcut>span{
+  background:#0d1720!important;
+  border-color:#2c4a61!important;
+  color:#7fa9c7!important;
+}
+
+.exact-shortcuts .green,
+.exact-shortcuts .blue,
+.exact-shortcuts .purple,
+.exact-shortcuts .gold{
+  border-color:rgba(50,68,86,.56)!important;
+}
+.exact-shortcuts .green>span,
+.exact-shortcuts .blue>span,
+.exact-shortcuts .purple>span,
+.exact-shortcuts .gold>span{
+  background:#0b1118!important;
+  border:1px solid rgba(47,66,84,.60)!important;
+  color:#89a6bb!important;
+}
+.exact-shortcuts .green>i,
+.exact-shortcuts .blue>i,
+.exact-shortcuts .purple>i,
+.exact-shortcuts .gold>i{
+  color:#7894a9!important;
+}
+
+.kraken-wow button,
+.kraken-wow select,
+.kraken-wow input,
+.kraken-wow textarea{
+  accent-color:#234d70;
+}
+.kraken-wow ::-webkit-scrollbar-track{background:#05090d!important}
+.kraken-wow ::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#16334d,#0d2235)!important;
+  box-shadow:0 0 8px rgba(24,61,91,.15)!important;
+}
+.kraken-wow ::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#1b3d5c,#102a42)!important;
+}
