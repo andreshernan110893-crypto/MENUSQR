@@ -49,7 +49,7 @@ $("#tabs").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>navigateAdmin
 $("#tabs").querySelectorAll("[data-nav-tab]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.navTab,{purchaseView:b.dataset.purchaseView,prodView:b.dataset.prodView,catalogView:b.dataset.catalogView}));
 $("#tabs").querySelectorAll("[data-group-toggle]").forEach(b=>b.onclick=()=>{const g=b.closest(".nav-group");g.classList.toggle("open")});
 $("#sidebarCollapse")?.addEventListener("click",()=>document.body.classList.toggle("sidebar-collapsed"));
-$("#mobileMenu")?.addEventListener("click",()=>$("#tabs")?.classList.toggle("mobile-open"));
+$("#mobileMenu")?.addEventListener("click",()=>{if(window.innerWidth<=760){$("#tabs")?.classList.toggle("mobile-open")}else{document.body.classList.toggle("sidebar-collapsed")}});
 function openSearch(){
  const p=$("#searchPalette"),i=$("#globalSearchInput");if(!p)return;p.hidden=false;document.body.classList.add("search-open");setTimeout(()=>i?.focus(),30);renderGlobalSearch("");
 }
@@ -202,21 +202,6 @@ function renderDashboard(){
  const orderActive=active.length;
  toolbar("Dashboard","OPERACIÓN",'<button id="refreshExecutive">Actualizar</button>');
  $("#content").innerHTML=`
- <section class="exact-hero">
-   <div class="exact-hero-shade"></div>
-   <div class="exact-copy">
-     <div class="exact-status"><i></i> Sistema operativo</div>
-     <h2>Todo lo importante,<br><em>en una sola vista.</em></h2>
-     <p>Operación, ventas y control financiero en tiempo real.</p>
-     <div class="exact-actions">
-       <button data-go="sales" class="primary">▣ <span>Ver ventas</span><b>→</b></button>
-       <button data-go="orders">▤ <span>Pedidos activos</span></button>
-       <button data-go="reports">▥ <span>Abrir reportes</span></button>
-     </div>
-   </div>
-   <div class="exact-kraken-title"><strong>KRAKEN</strong><span>CONTROL TOTAL<br>DE TU OPERACIÓN</span></div>
- </section>
-
  <section class="exact-kpis">
    <button data-go="sales" class="exact-kpi cyan">
      <div class="kpi-icon">▣</div><div><span>VENTAS DE HOY</span><b>${L(total)}</b><small>${today.length} operaciones · ticket ${L(avg)}</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
