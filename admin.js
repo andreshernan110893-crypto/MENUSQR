@@ -199,9 +199,14 @@ function renderDashboard(){
  const path=coords.map((p,i)=>(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)).join(" ");
  const area=path+" L "+coords[coords.length-1].x.toFixed(1)+" 220 L "+coords[0].x.toFixed(1)+" 220 Z";
  const recent=valid.slice().sort((a,b)=>new Date(b.sale_recorded_at)-new Date(a.sale_recorded_at)).slice(0,5);
+ const expenseToday=state.expenses.filter(x=>x.expense_date===todayKey);
+ const purchaseToday=state.purchases.filter(x=>x.purchase_date===todayKey);
+ const expenseTodayTotal=expenseToday.reduce((a,x)=>a+Number(x.amount||0),0);
+ const purchaseTodayTotal=purchaseToday.reduce((a,x)=>a+Number(x.total||0),0);
  const orderActive=active.length;
  toolbar("Dashboard","OPERACIÓN",'<button id="refreshExecutive">Actualizar</button>');
  $("#content").innerHTML=`
+ <div class="dashboard-kraken-window" aria-hidden="true"></div>
  <section class="exact-kpis">
    <button data-go="sales" class="exact-kpi cyan">
      <div class="kpi-icon">▣</div><div><span>VENTAS DE HOY</span><b>${L(total)}</b><small>${today.length} operaciones · ticket ${L(avg)}</small></div><i class="mini-bars"><u></u><u></u><u></u><u></u></i>
@@ -238,12 +243,18 @@ function renderDashboard(){
      </div>
    </article>
 
-   <article class="exact-panel exact-activity">
-     <div class="exact-panel-head"><div><span>◷</span><div><b>ACTIVIDAD RECIENTE</b></div></div><button data-go="sales" class="see-all">Ver todo →</button></div>
-     <div class="activity-timeline">
-       ${recent.length?recent.map((o,i)=>`<button data-go="sales"><i class="timeline-dot t${i}"></i><div class="activity-icon">${i===0?"▣":i===1?"◇":i===2?"◉":"◎"}</div><div class="activity-copy"><b>${safe(o.customer_name||o.diners?.display_name||"Nueva venta registrada")}</b><small>${safe(o.station==="BS"?"Beer Station":"La Bandeja")} · ${L(o.total)}</small></div><time>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit"})}</time></button>`).join(""):'<div class="quiet-state">Sin actividad reciente.</div>'}
-     </div>
-   </article>
+   <div class="dashboard-finance-stack">
+     <button data-go="expenses" class="exact-panel finance-mini finance-expenses">
+       <div class="finance-mini-icon">↘</div>
+       <div class="finance-mini-copy"><span>GASTOS DE HOY</span><b>${L(expenseTodayTotal)}</b><small>${expenseToday.length} registros</small></div>
+       <i>→</i>
+     </button>
+     <button data-go="purchases" class="exact-panel finance-mini finance-purchases">
+       <div class="finance-mini-icon">▱</div>
+       <div class="finance-mini-copy"><span>COMPRAS DE HOY</span><b>${L(purchaseTodayTotal)}</b><small>${purchaseToday.length} documentos</small></div>
+       <i>→</i>
+     </button>
+   </div>
  </section>
 
  <section class="exact-shortcuts">
@@ -251,7 +262,14 @@ function renderDashboard(){
    <button data-go="production" class="blue"><span>▥</span><div><b>Producción</b><small>Órdenes y procesos</small></div><i>→</i></button>
    <button data-go="employees" class="purple"><span>◎</span><div><b>Empleados</b><small>Administra tu equipo</small></div><i>→</i></button>
    <button data-go="reports" class="gold"><span>▥</span><div><b>Reportes</b><small>Análisis y estadísticas</small></div><i>→</i></button>
- </section>`;
+ </section>
+
+ <article class="exact-panel exact-activity exact-activity-wide">
+   <div class="exact-panel-head"><div><span>◷</span><div><b>ACTIVIDAD RECIENTE</b><small>Últimos movimientos de ventas</small></div></div><button data-go="sales" class="see-all">Ver todo →</button></div>
+   <div class="activity-timeline activity-timeline-wide">
+     ${recent.length?recent.map((o,i)=>`<button data-go="sales"><i class="timeline-dot t${i}"></i><div class="activity-icon">${i===0?"▣":i===1?"◇":i===2?"◉":"◎"}</div><div class="activity-copy"><b>${safe(o.customer_name||o.diners?.display_name||"Nueva venta registrada")}</b><small>${safe(o.station==="BS"?"Beer Station":"La Bandeja")} · ${L(o.total)}</small></div><time>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit"})}</time></button>`).join(""):'<div class="quiet-state">Sin actividad reciente.</div>'}
+   </div>
+ </article>`;
  $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.go));
  $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
 }
