@@ -260,16 +260,9 @@ function renderDashboard(){
  <section class="exact-shortcuts">
    <button data-go="inventory" class="green"><span>◇</span><div><b>Inventario</b><small>Gestiona tus productos</small></div><i>→</i></button>
    <button data-go="production" class="blue"><span>▥</span><div><b>Producción</b><small>Órdenes y procesos</small></div><i>→</i></button>
-   <button data-go="employees" class="purple"><span>◎</span><div><b>Empleados</b><small>Administra tu equipo</small></div><i>→</i></button>
+   <button data-go="sales" class="purple activity-shortcut"><span>◷</span><div><b>Actividad reciente</b><small>${recent[0]?safe((recent[0].customer_name||recent[0].diners?.display_name||"Última venta")+" · "+L(recent[0].total)):"Sin movimientos recientes"}</small></div><i>→</i></button>
    <button data-go="reports" class="gold"><span>▥</span><div><b>Reportes</b><small>Análisis y estadísticas</small></div><i>→</i></button>
- </section>
-
- <article class="exact-panel exact-activity exact-activity-wide">
-   <div class="exact-panel-head"><div><span>◷</span><div><b>ACTIVIDAD RECIENTE</b><small>Últimos movimientos de ventas</small></div></div><button data-go="sales" class="see-all">Ver todo →</button></div>
-   <div class="activity-timeline activity-timeline-wide">
-     ${recent.length?recent.map((o,i)=>`<button data-go="sales"><i class="timeline-dot t${i}"></i><div class="activity-icon">${i===0?"▣":i===1?"◇":i===2?"◉":"◎"}</div><div class="activity-copy"><b>${safe(o.customer_name||o.diners?.display_name||"Nueva venta registrada")}</b><small>${safe(o.station==="BS"?"Beer Station":"La Bandeja")} · ${L(o.total)}</small></div><time>${new Date(o.sale_recorded_at).toLocaleString("es-HN",{hour:"2-digit",minute:"2-digit"})}</time></button>`).join(""):'<div class="quiet-state">Sin actividad reciente.</div>'}
-   </div>
- </article>`;
+ </section>`;
  $("#content").querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>navigateAdmin(b.dataset.go));
  $("#refreshExecutive").onclick=async()=>{await loadAll();render();toast("Dashboard actualizado")};
 }

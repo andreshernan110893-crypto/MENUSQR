@@ -1576,3 +1576,21 @@ html,body{min-height:100%;background:#02060b!important}
   .dashboard-finance-stack{grid-template-columns:1fr}
   .activity-timeline-wide{grid-template-columns:1fr}
 }
+
+/* Compact recent activity shortcut v10 */
+.exact-shortcuts .activity-shortcut{
+  border-color:rgba(18,153,224,.65)!important;
+  background:linear-gradient(145deg,rgba(3,25,42,.72),rgba(2,10,18,.54))!important;
+}
+.exact-shortcuts .activity-shortcut>span{
+  background:rgba(5,54,84,.72)!important;
+  color:#48c3ff!important;
+  border:1px solid rgba(25,149,219,.42);
+}
+.exact-shortcuts .activity-shortcut small{
+  color:#88a8bc!important;
+}
+.exact-shortcuts .activity-shortcut:hover{
+  box-shadow:0 0 26px rgba(0,150,255,.14)!important;
+  transform:translateY(-2px);
+}
