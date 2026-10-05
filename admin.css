@@ -2055,3 +2055,214 @@ html,body,.kraken-wow{
 .kraken-wow ::-webkit-scrollbar-thumb:hover{
   background:linear-gradient(180deg,#252c33,#151a20)!important;
 }
+
+/* ===== KRAKEN production UX v15 ===== */
+.kr-filterbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:end;
+  margin:0 0 16px;
+  padding:12px;
+  background:rgba(4,5,7,.76);
+  border:1px solid #1d2329;
+  border-radius:14px;
+}
+.kr-filterbar label{
+  display:grid;
+  gap:6px;
+  min-width:150px;
+  color:#77838e;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:.25px;
+}
+.kr-filterbar .kr-search{flex:1;min-width:240px}
+.kr-filterbar input,.kr-filterbar select{
+  width:100%;
+  min-height:38px;
+  padding:0 11px;
+  border-radius:9px;
+  background:#080a0c!important;
+  border:1px solid #252c33!important;
+  color:#e8edf1!important;
+  outline:none;
+}
+.kr-filterbar input:focus,.kr-filterbar select:focus{
+  border-color:#3c4b58!important;
+  box-shadow:0 0 0 2px rgba(55,76,94,.10)!important;
+}
+.kr-empty{
+  padding:30px!important;
+  text-align:center;
+  color:#697580!important;
+}
+.danger-tag{
+  color:#b98a8a!important;
+  border-color:#5a3838!important;
+  background:#150d0d!important;
+}
+.paid-tag{
+  color:#8fb09f!important;
+  border-color:#334c3f!important;
+  background:#0b130f!important;
+}
+.kr-note{
+  margin-top:14px;
+  padding:12px 14px;
+  border:1px solid #20262c;
+  border-radius:10px;
+  background:#07090b;
+  color:#78838d;
+  font-size:.74rem;
+}
+.kr-section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.kr-section-title small{display:block;color:#65727d;font-size:.62rem;letter-spacing:.6px;font-weight:800}
+.kr-section-title h2{margin:3px 0 0;font-size:1rem}
+.kr-section-title>span{
+  display:grid;place-items:center;
+  min-width:32px;height:32px;padding:0 8px;
+  border-radius:9px;
+  background:#0b0f13;border:1px solid #262e35;color:#a8b3bc;
+}
+.crm-table td small{display:block;margin-top:4px;color:#6e7a84}
+.crm-table tbody tr:hover{background:rgba(255,255,255,.018)}
+.crm-table button,.row-actions button{
+  border:1px solid #2a3138;
+  background:#0b0e11;
+  color:#aab5bf;
+}
+.crm-table button:hover,.row-actions button:hover{background:#11161b;border-color:#3a444d;color:#f0f3f5}
+.wow-actions{display:flex!important;gap:8px;align-items:center}
+#globalRefresh{
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid #293139;
+  border-radius:10px;
+  background:#080b0e;
+  color:#a7b2bc;
+  font-weight:700;
+  cursor:pointer;
+}
+#globalRefresh:hover{background:#10151a;border-color:#3a4650;color:#f3f5f7}
+#globalRefresh.loading{opacity:.55;pointer-events:none}
+.config-grid button{
+  display:flex!important;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+}
+.config-grid button>div{display:grid;gap:5px}
+.config-grid button>strong{
+  min-width:38px;height:38px;display:grid;place-items:center;
+  border-radius:10px;background:#0b0f13;border:1px solid #252d34;color:#9eabb6;
+}
+@media(max-width:900px){
+  .kr-filterbar{display:grid;grid-template-columns:1fr 1fr}
+  .kr-filterbar .kr-search{grid-column:1/-1;min-width:0}
+}
+@media(max-width:560px){
+  .kr-filterbar{grid-template-columns:1fr}
+  .kr-filterbar .kr-search{grid-column:auto}
+}
+
+/* KRAKEN mobile production fix v15.1 */
+@media(max-width:760px){
+  html,body,.kraken-wow{min-height:100%!important}
+  .kraken-wow{background-attachment:scroll!important;background-position:58% top!important}
+  .kraken-wow .wow-app{
+    display:block!important;
+    grid-template-columns:none!important;
+    min-height:100vh!important;
+    width:100%!important;
+  }
+  .kraken-wow .wow-sidebar{
+    position:fixed!important;
+    top:0!important;bottom:0!important;left:0!important;
+    width:250px!important;height:100dvh!important;
+    z-index:220!important;
+    transform:translateX(-104%)!important;
+    transition:transform .22s ease!important;
+    overflow:hidden!important;
+  }
+  .kraken-wow .wow-sidebar:has(.wow-nav.mobile-open){
+    transform:translateX(0)!important;
+  }
+  .kraken-wow .wow-workspace{
+    position:relative!important;
+    z-index:1!important;
+    display:block!important;
+    width:100%!important;
+    min-height:100vh!important;
+    margin:0!important;
+  }
+  .kraken-wow .wow-topbar{
+    position:sticky!important;
+    top:0!important;
+    z-index:180!important;
+    min-height:58px!important;
+    width:100%!important;
+    grid-template-columns:38px minmax(0,1fr) auto!important;
+    gap:7px!important;
+    padding:8px 10px!important;
+    margin:0!important;
+  }
+  .kraken-wow .mobile-menu{
+    display:grid!important;
+    place-items:center!important;
+    width:38px!important;height:38px!important;
+    padding:0!important;
+  }
+  .kraken-wow .wow-search{
+    grid-column:auto!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+  }
+  .kraken-wow .wow-search span{
+    overflow:hidden!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+  }
+  .kraken-wow .wow-search kbd{display:none!important}
+  .kraken-wow .wow-user{display:none!important}
+  .kraken-wow #globalRefresh{
+    min-width:38px!important;
+    width:38px!important;
+    height:38px!important;
+    padding:0!important;
+    overflow:hidden!important;
+    font-size:0!important;
+  }
+  .kraken-wow #globalRefresh:before{content:"↻";font-size:1rem}
+  .kraken-wow .wow-actions{grid-column:1/-1!important;justify-content:flex-end!important}
+  .kraken-wow .wow-actions:empty{display:none!important}
+  .kraken-wow .wow-main{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:14px 10px 36px!important;
+  }
+  .kraken-wow .wow-page-head{margin-bottom:10px!important}
+  .kraken-wow .wow-page-head h1{font-size:1.1rem!important}
+  .kraken-wow #content{width:100%!important;min-width:0!important}
+  .dashboard-kraken-window{height:42px!important}
+  .exact-kpis,.exact-shortcuts{grid-template-columns:1fr!important}
+  .exact-main-grid{grid-template-columns:1fr!important}
+  .dashboard-finance-stack{grid-template-columns:1fr!important;grid-template-rows:auto!important}
+  .crm-kpis,.finance-kpis,.prod-summary{grid-template-columns:1fr!important}
+  .crm-panels{grid-template-columns:1fr!important}
+  .crm-table{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  .crm-table table{min-width:720px}
+  .prod-tabs,.catalog-tabs,.purchase-subtabs{overflow-x:auto!important;white-space:nowrap!important;padding-bottom:4px}
+  .prod-tabs button,.catalog-tabs button,.purchase-subtabs button{flex:0 0 auto}
+  .purchase-header-grid,.purchase-line-grid,.purchase-line-grid-v2{grid-template-columns:1fr!important}
+  .config-grid{grid-template-columns:1fr!important}
+}
